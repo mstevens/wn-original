@@ -1,0 +1,47 @@
+.\" source:
+.\"   $Source: /var/cvs/projects/debian/printop/debian/dpkg.src/printop.printop.1.in,v $
+.\"
+.\" revision:
+.\"   @(#) $Id: printop.printop.1.in,v 1.2 1998/04/23 04:31:28 jplejacq Exp $
+.\"
+.\" copyright:
+.\"   Copyright (C) 1998 Jean Pierre LeJacq <jplejacq@quoininc.com>
+.\"
+.\"   Distributed under the GNU GENERAL PUBLIC LICENSE.
+.\"
+.TH wnhtmlify 1 "Sat, 25 Apr 1998 00:34:33 -0400" "1.18.7-1" "Debian GNU/Linux manual"
+.SH NAME
+wnhtmlify \- produce simple HTML document from text for wn HTTP server
+.SH SYNOPSIS
+.B wnhtmlify
+.SH DESCRIPTION
+.B wnhtmlify
+is a
+.BR perl (1)
+program that is part of the
+.BR wn (1)
+HTTP server package.  It reads text from its standard input and prints
+on its standard output a simple HTML document wrapping the input in
+.B <pre>
+and
+.B </pre>
+tags to prevent an HTML browser from formatting the input.  It also
+escapes certain special characters to prevent misinterpretation by an
+HTML browser.
+.SH SEE ALSO
+.BR wn (1),
+.BR wndigest (1),
+.BR wnindexmaker (1),
+.BR wnpnuts (1)
+.br
+.B http://dochost/doc/wn/manual.html
+.br
+.B http://hopf.math.nwu.edu/index.html
+.SH AUTHOR
+.B wn
+is written by John Franks <john@math.nwu.edu>.  Modified by Jean
+Pierre LeJacq <jplejacq@quoininc.com> as part of packaging for the
+Debian GNU/Linux distribution. Manual page also added by Jean Pierre
+LeJacq.
+.SH BUGS
+Not particularly robust or complete.

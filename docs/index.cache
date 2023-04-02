@@ -1,0 +1,44 @@
+dwrapper=swrapper.html&nomatchsub=nomatch.html&subdirs=authentication,examples,images
+
+file=index.html&content=text/html&title=Documentation for the WN server&keywords=WN documentation overview
+file=nomatch.html&content=text/html&title=WN Documentation Search Results -- No Matches&keywords=search results no matches&attributes=192
+file=swrapper.html&content=text/html&title=WN Documentation Search Results -- Matches&keywords=search results matches&attributes=192
+file=howindex.html&content=text/html&title=How the Index to WN User's Guide Works&keywords=WN index
+file=manual.html&content=text/html&title=User's Guide for the WN Server&keywords=WN manual&attributes=128
+file=overview.html&content=text/html&title=An Overview of the WN server&keywords=WN overview
+file=setup.html&content=text/html&title=Installation and Setup of WN&keywords=WN installation
+file=index_desc.html&content=text/html&title=Creating your WN data directory&keywords=WN data hierarchy
+file=security.html&content=text/html&title=Security on the WN Server&keywords=WN security
+file=search.html&content=text/html&title=Setting Up Searches on the WN Server&keywords=WN searching
+file=parse.html&content=text/html&title=Parsed Text and Server Side Includes on the WN server&keywords=WN parsing
+file=filter.html&content=text/html&title=Filters on the WN server&keywords=WN filters
+file=field.html&content=text/html&title=User Defined Fields on the WN server&keywords=WN fields
+file=range.html&content=text/html&title=Ranges on the WN server&keywords=WN ranges
+file=access.html&content=text/html&title=Limiting Access to Your WN Hierarchy&keywords=WN access, wnauth, wn_mkpasswd, wn_md5passwd
+file=tilde.html&content=text/html&title=Users' Hierarchies and Personal Home Pages on the WN server&keywords=WN personal home pages
+file=multi.html&content=text/html&title=Multi-homed or Virtual Servers on the WN server&keywords=WN multi-homed or virtual servers
+file=utility.html&content=text/html&title=WN Utility Programs&keywords=WN utility programs
+file=module.html&content=text/html&title=WN Auxiliary Modules&keywords=WN auxiliary modules
+file=click.html&content=text/html&title=Clickable Images and Imagemap files on the WN Server&keywords=WN image maps
+file=cgi.html&content=text/html&title=Using CGI Programs on the WN Server&keywords=WN image maps
+file=defcache.html&content=text/html&title=Default Index Cache Files&keywords=user home pages
+file=support.html&content=text/html&title=Support for the WN Server and Thanks&keywords=WN support
+file=config.h.dist&title=Configuration File for the WN Package&content=text/plain
+file=cacheformat&title=Format of index.cache file for WN&content=text/plain
+file=appendixA1.html&content=text/html&title=Command Line Options for the WN Server&keywords=WN server options
+file=appendixA2.html&content=text/html&title=Command Line Options for WN Server wndex Utility&keywords=WN wndex utility options
+file=appendixB.html&content=text/html&title=Index File Directives for the WN Server&keywords=WN server options
+file=appendixC.html&content=text/html&title=Parsed Document Syntax for the WN Server&keywords=WN parsing syntax
+file=appendixD.html&content=text/html&title=CGI and other Environment Variables for the WN Server&keywords=CGI, environment variables
+file=appendixE.html&content=text/html&title=Creating User Home Pages for the WN Server&keywords=user home pages
+file=appendixF.html&list=md5.src.asc&content=text/html&title=MD5 Digests of Recent WN Releases&keywords=WN MD5 digests
+file=configmacros.html&content=text/html&title=Configuration Macros for WN&keywords=WN installation, WN configuration
+file=docindex.html&content=text/html&title=Index of the WN User's Guide&keywords=WN index&attributes=64
+file=dosearch.html&content=text/html&title=Searching the User's Guide for the WN Server&keywords=search
+file=complete.html&list=manual.html,overview.html,setup.html,index_desc.html,security.html,search.html,parse.html,field.html,filter.html,range.html,access.html,tilde.html,multi.html,utility.html,module.html,click.html,cgi.html,support.html,defcache.html,appendixA1.html,appendixA2.html,appendixB.html,appendixC.html,appendixD.html,appendixE.html,appendixF.html,configmacros.html,howindex.html,colophone.html,md5.src.asc&content=text/html&title=The Complete User's Guide for the WN server&keywords=WN manual&attributes=192
+file=changelog&title=Changelog for WN&content=text/plain
+file=QUICKSTART&title=Quick start&content=text/plain
+file=Gnu_License&title=GNU Public License&content=text/plain
+file=fdl.txt&title=GNU Free Documentation License&content=text/plain
+file=colophone.html&content=text/html&title=Colophon for the WN User's Guide&keywords=WN colophon
+file=colophone.html&content=text/html&title=Colophon for the WN User's Guide&keywords=WN colophon

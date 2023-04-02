@@ -1,0 +1,87 @@
+.\" source:
+.\"   $Source: /var/cvs/projects/debian/printop/debian/dpkg.src/printop.printop.1.in,v $
+.\"
+.\" revision:
+.\"   @(#) $Id: printop.printop.1.in,v 1.2 1998/04/23 04:31:28 jplejacq Exp $
+.\"
+.\" copyright:
+.\"   Copyright (C) 1998 Jean Pierre LeJacq <jplejacq@quoininc.com>
+.\"
+.\"   Distributed under the GNU GENERAL PUBLIC LICENSE.
+.\"
+.TH wnsectsearch 3 "Sat, 25 Apr 1998 00:34:33 -0400" "1.18.7-1" "Debian GNU/Linux manual"
+.SH NAME
+wnsectsearch \- CGI program for searching files for sections for wn HTTP server
+.SH SYNOPSIS
+.B wnsectsearch
+.I pattern
+.I file
+.RI [\| file \|] \ .\|.\|.
+.SH DESCRIPTION
+.B wnsectsearch
+is a
+.BR perl (1)
+CGI program that is part of the
+.BR wn (1)
+HTTP server package.
+.B wnsectsearch
+searches
+.I file
+and produces a document consisting of those sections of the file
+containing a match for the regular expression in the environment
+variable
+.B QUERY_STRING
+(see
+.BR http://dochost/doc/wn/appendixD.html ).
+A new section is determined to begin when a line matching
+.I pattern
+is found.
+
+The matching text is prefixed by
+.B <dl>
+and postfixed with
+.BR </dl> .
+This can be modified by setting the values of the variables
+.B $prefix
+and
+.B $postfix
+in the
+.BR perl (1)
+program.  They must be quoted.
+
+.B wnsectsearch
+is intended as an Index Search Module of
+.BR wn (1)
+(see
+.BR http://dochost/doc/wn/module.html#isearch ).
+This requires that the
+.B Search-Module
+directive be set in the appropriate
+.I index
+file (see
+.BR http://dochost/doc/wn/appendixB.html ).
+For example:
+.nf
+  Search-Module=/usr/lib/cgi-bin/wn/wnsectsearch pattern file
+.fi
+.SH SEE ALSO
+.BR wn (1),
+.BR wnauth (3),
+.BR wncat (3),
+.BR wnredir (3),
+.BR wnseven_m (3)
+.br
+.B http://dochost/doc/wn/manual.html
+.br
+.B http://dochost/doc/wn/module.html#isearch
+.br
+.B http://dochost/doc/wn/appendixB.html
+.br
+.B http://dochost/doc/wn/appendixD.html
+.B http://hopf.math.nwu.edu/index.html
+.SH AUTHOR
+.B wn
+is written by John Franks <john@math.nwu.edu>.  Modified by Jean
+Pierre LeJacq <jplejacq@quoininc.com> as part of packaging for the
+Debian GNU/Linux distribution. Manual page also added by Jean Pierre
+LeJacq.

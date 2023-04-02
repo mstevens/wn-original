@@ -1,0 +1,138 @@
+<!doctype html public "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+  <head>
+    <title>WN Server Side Includes that Execute a Program</title>
+
+    <link rev="made" href="mailto:john@math.nwu.edu">
+
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <meta http-equiv="last-modified" content="Sun, 19 Dec 1999 14:51:46 GMT">
+    <meta http-equiv="keywords" content="WN clickable image example">
+  </head>
+
+  <body bgcolor="#FFFFFF">
+    <p>
+      <a href="http://hopf.math.nwu.edu/"><img
+        src="../images/powered.jpg"
+        border="0"
+        width="190"
+        height="41"
+        align="right"
+        alt="WN home page"
+      ></a>
+    </p>
+
+    <strong>Version 2.2.4</strong>
+
+    <br>
+
+    <!-- pnuts --> <a href="index.html">[Up]</a> <a href="../index.html">[Top]</a>
+
+    <br clear="right">
+
+    <hr size="4">
+
+    <h2 align="center"><em>WN</em> Server Side Includes that Execute a
+    Program</h2>
+    <hr size="4">
+
+    <blockquote>
+      <p>
+        Is it possible to do a server-side include such as the following:
+      </p>
+
+      <blockquote>
+        <code>
+          &lt;!--&nbsp;#echo&nbsp;var="LAST_MODIFIED"&nbsp;--&gt;
+        </code>
+      </blockquote>
+
+      <p>
+        I've tried it numerous ways and failed every time -- so I figured it
+        was time for a definitive answer.  I can certainly live without them
+        but they would be nice to have.
+      </p>
+    </blockquote>
+
+
+    <h3>1 <a name="howto">How it Works</a></h3>
+
+    <p>
+      This is done with a server side include that executes a program.  To see
+      this example in action try <a
+      href="index.html"><code>index.html</code></a>.
+    </p>
+
+    <p>
+      Here is an example of how to use scripts as server side includes.  This
+      is not a <a href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a> program,
+      but something similar could be done with <a
+      href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a>.  Assuming that the
+      program "<code><a href="#program">counter.cgi</a></code>" is in the same
+      directory as "<code>foo.html</code>" put something like:
+    </p>
+
+    <blockquote>
+      <code>
+        <a href="../appendixB.html#fdir.file">File=</a>foo.html
+        <br>
+        <a href="../appendixB.html#fdir.includes">Includes=</a>!counter.cgi
+      </code>
+    </blockquote>
+
+    <p>
+      in your <a href="../index_desc.html#index"><code>index.wn</code></a> file.
+      Then put:
+    </p>
+
+    <blockquote>
+      <code>
+        <a href="../parse.html#including">&lt!--&nbsp;#include&nbsp;--&gt;</a>
+      </code>
+    </blockquote>
+
+    <p>
+      on a line with no leading whitespace in the file <code>foo.html</code>.
+      The program <code>counter.cgi</code> gives the current count of accesses
+      to this page and also prints the last-modified date.  It should be easy
+      to modify for your needs.
+    </p>
+
+    <p>
+      There are a couple of permissions issues.  The user id under which the
+      server runs (e.g. "<code>nobody</code>") must have permission to execute
+      <code>counter.cgi</code> and to read and write the file
+      <code>/tmp/wncount</code>.
+    </p>
+
+
+    <h3>2 <a name="program">The Program <code>counter.cgi</code></a></h3>
+
+    <p>
+      Here is the <a href="http://www.perl.org">perl</a> program:
+    </p>
+
+    <blockquote>
+      <pre>
+<!-- #include -->
+      </pre>
+    </blockquote>
+
+
+    <hr size="4">
+
+    <address>
+      <em>WN</em> version 2.2.4
+      <br>
+      Copyright &copy; 1998 <a href="mailto:john@math.nwu.edu">John Franks
+      &lt;john@math.nwu.edu&gt;</a>
+      <br>
+      licensed under the <a href="http://www.gnu.org/copyleft/gpl.html">GNU
+      General Public License</a>
+      <br>
+      Last modified: Sat, 11 Sep 1999 13:09:13 GMT
+    </address>
+
+    <!-- pnuts --><a href="index.html">[Up]</a> <a href="../index.html">[Top]</a>
+  </body>
+</html>

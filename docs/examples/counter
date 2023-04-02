@@ -1,0 +1,30 @@
+#!/usr/local/bin/perl
+
+require "stat.pl";
+require "ctime.pl";
+
+# This perl script counts accesses to a file foo.html and prints
+# the last modified date for that file.  Set the variable $file
+# to the complete path of the file whose accesses you want to count.
+# $countfile is a file which will contain the current count.  The complete 
+# filename must be given for it too.  A careful version of this script
+# would do file locking since multiple processes might be trying to
+# update $countfile simultaneously.  Note that the WN user id (usually
+# "nobody") must have write permission for this file.
+
+$countfile = "$ENV{WN_DIR_PATH}/count";
+$file = "$ENV{WN_DIR_PATH}/index.html";
+
+&Stat( $file);
+
+open( COUNT, "<$countfile" ) || die "Can't open file: $! for reading";
+$count = <COUNT>;
+close( COUNT);
+$count++;
+
+print "You are viewer number <b>", $count, "</b> to see this page. <p>\n";
+print "It was last modified <b>", &ctime($st_mtime), "</b> <p>\n";
+
+open( COUNT, ">$countfile" ) || die "Can't open file: $! for writing";
+print COUNT $count, "\n";
+close (COUNT);

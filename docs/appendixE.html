@@ -1,0 +1,371 @@
+<!doctype html public "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+  <head>
+    <title>Creating User Home Pages for the WN Server</title>
+
+    <link rev="made" href="mailto:john@math.northwestern.edu">
+
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <meta http-equiv="last-modified" content="Sat June 18 2005">
+    <meta http-equiv="keywords" content="user home pages">
+  </head>
+
+  <body bgcolor="#FFFFFF">
+    <p>
+      <a href="http://hopf.math.northwestern.edu/"><img
+        src="images/powered.jpg"
+        border="0"
+        width="190"
+        height="41"
+        align="right"
+        alt="WN home page"
+      ></a>
+    </p>
+
+    <strong>Version 2.4.7</strong>
+
+    <br>
+
+    <!-- pnuts --> <a href="appendixD.html">[Previous]</a> <a href="appendixF.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+
+
+
+    <br clear="right">
+
+    <hr size="4">
+    <!-- #start -->
+
+    <h2 align="center">Creating User Home Pages for the <em>WN</em>
+    Server</h2>
+    <hr size="4">
+
+    <p>
+      This document is for the ordinary user, not the system "webmaster".  It
+      is intended as a short description of how to use the <em>WN</em> server
+      to set up your home page (and related documents if you wish).  It is not
+      a primer on writing HTML.  There are many of those -- <a
+      href="#html">some are listed below</a>.  Instead it deals with what to do
+      with a home page document after it is created to put it "on the Web".  We
+      assume that your system administrator has already set up the <em>WN</em>
+      server in such a way that users are permitted to have home pages in their
+      own directories.  If that isn't the case you will have to persuade your
+      local administrator to do so or read the full "<a
+      href="manual.html">User's Guide for the <em>WN</em> Server</a>" to learn
+      how to do it yourself.
+    </p>
+
+
+    <h3>E.1 <a name="starting">Getting Started</a></h3>
+
+    <p>
+      But let's be optimistic and suppose everything is set up and working
+      properly.  If you haven't created a home page here is a bare bones one
+      you can copy to expand on later:
+    </p>
+
+    <blockquote>
+      <code>
+        &lt;!doctype&nbsp;html&nbsp;public&nbsp;"-//W3C//DTD&nbsp;HTML&nbsp;3.2&nbsp;Final//EN"&gt;
+        <br>
+        &lt;head&gt;
+        <br>
+        &nbsp;&nbsp;&lt;title&gt;John Doe's Home Page&lt;/title&gt;
+        <br>
+        &lt;/head&gt;
+        <br>
+        &lt;body&gt;
+        <br>
+        &nbsp;&nbsp;&lt;h1&gt;John Doe's Home Page&lt;/h1&gt;
+        <br>
+        <br>
+        &nbsp;&nbsp;&lt;p&gt;
+        <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;This is the story of my life...
+        <br>
+        &nbsp;&nbsp;&lt;/p&gt;
+        <br>
+        &lt;/body&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      Your home page and any other files you want to serve must be located in
+      a particular subdirectory of your home directory (your home directory is
+      where you are when you first login) on the UNIX system which is running
+      the <em>WN</em> server.  Usually this subdirectory is called
+      <code>public_html</code>, but your system webmaster may have chosen
+      something different.  We'll assume the name is <code>public_html</code>.
+    </p>
+
+    <p>
+      It probably doesn't yet exist in your home directory. If not create it
+      with the command:
+    </p>
+
+    <blockquote>
+      <code>
+        mkdir&nbsp;public_html&lt;Enter&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      The <code>public_html</code> directory also must have the correct
+      "permissions" so that the server can look inside it.  For security
+      reasons the <em>WN</em> server isn't very powerful and it can only
+      access files and directories which are not heavily protected.  Just to
+      make sure the server won't have trouble accessing your home page run the
+      command:
+    </p>
+
+    <blockquote>
+      <code>
+        chmod&nbsp;755&nbsp;public_html&lt;Enter&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      You must place a copy of your home page in this directory and give it
+      the name <code>index.html</code>.  One way to do this is enter the
+      <code>public_html</code> directory and use an editor to create the home
+      page file there with the name <code>index.html</code>.  Alternatively,
+      you could create it elsewhere and copy it to the
+      <code>public_html</code> directory.  If you need to rename it the proper
+      UNIX command is:
+    </p>
+
+    <blockquote>
+      <code>
+        mv&nbsp;oldname&nbsp;newname&lt;Enter&gt;
+      </code>
+    </blockquote>
+
+
+    <p>
+      Of course the server must also be able to read your home page in order
+      to serve it.  If documents you create are automatically protected from
+      viewing by others you will have to change that for your home page.  The
+      command:
+    </p>
+
+    <blockquote>
+      <code>
+        chmod&nbsp;644&nbsp;index.html&lt;Enter&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      gives anyone (including the server) permission to read but not change
+      your home page.
+    </p>
+
+
+
+    <h3>E.2 <a name="security">Granting Access to Your Home Page</a></h3>
+
+    <p>
+      There is one more step before your home page is available to the world.
+      The <em>WN</em> server is very security conscious.  It is much more
+      careful about refusing to serve documents which users did not intend to
+      be served.  This means that in addition to serving only documents in
+      designated directories (such as your "<code>public_html</code>") it will
+      only serve documents which have been explicitly designated for serving
+      in some way.
+    </p>
+
+    <p>
+      Here are two different ways to grant the server permission to serve your
+      home page.  You only need to do one of these.
+    </p>
+
+
+    <h4>E.2.1 <a name="security.lazy">A Lazy Way</a></h4>
+
+    <p>
+      Create a file in the <code>public_html</code> directory named
+      <code>index.wn</code> which contains the line:
+    </p>
+
+    <blockquote>
+      <code>
+        Attribute=serveall
+      </code>
+    </blockquote>
+
+    <p>
+      Then execute the command:
+    </p>
+
+    <blockquote>
+      <code>
+        wndex&lt;Enter&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      which will create the file "<code>index.cache</code>".  It grants the
+      server permission to serve anything in this directory.  If you put
+      documents to be served in subdirectories of <code>public_html</code>,
+      copy the file <code>index.wn</code> to them also and rerun
+      <code>wndex</code> in these subdirectories to grant permission to serve
+      anything from them (actually the file "<code>index.wn</code>" itself is
+      excluded from being served as are files beginning with the
+      '<code>.</code>' character).
+    </p>
+
+
+    <h4>E.2.2 <a name="security.better">A Better Way</a></h4>
+
+    <p>
+      Create a file in the <code>public_html</code> directory named
+      <code>index.wn</code> which contains the line:
+    </p>
+
+    <blockquote>
+      <code>
+        File=index.html
+      </code>
+    </blockquote>
+
+    <p>
+      If you have other files you want to serve add additional lines like
+      "<code>File=foo.html</code>" where <code>foo.html</code> is the name of
+      the file you want to serve. Then execute the command:
+    </p>
+
+    <blockquote>
+      <code>
+        wndex&lt;Enter&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      Files which are HTML files should have names which end with the suffix
+      "<code>.html</code>".  Files which are ASCII text files should end with
+      "<code>.txt</code>" and PNG image files should end with
+      "<code>.png</code>".  Executing the "<code>wndex</code>" (pronounced
+      "windex") command will create the file "<code>index.cache</code>" as
+      before, but now the server will only have permission to serve those
+      files whose names are listed explicitly in your <code>index.wn</code> file.
+    </p>
+
+    <p>
+      If you put documents to be served in subdirectories of
+      <code>public_html</code>, you must create an <code>index.wn</code> file in
+      each of them also which lists the files which can be served.
+    </p>
+
+    <p>
+      The "better way", in addition to providing better security, also enables
+      many of the advanced features of the <em>WN</em> server, such as
+      searching capabilities.  In the long run if you serve multiple documents
+      you will probably want to use it.  The trade off is that the "lazy" way
+      is easier since it only needs to be done once, while the "better" way
+      requires that you edit the <code>index.wn</code> file and rerun
+      <code>wndex</code> each time you add a new file to
+      <code>public_html</code> to be served.
+    </p>
+
+
+    <h3>E.3 <a name="url">What's Your URL?</a></h3>
+
+    <p>
+      So once your home page is functional, how do you access it?  Well, your
+      home page address (called a URL which stands for "Uniform Resource
+      Locator") is made up from the name of your host and your user name.  For
+      example, if your user name is <code>jdoe</code> and the computer on
+      which the server is running is named <code>www.school.edu</code> then
+      the URL for your home page is probably:
+    </p>
+
+    <blockquote>
+      <code>
+        http://www.school.edu/~jdoe/
+      </code>
+    </blockquote>
+
+    <p>
+      The "probably" refers to the fact that there are many possible variations
+      which may have been chosen by your webmaster.  For example, some people
+      don't like the '<code>~</code>' character in URL's so they might use
+      "<code>http://www.school.edu/homepages/jdoe/</code>".  In any case there
+      are a couple of things to notice about your URL.
+    </p>
+
+    <p>
+      First it has a synonym:
+    </p>
+
+    <blockquote>
+      <code>
+        http://www.school.edu/~jdoe/index.html
+      </code>
+    </blockquote>
+
+    <p>
+      This is because whenever a URL ends in '<code>/</code>' the server knows
+      it is referring to a directory (in this case your
+      <code>public_html</code> directory) and looks for the default file
+      "<code>index.html</code>" in that directory.  Thus if you want to put
+      some files in subdirectories of <code>public_html</code> that is fine.
+      But keep in mind that if you create the directory "<code>mydir</code>" in
+      <code>public_html</code> then
+      "<code>http://www.school.edu/~jdoe/mydir/</code>" will really refer to
+      "<code>http://www.school.edu/~jdoe/mydir/index.html</code>" and to refer
+      to a file "<code>foo.png</code>" in <code>mydir</code> you should use
+      "<code>http://www.school.edu/~jdoe/mydir/foo.png</code>".  You should not
+      use the URL "<code>http://www.school.edu/~jdoe/mydir</code>" referring to
+      a directory but with no '<code>/</code>' at the end.
+    </p>
+
+
+    <h3>E.4 <a name="advanced">Advanced Features</a></h3>
+
+    <p>
+      There are many advanced features you can use with the <em>WN</em> server.
+      To learn to use them you will need to read parts of the <a
+      href="manual.html">manual</a> designed for system administrators.  A good
+      place to start is the chapter "<a href="overview.html">An Overview of the
+      <em>WN</em> Server</a>" in this guide.  It will give you a good idea of
+      some of the things the server can do.  Then you will likely also want to
+      consult the chapter "<a href="index_desc.html">Creating Your <em>WN</em>
+      Data Directory</a>" in this guide.  Neither of these chapters is too
+      long.
+    </p>
+
+
+    <h3>E.5 <a name="html">HTML References</a></h3>
+
+    <p>
+      To find out more about composing HTML documents consult "<a
+      href="http://www.ncsa.uiuc.edu/General/Internet/WWW/HTMLPrimer.html">A
+      Beginner's Guide to HTML</a>" (at
+      http://www.ncsa.uiuc.edu/General/Internet/WWW/HTMLPrimer.html) or see "<a
+      href="http://home.netscape.com/home/how-to-create-web-services.html">Creating
+      Web Sites</a>" (at
+      http://home.netscape.com/browsers/createsites/index.html).  "<a
+      href="http://www.htmlhelp.com">http://www.htmlhelp.com</a>" is an
+      excellent site on the various web authoring standards.
+    </p>
+
+
+
+    <!-- #end -->
+    <hr size="4">
+
+    <address>
+      <em>WN</em> version 2.4.7
+      <br>
+      Copyright &copy; 1998-2005 <a href="mailto:john@math.northwestern.edu">John Franks
+      &lt;john@math.northwestern.edu&gt;</a>
+      <br>
+      licensed under the <a
+        href="http://www.gnu.org/copyleft/fdl.txt">GNU Free Documentation License</a>
+      <br>
+Last modified: Sat June  18 2005
+    </address>
+
+    <!-- pnuts --> <a href="appendixD.html">[Previous]</a> <a href="appendixF.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+  </body>
+</html>
+
+

@@ -1,0 +1,537 @@
+<!doctype html public "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+  <head>
+    <title>User's Guide for the WN Server</title>
+
+    <link rev="made" href="mailto:john@math.northwestern.edu">
+
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <meta http-equiv="last-modified" content="Sat June 18 2005">
+    <meta http-equiv="keywords" content="WN manual">
+  </head>
+
+  <body bgcolor="#FFFFFF">
+    <p>
+      <a href="http://hopf.math.northwestern.edu/"><img
+        src="images/powered.jpg"
+        border="0"
+        width="190"
+        height="41"
+        align="right"
+        alt="WN home page"
+      ></a>
+    </p>
+
+    <strong>Version 2.4.7</strong>
+
+    <br>
+
+    <!-- pnuts --> <a href="overview.html">[Next]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+
+    <br clear="right">
+
+    <hr size="4">
+    <!-- #start -->
+
+    <h2 align="center">User's Guide for the <em>WN</em> server</h2>
+    <hr size="4">
+
+
+    <center>
+      <h3>Table of Contents</h3>
+    </center>
+
+
+    <h4>Chapter 1: <a href="overview.html">An Overview of the <em>WN</em>
+    Server</a></h4>
+
+    <ol>
+      <li><a href="overview.html#how">How <em>WN</em> Works</a></li>
+
+      <li><a href="overview.html#features">Features of <em>WN</em></a>
+        <ol>
+          <li><a href="overview.html#features.searching">Searching</a></li>
+
+          <li><a href="overview.html#features.parsed">Parsed Text, Server-Side
+          Includes and Wrappers</a></li>
+
+          <li><a href="overview.html#features.filters">Filters</a></li>
+
+          <li><a href="overview.html#features.ranges">Ranges</a></li>
+        </ol>
+      </li>
+    </ol>
+
+
+    <h4>Chapter 2: <a href="setup.html">Installation and Setup of
+    <em>WN</em></a></h4>
+
+    <ol>
+      <li><a href="setup.html#installing">Installing the Software</a>
+        <ol>
+          <li><a href="setup.html#installing.configure">Configuring
+          <em>WN</em></a></li>
+
+          <li><a href="setup.html#installing.build">Building
+          <em>WN</em></a></li>
+        </ol>
+      </li>
+
+      <li><a href="setup.html#stand-alone">Running the Server as a Stand-alone
+      Daemon</a></li>
+
+      <li><a href="setup.html#inetd">Running the Server Under
+      <code>inetd(8)</code></a></li>
+
+      <li><a href="setup.html#hostname">Your Hostname: What's in a
+      Name?</a></li>
+
+      <li><a href="setup.html#testing">Testing Your Setup</a></li>
+
+      <li><a href="setup.html#shutdown">Shutting Down Your Server</a></li>
+
+      <li><a href="setup.html#logging">Managing Log Files</a></li>
+
+      <li><a href="setup.html#trouble">Trouble Shooting</a></li>
+    </ol>
+
+
+    <h4>Chapter 3: <a href="index_desc.html">Creating Your <em>WN</em> Data
+    Directory</a></h4>
+
+    <ol>
+      <li><a href="index_desc.html#index">The <code>index.wn</code> file</a></li>
+
+      <li><a href="index_desc.html#file_owner">File Ownership and
+      Permissions</a></li>
+
+      <li><a href="index_desc.html#wndex">Using the <code>wndex</code>
+      Utility</a></li>
+
+      <li><a href="index_desc.html#dir_record">The Directory Record</a></li>
+
+      <li><a href="index_desc.html#file_records">File Records</a></li>
+
+      <li><a href="index_desc.html#default">Your Default Page</a></li>
+
+      <li><a href="index_desc.html#serveall">Serving Files not Listed in an
+      <code>index.wn</code> File</a></li>
+
+      <li><a href="index_desc.html#msgs_error">Customized Error
+      Messages</a></li>
+    </ol>
+
+
+    <h4>Chapter 4: <a href="security.html">Security on the <em>WN</em>
+    Server</a></h4>
+
+    <ol>
+      <li><a href="security.html#threats_external">External Threats</a>
+        <ol>
+          <li><a href="security.html#threats_external.protect_index">Protecting
+          Your <code>index.cache</code> Files</a></li>
+
+          <li><a href="security.html#threats_external.cgi">CGI Programs</a></li>
+        </ol>
+      </li>
+
+      <li><a href="security.html#threats_internal">Internal Threats</a></li>
+
+      <li><a href="security.html#authenticate">Password Authentication and
+      Restriction by IP Address</a></li>
+
+      <li><a href="security.html#recommend">Some Recommended Security
+      Configurations</a>
+        <ol>
+          <li><a href="security.html#recommend.no_cgi">Forbid CGI and Only
+          Maintainer Trusted</a></li>
+
+          <li><a href="security.html#recommend.only_maintainer">Only Maintainer
+          or Maintainer Group Trusted</a></li>
+
+          <li><a href="security.html#recommend.only_restricted">Restricted User
+          Serving Privileges</a></li>
+        </ol>
+      </li>
+
+      <li><a href="security.html#other">Other <em>WN</em> Security
+      Measures</a></li>
+    </ol>
+
+
+    <h4>Chapter 5: <a href="search.html">Setting Up Searches on the <em>WN</em>
+    Server</a></h4>
+
+    <ol>
+      <li><a href="search.html#title">Title Searches</a></li>
+
+      <li><a href="search.html#keyword">Keyword Searches</a></li>
+
+      <li><a href="search.html#title_keyword">Title/Keyword Searches</a></li>
+
+      <li><a href="search.html#fielded">Fielded Searches for User Supplied
+      Fields</a></li>
+
+      <li><a href="search.html#context">Context Searches</a></li>
+
+      <li><a href="search.html#grep">Grep Searches</a></li>
+
+      <li><a href="search.html#line">Line Searches</a></li>
+
+      <li><a href="search.html#fgrep">File Context and Grep Searches</a></li>
+
+      <li><a href="search.html#types">Search a Directory or Search a
+      Hierarchy?</a></li>
+
+      <li><a href="search.html#list">List Searches</a></li>
+
+      <li><a href="search.html#index">Index Searches</a></li>
+
+      <li><a href="search.html#mode">Search Modes</a></li>
+
+      <li><a href="search.html#searchwrapper">Searchwrappers</a></li>
+    </ol>
+
+
+    <h4>Chapter 6: <a href="parse.html">Parsed Text and Server Side Includes on
+    the <em>WN</em> Server</a></h4>
+
+    <ol>
+      <li><a href="parse.html#wrappers">Wrappers, Includes, and
+      List-Includes</a></li>
+
+      <li><a href="parse.html#including">Simple Including</a></li>
+
+      <li><a href="parse.html#if">Conditional Text: If, Else, and
+      Endif</a></li>
+
+      <li><a href="parse.html#conditional">Conditional Text and Access Control
+      Files</a></li>
+
+      <li><a href="parse.html#logic">Logical Operations in If
+      Conditions</a></li>
+
+      <li><a href="parse.html#section">More on Including: the
+      <code>section</code> Marker</a></li>
+
+      <li><a href="parse.html#wrapping">Wrapping Files</a></li>
+
+      <li><a href="parse.html#searchwrapper">Search Wrappers</a></li>
+
+      <li><a href="parse.html#nested">Nested Including and Wrapping</a></li>
+
+      <li><a href="parse.html#title">Including Title, Query, Fields and
+      Environment Variables</a></li>
+    </ol>
+
+
+    <h4>Chapter 7: <a href="field.html">User Defined Fields on the <em>WN</em>
+    Server</a></h4>
+
+
+    <h4>Chapter 8: <a href="filter.html">Filters on the <em>WN</em>
+    Server</a></h4>
+
+    <ol>
+      <li><a href="filter.html#process">Processing a File as it is
+      Served</a></li>
+
+      <li><a href="filter.html#cgi">Filters as a Substitute for CGI
+      Programs</a></li>
+    </ol>
+
+
+    <h4>Chapter 9: <a href="range.html">Ranges on the <em>WN</em>
+    Server</a></h4>
+
+    <ol>
+      <li><a href="range.html#parameters">URL Range Parameters</a></li>
+
+      <li><a href="range.html#header">The "<code>Range:</code>" Header</a></li>
+
+      <li><a href="range.html#wn_mkdigest">The <code>wn_mkdigest</code>
+      Utility</a></li>
+    </ol>
+
+
+    <h4>Chapter 10: <a href="access.html">Limiting Access to Your <em>WN</em>
+    Hierarchy</a></h4>
+
+    <ol>
+      <li><a href="access.html#ip">Access Control Files: Limiting Access by
+      Hostname or IP Address</a>
+        <ol>
+          <li><a href="access.html#ip.privilege">Privileged Sites</a></li>
+
+          <li><a href="access.html#ip.access_error">Customized Error
+          Messages</a></li>
+        </ol>
+      </li>
+
+      <li><a href="access.html#authenticate">Limiting Access by Password
+      Authentication</a></li>
+    </ol>
+
+
+    <h4>Chapter 11: <a href="tilde.html">Users' Hierarchies and Personal Home
+    Pages on the <em>WN</em> Server</a></h4>
+
+    <ol>
+      <li><a href="tilde.html#home_directory">Hierarchies in User Home
+      Directories</a></li>
+
+      <li><a href="tilde.html#home_directory_alternate">Alternate Hierarchies
+      From a Table Lookup</a></li>
+    </ol>
+
+
+    <h4>Chapter 12: <a href="multi.html">Multi-homed or Virtual Servers on the
+    <em>WN</em> Server</a></h4>
+
+    <ol>
+      <li><a href="multi.html#one_server_one_host">One Server per Virtual
+      Host</a></li>
+
+      <li><a href="multi.html#one_server_many_hosts">A Single Server with
+      Multiple Virtual Hosts</a>
+        <ol>
+          <li><a href="multi.html#one_server_many_hosts.file">Using a Virtual
+          Hosts List File</a></li>
+
+          <li><a href="multi.html#one_server_many_hosts.compiled">Compiling in
+          the List of Virtual Hosts</a></li>
+        </ol>
+      </li>
+    </ol>
+
+
+    <h4>Chapter 13: <a href="utility.html"><em>WN</em> Utility
+    Programs</a></h4>
+
+    <ol>
+      <li><a href="utility.html#wn_mkdigest"><code>wn_mkdigest</code></a></li>
+
+      <li><a href="utility.html#wnpnuts"><code>wnpnuts</code></a></li>
+
+      <li><a href="utility.html#wnindexmaker"><code>wnindexmaker</code></a></li>
+
+      <li><a href="utility.html#wn_uncache"><code>wn_uncache</code></a></li>
+
+      <li><a href="utility.html#wnv2c"><code>wnv2c</code></a></li>
+
+      <li><a href="utility.html#wnredir"><code>wnredir</code></a></li>
+    </ol>
+
+
+    <h4>Chapter 14: <a href="module.html"><em>WN</em> Auxiliary Modules</a></h4>
+
+    <ol>
+      <li><a href="module.html#db">Database Modules</a></li>
+
+      <li><a href="module.html#file">File Modules</a></li>
+
+      <li><a href="module.html#authorization">Authorization Modules</a></li>
+
+      <li><a href="module.html#isearch">Index Search Modules</a></li>
+    </ol>
+
+
+    <h4>Chapter 15: <a href="click.html">Clickable Images and Imagemap Files on
+    the <em>WN</em> Server</a></h4>
+
+    <ol>
+      <li><a href="click.html#howto">The Steps in Setting up a Clickable
+          Image</a>
+        <ol>
+          <li><a href="click.html#howto.create_image">Create an Image</a></li>
+
+          <li><a href="click.html#howto.create_map">Create a Map File</a></li>
+
+          <li><a href="click.html#howto.install">Install the Image and Map File
+          on Your Server</a></li>
+
+          <li><a href="click.html#howto.link">Put a Link to Your Image Map in
+          Your HTML Document</a></li>
+        </ol>
+      </li>
+
+      <li><a href="click.html#map_format">The Format of an Image Map File</a>
+        <ol>
+          <li><a href="click.html#map_format.default"><code>default</code>q
+          keyword</a></li>
+
+          <li><a href="click.html#map_format.rect"><code>rect</code>
+          keyword</a></li>
+
+          <li><a href="click.html#map_format.circle"><code>circle</code>
+          keyword</a></li>
+
+          <li><a href="click.html#map_format.poly"><code>poly</code>
+          keyword</a></li>
+
+          <li><a href="click.html#map_format.point"><code>point</code>
+          keyword</a></li>
+
+          <li><a href="click.html#map_format.point"><code>nocoords</code>
+          keyword</a></li>
+        </ol>
+      </li>
+
+      <li><a href="click.html#url">The URL Format in an Imagemap File</a></li>
+    </ol>
+
+
+    <h4>Chapter 16: <a href="cgi.html">Using CGI Programs on the <em>WN</em>
+    Server</a></h4>
+
+    <ol>
+      <li><a href="cgi.html#need">Do You Need a CGI Program?</a></li>
+
+      <li><a href="cgi.html#recognize">How Does the Server Recognize a CGI
+      Program?</a></li>
+
+      <li><a href="cgi.html#design">How Does a CGI Program Work?</a></li>
+
+      <li><a href="cgi.html#handlers">CGI Handlers</a></li>
+
+      <li><a href="cgi.html#safe">How Can CGI Programs be Made Safe?</a></li>
+    </ol>
+
+
+    <h4>Chapter 17: <a href="support.html">Support for the <em>WN</em> Server
+    and Thanks</a></h4>
+
+    <ol>
+      <li><a href="support.html#support">Support</a></li>
+
+      <li><a href="support.html#thanks">Thanks</a></li>
+    </ol>
+
+
+    <h4>Appendix A.1: <a href="appendixA1.html">Command Line Options for the
+    <em>WN</em> Server</a></h4>
+
+
+    <h4>Appendix A.2: <a href="appendixA2.html">Command Line Options for
+    <em>WN</em> Server <code>wndex</code> Utility</a></h4>
+
+
+    <h4>Appendix B: <a href="appendixB.html">Index File Directives for the
+    <em>WN</em> Server</a></h4>
+
+    <ol>
+      <li><a href="appendixB.html#ddir">Directory Directives</a></li>
+      <li><a href="appendixB.html#fdir">File Directives</a></li>
+    </ol>
+
+
+    <h4>Appendix C: <a href="appendixC.html">Parsed Document Syntax for the
+    <em>WN</em> Server</a></h4>
+
+    <ol>
+      <li><a href="appendixC.html#match">Matching Regular Expressions:
+      <code>#if</code> and <code>#elif</code></a>
+        <ol>
+          <li><a href="appendixC.html#match.conditions"><code>#if</code> and
+          <code>#elif</code> Conditions</a></li>
+
+          <li><a href="appendixC.html#match.control">Access Control
+          Files</a></li>
+        </ol>
+      </li>
+
+      <li><a href="appendixC.html#insert">Inserting the Contents of a
+      File</a></li>
+
+      <li><a href="appendixC.html#redirect">Conditional Redirecting</a></li>
+    </ol>
+
+
+    <h4>Appendix D: <a href="appendixD.html">CGI and Other Environment
+    Variables for the <em>WN</em> Server</a></h4>
+
+    <ol>
+      <li><a href="appendixD.html#cgi">Standard CGI Variables</a></li>
+
+      <li><a href="appendixD.html#wn_cgi"><em>WN</em> Specific CGI
+      Variables</a></li>
+
+      <li><a href="appendixD.html#wn_key"><em>WN</em> Specific Database
+      Variables</a></li>
+    </ol>
+
+
+    <h4>Appendix E: <a href="appendixE.html">Creating User Home Pages for the
+    <em>WN</em> Server</a></h4>
+
+    <ol>
+      <li><a href="appendixE.html#starting">Getting Started</a></li>
+
+      <li><a href="appendixE.html#security">Granting Access to Your Home
+      Page</a>
+        <ol>
+          <li><a href="appendixE.html#security.lazy">A Lazy Way</a></li>
+
+          <li><a href="appendixE.html#security.better">A Better Way</a></li>
+        </ol>
+      </li>
+
+      <li><a href="appendixE.html#url">What's Your URL</a></li>
+
+      <li><a href="appendixE.html#advanced">Advanced Features</a></li>
+
+      <li><a href="appendixE.html#html">HTML References</a></li>
+    </ol>
+
+
+    <h4>Appendix F: <a href="appendixF.html">MD5 Digests of Recent <em>WN</em>
+    releases</a></h4>
+
+
+    <h4>Appendix G: <a href="configmacros.html">Configuration Macros for
+    <em>WN</em></a></h4>
+
+    <h4>Appendix H: <a href="appendixH.html">Default Index Cache Files</a></h4>
+
+    <h4>Appendix I: <a href="howindex.html">How the Index to <em>WN</em>
+    User's Guide Server Works</a></h4>
+
+    <h4>Appendix J: <a href="colophone.html">Colophon for the <em>WN</em>
+    User's Guide</a></h4>
+
+
+    <h4><a href="docindex.html">Index of the <em>WN</em> User's Guide</a></h4>
+
+
+    <!-- #end -->
+    <hr size="4">
+
+    <h4>The <a href="complete.html">Complete User's Guide</a>
+    for the <em>WN</em> server</h4>
+
+    <p>
+      A single document suitable for printing
+    </p>
+
+    <hr>
+
+    <h4><a href="../index.html">Return to the <em>WN</em> Home
+    Page</a></h4>
+
+    <hr size="4">
+
+    <address>
+      <em>WN</em> version 2.4.7
+      <br>
+      Copyright &copy; 1998-2005 <a href="mailto:john@math.northwestern.edu">John Franks
+      &lt;john@math.northwestern.edu&gt;</a>
+      <br>
+      licensed under the <a
+        href="http://www.gnu.org/copyleft/fdl.txt">GNU Free Documentation License</a>
+      <br>
+Last modified: Sat June  18 2005
+    </address>
+
+    <!-- pnuts --> <a href="overview.html">[Next]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+  </body>
+</html>

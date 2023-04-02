@@ -1,0 +1,112 @@
+Version 0.03
+
+This package contains a modified suexec handler.
+
+In which cases can this handler be used.
+1. In cases with several virtual hosts, but they have to have the same 
+   main document root (e.g. /home, or /websites)
+2. In combination with WN.
+
+The advantages are:
+1. cgi-scripts can have execution rights of 700 (not readable by other users).
+   the index.cache file and the directory must have read and execute rights
+2. php3/php4 and other scripts which uses cgi-hander or a filter can also have
+   accessrights 600.
+3. A user can do: 'kill -9 -1' in his script, but this doesn't kill the webserver.
+
+The disadvantages are:
+1. scripts are executed under the users uid and gid; when a script has a 
+   failure, the attacker can execute scripts and access data of this user.
+   Consider this in the implementation and use e.g. different users for
+   the website and development and staff and don't allow these groups to have 
+   personal homepages.
+
+The modifications are made against the original suexec handler from apache,
+but can be compiled stand alone.
+
+All options can be manually defined in the file suexec.h
+
+HTTPD_USER	must be the username which the webserver uses. It's really
+		important to choose a separate name and not 'nobody', 
+		e.g. 'www'. When using a name, which is also used for other 
+		processes, you probably create a security risk.
+UID_MIN		minimum user id for execution, e.g. 100
+GID_MIN		minimum group id for execution
+GID_MAX		maximum gid; e.g. 65533 (65534 on some OSes is nobody,
+		65536 is root)
+USERDIR_SUFFIX	this should be 'www' or 'webroot'.
+LOG_EXEC	the logfile
+DOC_ROOT	this should be the root dir of your website, e.g. /home
+		in the example config this is /export, because of automounter
+		problems at my site
+SAFE_PATH	
+
+EXEMPT_USER	safebin, a user, different from the user under which the 
+		webserver runs
+EXEMPT_GROUP	safebin, a group, different from the group under which the 
+		webserver runs 
+EXEMPT_PATH	The path in which shared code, e.g. php or gzip can be 
+		placed to execute unter the users uid.
+These last three variables are for the modified code.
+
+Just run the makefile; copy the suexec handler to the desired location, 
+modify the config.h of the WN (at least WN-2.3.9a) and test it.
+suexec must be suid root
+
+For verifying the working of the suexec module for it's correct behaviour,
+the following steps are needed.
+1. su to the uid of the webserver
+2. cd to the usersdir in which the cgi-script should be executed
+3. /path/to/suexec <username> <groupname> <script.cgi>
+
+The logfile should contain the scriptname, the user and groupname and 
+the time of execution
+
+I will support the suexec code in the future; questions can be asked at:
+sander@doofpot.nl; In June, July and August 2000 is the response time 
+probably very long.
+
+Sander Schippers
+
+Note from John Franks:
+-------------------------------------------
+To use this with WN you must edit config.h and 
+find the section
+   #define WN_SU_EXEC 	(FALSE)
+   /*
+    * Change this to TRUE and edit the lines below to use suexec.
+    * You will also need to edit Makefile or Makefile.dist and
+    * set SUEXEC=suexec.  Also you must edit suexec/suexec.h
+    * See suexec/INSTALL for more information.  
+    */
+
+
+   #if WN_SU_EXEC
+   #define SUEXEC_HANDLER	"/path/to/suexec"
+   #define SUEXEC_KEY_FILE "/path/to/suexec.key"
+   #define RANDOM_DATA_FILE "/dev/urandom"
+   #define SUEXEC_KEYLEN	(40)
+
+You need to change the FALSE to TRUE and edit the "/path..."
+lines approriately.  If you do not have /dev/urandom or something
+similar put a file here with random data.  The suexec.key is
+a file which will contain a secret key used by suexec.  It should
+be readable and writable ONLY by root.
+
+In the top level Makefile you must set SUEXEC=suexec. 
+
+You will need to edit the file suexec/suexec.h also.
+
+I have modified suexec to make it more secure and to add features.
+I consider it "feature complete" as of WN 2.3.10.  This version
+of WN and the accompanying suexec require each other, i.e.
+this suexec won't work with older wn or vice versa.
+
+This suexec supports userdirs and supports filters.  Note that
+anything executed (e.g. cgi's includes, filters) must actually
+be located in the directory where the URL points or the exempt
+directory.  I.e. if text.html has myfilter as filter then
+myfilter must be in the directory with text.html or the 
+exempt directory.
+
+John Franks

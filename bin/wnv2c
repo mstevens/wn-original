@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+
+# Usage: wnv2c [-v] [-i nickname] < verboselog >commonlog
+
+# This script by default reads from standard input a WN logfile
+# produced in the verbose format and writes a non-verbose one in
+# the "common log format."   With the "-i nickname" option it writes only those
+# entries with given nickname.  I.e.  if you have listed three 
+# IP addresses and corresponding data roots then "v2c -i nick2 <logfile"
+# will produce the log entries for the second of the three if that virtual
+# host was assigned nickname "nick2".  Adding the "-v" option will give
+# the verbose form of log entries for that virtual host.
+
+	require "getopts.pl";
+
+	&Getopts('vi:');
+
+
+	$nickname = $opt_i if $opt_i ne "";
+
+	if ( !$opt_i) {
+		while ( $line = <STDIN>) {
+			$line =~ s/\s*<.*$//;
+			print $line;
+		}
+	}
+	else {
+		while ( $line = <STDIN>) {
+			chop $line;
+			next unless $line =~ /<$nickname>/;
+			if ( $opt_v) {
+				$line =~ s/<[0-9]*>$//;
+			}
+			else {
+				$line =~ s/\s*<.*$//;
+			}
+			print $line, "\n";
+		}
+	}

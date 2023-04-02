@@ -1,0 +1,117 @@
+###############################################################################
+# WN mime.types version 2.0.2
+#
+# The entries are based (in part) on the Debian mime.types file
+#
+# The format of lines in this file is:
+#
+#    Mime_type<SPACE>file_suffix[<SPACE>file_suffix...]
+#
+# where <SPACE> is any positive number of contiguous white space characters
+# Lines starting with '#' are comments.  Blank lines are fine.
+###############################################################################
+
+text/css			css
+text/html			html htm
+text/plain			txt
+audio/basic			au snd
+audio/midi			mid midi
+audio/mpeg			mp3
+audio/x-aiff			aif aiff aifc
+audio/x-pn-realaudio		ra rm ram
+audio/x-wav			wav
+video/quicktime			qt mov
+video/mpeg			mpeg mpg mpe
+application/cu-seeme		csm cu
+application/dsptype		tsp
+application/excel		xls
+application/maple-v-r4		mws
+application/mac-binhex40	hqx
+application/msword		doc dot
+application/octet-stream	bin
+application/oda			oda
+application/pdf			pdf
+application/pgp-signature	pgp
+application/postscript		ps ai eps
+application/powerpoint		ppt
+application/rtf			rtf
+application/wordperfect5.1	wp5
+application/x-123		wk
+application/x-Wingz		wz
+application/x-bcpio		bcpio
+application/x-cpio		cpio
+application/x-csh		csh
+application/x-debian-package	deb
+application/x-dvi		dvi
+application/x-font		pfa pfb gsf pcf
+application/x-gtar		gtar tgz
+application/x-hdf		hdf
+application/x-httpd-php		phtml pht php
+application/x-httpd-php3	php3
+application/x-httpd-php3-source	phps
+application/x-httpd-php3-preprocessed	php3p
+application/x-java		class
+application/x-java-jnlp-file    jnlp
+application/x-latex		latex
+application/x-maker		frm maker frame fm fb book fbdoc
+application/x-mif		mif
+application/x-msdos-program	com exe bat
+application/x-netcdf		nc cdf
+application/x-object		o
+application/x-perl		pl pm
+application/x-sh		sh
+application/x-shar		shar
+application/x-sv4cpio		sv4cpio
+application/x-sv4crc		sv4crc
+application/x-tar		tar
+application/x-tcl		tcl
+application/x-tex		tex
+application/x-tex-gf		gf
+application/x-tex-pk		pk
+application/x-texinfo		texinfo texi
+application/x-trash		bak old sik
+application/x-troff		t tr roff
+application/x-troff-man		man
+application/x-troff-me		me
+application/x-troff-ms		ms
+application/x-ustar		ustar
+application/x-wais-source	src
+application/zip			zip
+image/gif			gif
+image/ief			ief
+image/jpeg			jpeg jpg jpe
+image/png			png
+image/tiff			tiff tif
+image/x-cmu-raster		ras
+image/x-ms-bmp			bmp
+image/x-portable-anymap		pnm
+image/x-portable-bitmap		pbm
+image/x-portable-graymap	pgm
+image/x-portable-pixmap		ppm
+image/x-rgb			rgb
+image/x-xbitmap			xbm
+image/x-xpixmap			xpm
+image/x-xwindowdump		xwd
+text/comma-separated-values	csv
+text/calendar			ics
+text/css			css
+text/richtext			rtx
+text/tab-separated-values	tsv
+text/x-c++hdr			hpp hxx hh
+text/x-c++src			cpp cxx cc
+text/x-chdr			h
+text/x-csrc			c
+text/x-java			java
+text/x-moc			moc
+text/x-pascal			p pas
+text/x-setext			etx
+text/x-tcl			tcl tk
+text/x-tex			tex ltx sty cls
+text/x-vCalendar		vcs
+text/x-vCard			vcf
+video/dl			dl
+video/fli			fli
+video/gl			gl
+video/x-msvideo			avi
+video/x-sgi-movie		movie
+x-world/x-vrml			vrm vrml wrl

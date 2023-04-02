@@ -1,0 +1,915 @@
+<!doctype html public "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+  <head>
+    <title>Installation and Setup of WN</title>
+
+    <link rev="made" href="mailto:john@math.northwestern.edu">
+
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<!-- hhmts start -->
+    <meta http-equiv="last-modified" content="Sat June 18 2005">
+<!-- hhmts end -->
+    <meta http-equiv="keywords" content="WN installation">
+  </head>
+
+  <body bgcolor="#FFFFFF">
+    <p>
+      <a href="/"><img
+        src="images/powered.jpg"
+        border="0"
+        width="190"
+        height="41"
+        align="right"
+        alt="WN home page"
+      ></a>
+    </p>
+
+    <strong>Version 2.4.7</strong>
+
+    <br>
+
+    <!-- pnuts --> <a href="overview.html">[Previous]</a> <a href="index_desc.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+
+
+    <br clear="right">
+
+    <hr size="4">
+    <!-- #start -->
+
+    <h2 align="center">Installation and Setup of <em>WN</em></h2>
+    <hr size="4">
+
+
+
+    <h3>2.1 <a name="installing">Installing the Software</a></h3>
+
+    <p>
+      Get the source file from <a
+      href="http://hopf.math.northwestern.edu/">http://hopf.math.northwestern.edu/</a>
+      (U.S.) or <a
+      href="http://www.wnserver.org/">http://www.wnserver.org/</a>
+      (Europe) then uncompress it and untar it to make the
+      <em>WN</em> source directory hierarchy.  The file must be uncompressed
+      with the <a href="http://www.gnu.org/">GNU</a> compression utility <a
+      href="/cgi-bin/man2html/usr/man/man1/gzip.1.gz"><code>gzip(1)</code></a>
+      (or <a
+      href="/cgi-bin/man2html/usr/man/man1/gunzip.1.gz"><code>gunzip(1)</code></a>).
+      The resulting file <code>wn.tar</code> should be unpacked with the UNIX
+      <a
+      href="/cgi-bin/man2html/usr/man/man1/tar.1.gz"><code>tar(1)</code></a>
+      utility using "<code>tar&nbsp;-xvf&nbsp;wn.tar</code>".  The top level of
+      the directory created by untarring this file contains several
+      directories, including: <code>wn</code>, <code>wndex</code>,
+      <code>wnauth</code> and <code>docs</code>.
+    </p>
+
+
+    <h4>2.1.1 <a name="installing.configure">Configuring <em>WN</em></a></h4>
+
+    <p>
+      If your system supports <a href="http://www.perl.org/">perl</a>, the
+      quickest way to get your server configured is to run the <a
+      href="http://www.perl.org/">perl</a> program "<code>configure</code>"
+      which is in the main source directory.  Do this with the command:
+    </p>
+
+    <blockquote>
+      <code>
+        perl configure
+      </code>
+    </blockquote>
+
+    <p>
+      This program will ask you various questions, like what version of UNIX
+      you are using and the path to the directory you want to be the
+      <code>wnroot</code> of your data hierarchy.
+    </p>
+
+    <p>
+      Default answers are printed in square brackets <code>[&nbsp;]</code> so
+      you can simply press return to enter that value.  You can quit at any
+      time by pressing <code>Ctrl-C</code> and nothing should be changed.  If
+      you want to try it once to see what the questions are, that is fine.
+    </p>
+
+    <p>
+      This program creates two files: <a
+      href="configmacros.html"><code>config.h</code></a> and
+      <code>Makefile</code> which are customized based on the answers you gave.
+      You may rerun this program as many times as you like.  The first time you
+      run the program the default values are those in the file <a
+      href="configmacros.html"><code>config.h.dist</code></a>.  Subsequent
+      times the default values for all question answers are taken from the most
+      recent <a href="configmacros.html"><code>config.h</code></a> you have
+      produced (if it still exists in the top level directory).
+    </p>
+
+    <p>
+      An alternative to running this program is to copy the files
+      <code>Makefile.dist</code> and <a
+      href="configmacros.html"><code>config.h.dist</code></a> to
+      <code>Makefile</code> and <a
+      href="configmacros.html"><code>config.h</code></a> respectively and edit
+      them manually.  If you want to use some of the features which are not
+      turned on by default like multiple IP interfaces, you will have to edit
+      at least <a href="configmacros.html"><code>config.h</code></a>.  I
+      recommend starting with the <a href="http://www.perl.org/">perl</a>
+      program and getting your server up and running.  Then you can go back
+      browse through <a href="configmacros.html"><code>config.h</code></a> to
+      see if there are things you want to change.  If there are you will have
+      to recompile but that takes only a few minutes.
+    </p>
+
+    <p>
+      Here are some of the questions you will be asked when you run
+      <code>configure</code>.  You will be given a list of supported operating
+      systems and asked to pick the one you are using, e.g. <code>SUNOS</code>,
+      <code>SOLARIS2</code>, <code>AIX</code>, <code>LINUX</code>, etc.  You
+      will be asked the complete path name of your data directory.  You will
+      also have to enter the names of the <a href="#logging">access and error
+      log files</a> you wish to use (they can be the same file).  If you don't
+      want logging or you want to use the UNIX <a
+      href="/cgi-bin/man2html/usr/man/man8/syslogd.8.gz"><code>syslogd(8)</code></a>
+      system utility (i.e. the <a
+      href="appendixA1.html#S_opt"><code>-S</code></a> option) then these
+      should both be defined to be the empty string (i.e. a pair of double
+      quotes with nothing between them like <code>""</code>).  If you specify
+      the names of these log files then you must make sure that either these
+      two files exist and are writable by the server or that they are files in
+      a directory where the server has permission to create them.
+    </p>
+
+    <p>
+      Additional customizations in <a
+      href="configmacros.html"><code>config.h</code></a> are possible but
+      should not be needed.  These customizations require that you manually
+      edit the <a href="configmacros.html"><code>config.h</code></a> file.  For
+      example, there is a <a
+      href="configmacros.html#DEFAULT_URI"><code>#define&nbsp;DEFAULT_URI</code></a>
+      line in the <a href="configmacros.html"><code>config.h</code></a> file.
+    </p>
+
+    <p>
+      You may also customize the file <code>Makefile</code> in the top level
+      directory.  In particular you should do this if you wish to specify a C
+      compiler other than the UNIX <a
+      href="/cgi-bin/man2html/usr/man/man1/gcc.1.gz"><code>cc(1)</code></a>
+      utility (e.g. <a href="http://www.fsf.org/software/gcc/gcc.html">gcc</a>)
+      should be used for compiling.  Also some systems require that special
+      libraries for sockets, or whatever, be mentioned in the compile command.
+      The configuration program attempts to do this, but I am working from user
+      reports since I do not have access to most of the UNIX variations.  If
+      they are incorrect please let <a href="mailto:john@math.northwestern.edu">me</a>
+      know.
+    </p>
+
+
+    <h4>2.1.2 <a name="installing.build">Building <em>WN</em></a></h4>
+
+    <p>
+      In the top level directory do a <a
+      href="/cgi-bin/man2html/usr/man/man1/make.1.gz"><code>make(1)</code></a>
+      to produce the server <code>wnd</code>, the stand-alone version
+      <code>wnsd</code> and the utility <a href="utility.html#wndex">wndex</a>.
+      This utility is used to produce <code>index.cache</code> files for use by
+      the server.  If the <code>make</code> proceeds without problem you should
+      next do a "<code>make&nbsp;install</code>".  This will strip the binaries
+      and place them in the top level <code>bin</code> directory or whatever
+      directory you specified when you ran the <a
+      href="#installing.configure"><code>configure</code></a> program.
+    </p>
+
+    <p>
+      If you specified a log file name or error log file name when you ran the
+      configuration program or edited <a
+      href="configmacros.html"><code>config.h</code></a> you will need to make
+      sure that these files exist and that they are writable by the user id
+      under which the server will run.  The best way to do this is create the
+      files as <code>root</code> ("<code>touch&nbsp;wn.log</code>"), then
+      change their ownership to the appropriate user
+      ("<code>chown&nbsp;nobody&nbsp;wn.log</code>") and finally set the
+      permissions appropriately ("<code>chmod&nbsp;644&nbsp;wn.log</code>").
+      An alternative is to create a directory in which these files will reside
+      and make sure that the user <code>nobody</code> has permission to create
+      files in this directory.  Then the server will create the files with
+      proper ownership and permissions.
+    </p>
+
+
+
+    <h3>2.2 <a name="stand-alone">Running the Server as a Stand-alone
+    Daemon</a></h3>
+
+    <p>
+      You can now either run the server as a stand-alone daemon, the
+      <code>wnsd</code> executable, or run under the UNIX <a
+      href="/cgi-bin/man2html/usr/man/man8/inetd.8.gz"><code>inetd(8)</code></a>
+      system utility, the <code>wnd</code> executable.  We first describe the
+      stand-alone version.  Run this with the command:
+    </p>
+
+    <blockquote>
+      <code>
+	wnsd -p port [other options] wnroot
+      </code>
+    </blockquote>
+
+    <p>
+      where "<code>port</code>" is the number of the port on which you wish the
+      server to run.  If this is a non-privileged port (i.e. &gt; 1024) then
+      <code>wnsd</code> can be run as an ordinary user.  However, for
+      privileged ports like 80 you must run the command above as
+      <code>root</code>.  If <code>wnsd</code> is run without the <a
+      href="appendixA1.html#p_opt"><code>-p</code></a> option it will use port
+      80 by default.  If <code>wnsd</code> is run by <code>root</code> then
+      when it starts up it will change its user id to the one set when running
+      the configuration program or by editing the <a
+      href="configmacros.html"><code>config.h</code></a> file line containing
+      <a href="configmacros.html#USERID"><code>#define&nbsp;USERID</code></a>.
+      Otherwise it will have all the permissions of the user who runs it.
+    </p>
+
+    <p>
+      The safest practice is to use the numeric UID of <code>nobody</code> for
+      the <a href="configmacros.html#USERID"><code>USERID</code></a> set in <a
+      href="configmacros.html"><code>config.h</code></a> (this is the default)
+      and then start the server as <code>root</code>.
+    </p>
+
+    <blockquote>
+      <em>Note:</em> on HPUX and
+      perhaps other systems user <code>nobody</code> cannot be used.  In this
+      case just create a new user, say "<code>www</code>", with the fewest
+      possible privileges and no shell.
+    </blockquote>
+
+    <p>
+      The server needs to have <code>root</code> permissions to connect to a
+      socket on a privileged port and listen for requests.  But immediately
+      after doing so it will change its user id to that of <code>nobody</code>
+      and have minimal access permissions.  In this situation the user
+      <code>nobody</code> needs to have only read permission to your server
+      data and should not own or have have write permission.  In particular
+      <code>nobody</code> should not have ownership or write access of the
+      <code>index.cache</code> database file described in the chapter "<a
+      href="index_desc.html">Creating Your <em>WN</em> Data Hierarchy</a>" of
+      this guide.
+    </p>
+
+
+
+    <h3>2.3 <a name="inetd">Running the Server Under
+    <code>inetd(8)</code></a></h3>
+
+    <p>
+      The other way to run the server is to use it under the UNIX <a
+      href="/cgi-bin/man2html/usr/man/man8/inetd.8.gz"><code>inetd(8)</code></a>
+      system utility. This is an efficient way to run the server if the load on
+      it is relatively light (a few thousand hits per day) and the host on
+      which it runs is used for other purposes.  There are variations on how
+      <code>inetd(8)</code> works from system to system so you may need to look
+      at the man page for the UNIX <a
+      href="/cgi-bin/man2html/usr/man/man8/inetd.8.gz"><code>inetd.conf(5)</code></a>
+      configuration file.  Here's how it works under many systems (e.g. SunOS
+      4.1.3): Edit the file UNIX <a
+      href="/cgi-bin/man2html/usr/man/man5/services.5.gz"><code>services(5)</code></a>
+      configuration file and create the line:
+    </p>
+
+    <blockquote>
+      <code>
+        wnd  80/tcp
+      </code>
+    </blockquote>
+
+    <p>
+      or replacing <code>80</code> by the port you wish to use.  Then edit the
+      file <code>inetd.conf(5)</code> and insert the line:
+    </p>
+
+    <blockquote>
+      <code>
+        wnd    stream    tcp nowait    nobody    /path/wnd    wnd
+      </code>
+    </blockquote>
+
+    <p>
+      After the last <code>wnd</code> you can have optional arguments to turn
+      on logging or use a different data directory.  Some <code>inetd(8)</code>
+      limit the number of arguments you may use so I prefer to use a small
+      program in place of <code>wnd</code> here.  My <code>inetd.conf(5)</code>
+      line looks like:
+    </p>
+
+    <blockquote>
+      <code>
+        wnd    stream    tcp nowait    nobody    /path/wn.rc    wn.rc
+      </code>
+    </blockquote> 
+
+    <p>
+      and <code>wn.rc</code> contains only the two lines:
+    </p>
+
+    <blockquote>
+      <code>
+        #!/bin/sh
+        <br>
+        exec /path/wnd -t 202 -L /path2/logfile wnroot
+      </code>
+    </blockquote>
+
+    <p>
+      It is important to run <code>wnd</code> as <code>nobody</code> (the fifth
+      field in the <code>inetd.conf(5)</code> line above) or some other user
+      with no special access privileges.  If you are using an
+      <code>inetd(8)</code> with without the capability to set UID on startup
+      (e.g., Ultrix), you should define the group ID and user ID in <a
+      href="configmacros.html"><code>config.h</code></a> so that the program is
+      not running as <code>root</code> (look for the <a
+      href="configmacros.html#USERID"><code>#define&nbsp;USERID</code></a> and
+      <a href="configmacros.html#GROUPID"><code>#define&nbsp;GROUPID</code></a>
+      and set the values appropriately).  It should <strong>never</strong> be
+      necessary to run <code>wnd</code> under <code>inetd(8)</code> as
+      <code>root</code> and to do so would be a serious mistake for maintaining
+      security.  Every attempt has been made to make <code>wnd</code> as secure
+      as possible, even if it is run as <code>root</code>, however, no program
+      accessible to remote users on the Internet can be assumed perfectly
+      secure. See the chapter "<a href="security.html">Security on the
+      <em>WN</em> Server</a>" in this guide.
+    </p>
+
+    <p>
+      After editing the <code>inetd.conf(5)</code> and <code>services(5)</code>
+      files you should find the process id number of the <code>inetd(8)</code>
+      process and use the UNIX <a
+      href="/cgi-bin/man2html/usr/man/man1/kill.1.gz"><code>kill(1)</code></a>
+      utility to reload the configuration using
+      "<code>kill&nbsp;-HUP&nbsp;&lt;process_id&gt;</code>".  This must be done
+      as <code>root</code>.  You find the number
+      "<code>&lt;process_id&gt;</code>" by using the UNIX <a
+      href="/cgi-bin/man2html/usr/man/man1/ps.1.gz"><code>ps(1)</code></a>
+      utility or by looking at the contents of the file (which you specified
+      when you ran the <a
+      href="#installing.configure"><code>configure</code></a> program) in which
+      the server stores this number.
+    </p>
+
+
+
+    <h3>2.4 <a name="hostname">Your Hostname: What's in a Name?</a></h3>
+
+    <p>
+      If the fully qualified domain name of your server is <code>abc.com</code>
+      you might like to have your server known as <code>www.abc.com</code> or
+      some other "vanity" name.  For most purposes this is simply a matter of
+      properly setting up <a href="http://www.dns.net/dnsrd/">Domain Name
+      Service</a> (DNS) on your system so that the system responds to the
+      desired name.
+    </p>
+
+    <blockquote>
+      <em>Note:</em> To use multiple vanity names for different IP addresses on
+      a single server see the chapter "<a href="multi.html">Multi-homed or
+      Virtual Servers on the <em>WN</em> Server</a>" in this guide.
+    </blockquote>
+
+    <p>
+      There are a few instances, however, where the <em>WN</em> server does use
+      its own hostname.  Ideally, in my opinion, the server should do nothing
+      with its hostname and not even need to know it.  This is not possible for
+      two reasons.
+    </p>
+
+    <p>
+      First, the <a href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1
+      protocol</a> requires the server to pass its hostname to CGI programs in
+      an environmental variable whenever those programs are run.  Secondly
+      clients often implement redirection so that it cannot handle relative but
+      only complete <a
+      href="http://linux-howto.com/rfc/rfc1500-1999/rfc1738.txt">URLs</a>.
+      (This is a mistake in my view, but one we have to live with.)  Thus when
+      a server redirects to another local document it must supply its own
+      hostname.  These are the only places <em>WN</em> uses hostname.
+    </p>
+
+    <p>
+      For most cases then, <em>WN</em> only uses it hostname when a redirection
+      is done.  This happens in several circumstances.  The most common is when
+      a request is made for a directory any the trailing '<code>/</code>' is
+      left off of the <a
+      href="http://linux-howto.com/rfc/rfc1500-1999/rfc1738.txt">URL</a>.
+    </p>
+
+    <p>
+      So how does <em>WN</em> know its hostname?  When you run the <a
+      href="#installing.configure"><code>configure</code></a> program you are
+      queried for the value you want or you have the option of using a system
+      call at the time the server is run.  This value is placed into the <a
+      href="configmacros.html"><code>config.h</code></a> header file and
+      compiled into your server.  In the file <a
+      href="configmacros.html"><code>config.h</code></a> the <a
+      href="configmacros.html#WN_HOSTNAME"><code>#define&nbsp;WN_HOSTNAME</code></a>
+      macro is set by default to the empty string.  If this is not changed the
+      server will get its name from the UNIX <a
+      href="/cgi-bin/man2html/usr/man/man3/gethostbyaddr.3.gz"><code>gethostbyaddr(3)</code></a>
+      system call.  If this is set to another string that string will be used.
+      If you are using <em>WN</em> as a multi-homed server then you need to set
+      different names for the different IP addresses.  This is done in the file
+      <code>wn/vhost.h</code> which you edit to set up the correspondence
+      between IP addresses and <code>wnroot</code> directories.
+    </p>
+
+
+
+    <h3>2.5 <a name="testing">Testing Your Setup</a></h3>
+
+    <p>
+      After compiling and setting up the software you can test it on a sample
+      directory provided with the distribution.  To do this first make a
+      symbolic link in your <code>wnroot</code> data directory to the
+      <code>docs</code> directory in the source distribution.  The command
+      "<code>ln&nbsp;-s&nbsp;/your/src/dir/docs&nbsp;docs</code>" executed in
+      the <code>wnroot</code> directory should do this.  If your system does
+      not support symbolic links you can copy this directory and its
+      subdirectories to your data directory temporarily.
+    </p>
+
+    <p>
+      Now you are ready to test your server installation on this directory.
+      Try it with your favorite HTTP client. The <a
+      href="http://linux-howto.com/rfc/rfc1500-1999/rfc1738.txt">URL</a> should
+      be:
+    </p>
+
+    <blockquote>
+      <code>
+        http://localhost/docs/index.html
+      </code>
+    </blockquote>
+
+
+
+    <h3>2.6 <a name="shutdown">Shutting Down Your Server</a></h3>
+
+    <p>
+      If your are running under UNIX <a
+      href="/cgi-bin/man2html/usr/man/man8/inetd.8.gz"><code>inetd(8)</code></a>
+      system utility as <a href="#inetd">described above</a> then to shut down
+      the server first remove or comment out the line you created in the UNIX
+      <a
+      href="/cgi-bin/man2html/usr/man/man8/inetd.8.gz"><code>inetd.conf(5)</code></a>
+      configuration file.  Then you should again find the process id number of
+      the <code>inetd(8)</code> process and run the UNIX <a
+      href="/cgi-bin/man2html/usr/man/man1/kill.1.gz"><code>kill(1)</code></a>
+      utility using "<code>kill&nbsp;-HUP&nbsp;&lt;process_id&gt;</code>" where
+      "<code>&lt;process_id&gt;</code>" is the process id number of
+      <code>inetd(8)</code> just as you did to start <em>WN</em>.
+    </p>
+
+    <p>
+      If you are running <code>wnsd</code>, the stand-alone version of
+      <em>WN</em>, you should find the process id number of the running
+      <code>wnsd</code> by using the UNIX <a
+      href="/cgi-bin/man2html/usr/man/man1/ps.1.gz"><code>ps(1)</code></a>
+      utility or by looking at the contents of the file (which you specified
+      when you ran the <a
+      href="#installing.configure"><code>configure</code></a> program or by
+      using the <a href="appendixA1.html#q_opt"><code>-q</code></a> option) in
+      which the server stores this number.  Then you run the UNIX
+      <code>kill(1)</code> utility using
+      "<code>kill&nbsp;&lt;process_id&gt;</code>" where
+      "<code>&lt;process_id&gt;</code>" is the process id number of
+      <code>wnsd</code>.  If you started the server as <code>root</code> you
+      should be <code>root</code> to kill it.
+    </p>
+
+
+
+    <h3>2.7 <a name="logging">Managing Log Files</a></h3>
+
+    <p>
+      There are two ways to log <em>WN</em> transactions: dedicated log files
+      or using the UNIX <a
+      href="/cgi-bin/man2html/usr/man/man8/syslogd.8.gz"><code>syslogd(8)</code></a>
+      system utility.  We first describe dedicated log files.
+    </p>
+
+    <p>
+      Normally when you use <em>WN</em> you will keep two log files.  The first
+      is a log of all "normal" transactions and the second records error
+      conditions or items which might require your attention.  For example, if
+      the server cannot find a file which your <code>index.wn</code> file
+      indicates should be served it will log an error.  The error log file can
+      be the same file used for the normal transaction log.  In general the
+      difference between the two is that the error log gets information about
+      anything which might require attention of the maintainer while routine
+      transactions and errors which are simply user errors tend to go to the
+      regular log.  The intent is that a conscientious maintainer should keep
+      an eye on the error log but need not read the (much larger) log of
+      regular transactions.
+    </p>
+
+    <p>
+      There are two ways to tell the server the names of these files.  The
+      first is by supplying the file names when you run the <a
+      href="#installing.configure"><code>configure</code></a> program and then
+      compiling these into your server.  And the second is by supplying the
+      file names on the command line when you execute the server.  This is done
+      with the <a href="appendixA1.html#L_opt"><code>-L</code></a> option and
+      the <a href="appendixA1.html#l_opt"><code>-l</code></a> option to specify
+      the transaction and error log files respectively.
+    </p>
+
+    <p>
+      For example, executing the command:
+    </p>
+
+    <blockquote>
+      <code>
+        wnsd -L /path2/logfile -l /path3/error.log wnroot
+      </code>
+    </blockquote>
+
+    <p>
+      will cause the server to use "<code>logfile</code>" and
+      "<code>error.log</code>" as the log file and error log respectively.  Of
+      course, it is necessary for the server to have write permission to these
+      files and execute permission on the directory containing them.
+    </p>
+
+    <p>
+      A good way to achieve this if the server is running as
+      <code>nobody</code> is to create the files yourself and change their
+      ownership to the user <code>nobody</code>.  This can be done, for
+      example, with the commands:
+    </p>
+
+    <blockquote>
+      <code>
+        touch&nbsp;logfile
+        <br>
+        /usr/etc/chown&nbsp;nobody&nbsp;logfile
+        <br>
+        chmod&nbsp;600&nbsp;logfile
+        <br>
+      </code>
+    </blockquote>
+
+    <p>
+      executed as <code>root</code> in the directory where the log file is to
+      reside.  The first of these commands creates the file
+      "<code>logfile</code>".  The second makes <code>nobody</code> the owner
+      and the third gives <code>nobody</code> (and no one else except
+      <code>root</code>) permission to read and write this file.  You might
+      want to allow others to read, but not write to the log file, or security
+      of the log file might not be a concern.
+    </p>
+
+    <p>
+      Thus a program executed by the UNIX <a
+      href="/cgi-bin/man2html/usr/man/man8/crond.8.gz"><code>crond(8)</code></a>
+      system utility to rotate log files might look like:
+    </p>
+
+    <blockquote>
+      <code>
+        cd /path2
+        <br>
+        mv logfile logfile.old
+        <br>
+        touch logfile
+        <br>
+        chown nobody logfile
+        <br>
+        chmod 600 logfile
+        <br>
+        kill -HUP `/bin/cat /path/to/wn.pid`
+        <br>
+        chown maintainer logfile.old
+        <br>
+        chmod 600 logfile.old
+      </code>
+    </blockquote>
+
+    <p>
+      where <code>/path/to/wn.pid</code> is a file containing the processes id
+      of the server created by using the <a
+      href="appendixA1.html#q_opt"><code>-q</code></a> option or by specifying
+      this filename when the <a
+      href="#installing.configure"><code>configure</code></a> program is run.
+      If neither of these has been done the stand-alone server,
+      <code>wnsd</code>, will print its process id on the UNIX <a
+      href="/cgi-bin/man2html/usr/man/man3/stdio.3.gz"><code>stdout(3)</code></a>
+      stream when it is run.  If you are using <code>wnd</code> under <a
+      href="/cgi-bin/man2html/usr/man/man8/inetd.8.gz"><code>inetd(8)</code></a>
+      there is no need to send the <code>-HUP</code> signal as the server must
+      close this file after each transaction.
+    </p>
+    <p>
+      If you are using a system that supports the <code>logrotate</code>
+      program, it provides a good way to handle logs.  Here is an excerpt
+      from a typical logrotate.conf file.
+    </p>
+    <blockquote>
+      <code>
+	/var/log/wnsd/error_log {
+        <br>
+	&nbsp;&nbsp;&nbsp;&nbsp;daily
+        <br>
+	}
+        <br>
+
+	/var/log/wnsd/access_log {
+        <br>
+	&nbsp;&nbsp;&nbsp;&nbsp;daily
+        <br>
+	&nbsp;&nbsp;&nbsp;&nbsp;postrotate
+        <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/usr/bin/killall -HUP wnsd
+        <br>
+	&nbsp;&nbsp;&nbsp;&nbsp;endscript
+        <br>
+	}
+        <br>
+      </code>
+    </blockquote>
+
+    <p>
+      This causes the logs to be rotated daily.  The command
+      <code>/usr/bin/killall -HUP wnsd</code> assumes that your
+      system supports the <code>killall</code> command, in which
+      case it finds the process id of the wnsd process and sends it
+      the -HUP signal, as was done by the <code>kill</code> command.
+      in the script above.
+    </p>
+
+    <p>
+      There are three formats which the server can use in writing its
+      log files, each with three options concerning how much DNS
+      lookup to do for the remote host.  The two most common formats
+      are "verbose" and "common log format".  The verbose mode is
+      essentially the common log format but with the user-agent,
+      referrer, HTTP cookie, and virtual server nickname appended to
+      the line for that transaction as well as better transaction
+      error messages if necessary.
+    </p>
+
+    <p>
+      You can chose between verbose and common log formats by answering the
+      relevant question when running the <a
+      href="#installing.configure"><code>configure</code></a> program before
+      compilation (or by editing <a
+      href="configmacros.html"><code>config.h</code></a>).
+    </p>
+
+    <p>
+      To use the third format you need to use the <a
+      href="appendixA1.html#v_opt"><code>-v</code></a> command line
+      option.  When the server is invoked with the <a
+      href="appendixA1.html#v_opt"><code>-v</code></a> option it will
+      write a log file in the format specified by the value of this
+      option.  The legal values for this option are
+      "<code>common</code>", "<code>verbose</code>", and
+      "<code>ncsa</code>".  They cause the log file to be written in
+      the so-called common log format, or <em>WN</em>'s verbose format
+      including user agent, referrer, X-Forwarded-For header, virtual
+      server nickname, and cookies, or in the NCSA extended format
+      which includes just referrer and user agent.  When using verbose
+      logging the nickname (enclosed in angle brackets) will be the
+      last field of each log entry.  If virtual hosting is not being used
+      this field will be omitted.
+    </p>
+
+    <p>
+      More precisely a verbose log line begins with a normal "common" log
+      format line and then adds the following:
+    </p>
+
+    <blockquote>
+      <code>
+        &lt;(pid/count) msg1: msg2&gt; &lt;user_agent&gt; &lt;referrer&gt; &lt;cookie&gt; &lt;X-forwarded-for&gt; &lt;nickname&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      The punctuation characters, i.e., <code>&lt; &gt; ( )</code> and
+      <code>:</code>, will always be present in this order.  The
+      fields "<code>msg1</code>" and "<code>msg2</code>" may contain
+      additional parentheses or colons.  Hopefully none of the fields
+      will contain the character '<code>&lt;</code>' or the character
+      '<code>&gt;</code>', but "referrer", "cookie", "X-forwarded-for"
+      and "nickname" are provided by the browser or the server
+      maintainer so <em>WN</em> has no control over them.
+    </p>
+
+    <p>
+      The fields are as follows:
+    </p>
+
+    <center>
+      <table>
+        <tr>
+          <th>field</th>
+          <th>description</th>
+        </tr>
+
+        <tr>
+          <td>pid</td>
+          <td>Process id of the process serving the transaction.</td>
+        </tr>
+
+        <tr>
+          <td>count</td>
+          <td>
+            n if this is the nth transaction of this (keepalive) connection.
+          </td> 
+        </tr>
+
+        <tr>
+          <td>msg1</td>
+          <td>Description of transaction. May be sent to user.</td>
+        </tr>
+
+        <tr>
+          <td>msg2</td>
+          <td>
+            Description of transaction. Information <em>NOT</em> sent to user.
+          </td>
+        </tr>
+
+        <tr>
+          <td>user_agent</td>
+          <td>From the HTTP user agent header.</td>
+        </tr>
+
+        <tr>
+          <td>referrer</td>
+          <td>From the HTTP referer (sic) header.</td>
+        </tr>
+
+        <tr>
+          <td>cookie</td>
+          <td>From the client's cookie header.</td>
+        </tr>
+
+        <tr>
+          <td>X-forwarded-for</td>
+          <td>From the client's X-Forwarded-For header.</td>
+        </tr>
+
+        <tr>
+          <td>nickname</td>
+          <td>Value assigned this virtual host by the maintainer (omitted if virtual 
+           hosting is not used).</td>
+        </tr>
+      </table>
+    </center>
+
+    <p>
+      The NCSA format will likely only be of interest if you want to use log
+      processing tools which expect this format.  If the <a
+      href="appendixA1.html#v_opt"><code>-v</code></a> option option is not
+      specified the server will default to either the common log format or the
+      <em>WN</em> verbose format depending on which was selected when the <a
+      href="#installing.configure"><code>configure</code></a> program was run.
+      The utility <a href="utility.html#wnv2c"><code>wnv2c</code></a> can
+      convert verbose log files to log files in the shorter common log format.
+    </p>
+
+    <p>
+      The <em>WN</em> server does not send the UNIX <a
+      href="/cgi-bin/man2html/usr/man/man3/stdio.3.gz"><code>stderr(3)</code></a>
+      stream output to the error log file, but leaves its default the terminal
+      from which the server is invoked.  This allows the maintainer to set it
+      to a file of her choice, for example the error log, or leave it directed
+      to the console window in which <code>wnsd</code> was invoked.  To
+      redirect it to a file called <code>my.errs</code> simply run
+      <code>wnsd</code> with a command like
+      "<code>wnsd&nbsp;&lt;options&gt;&nbsp;2&gt;my.errs</code>" if you are
+      using a Borne-like shell like <code>sh(1)</code>.  The server itself
+      sends very few things to <code>stderr(3)</code> -- only errors which it
+      is impossible to put in the error log (like "Can't open error log file").
+      The real usefulness of redirecting <code>stderr(3)</code> comes when you
+      are creating <a href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1
+      programs</a> because their errors are typically sent to
+      <code>stderr(3)</code> so you can easily view them rather than have them
+      buried in a log file.
+    </p>
+
+
+
+    <h3>2.8 <a name="trouble">Trouble Shooting</a></h3>
+
+    <p>
+      If things are not working as they should here are some tips to help you
+      isolate the problems.
+    </p>
+
+    <p>
+      If the compilation was successful you can check the server itself by
+      executing it from the command line.  If you use the command:
+    </p>
+
+    <blockquote>
+      <code>
+        wnd  wnroot
+      </code>
+    </blockquote>
+
+    <p>
+      it should run and pause for input.  Type the line:
+    </p>
+
+    <blockquote>
+      <code>
+        GET /&lt;ret&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      and in response <code>wnd</code> should print the raw HTML of the
+      <code>index.html</code> file in your top level directory (perhaps along
+      with a message about not being able to open a log file).  If instead you
+      type:
+    </p>
+
+    <blockquote>
+      <code>
+        GET /docs/overview.html&lt;ret&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      (and you still have the <code>/docs</code> subdirectory in your top level
+      directory) the overview document should be sent to your screen.  If this
+      doesn't happen there should be an error message which may be helpful.
+      Better error messages are placed in the log file so you may want run
+      <code>wnd</code> again with the additional arguments
+      "<code>-L&nbsp;logfile</code>" and then examine the contents of the log
+      file.  Or if you run "<code>wnd&nbsp;-L&nbsp;/dev/tty</code>" the log
+      entries will be printed to your screen instead of being put in a file. If
+      the server can't open a file, for example, the name of that file will be
+      recorded in the log file. Check its permissions. Remember that all files
+      that <code>wnd</code> serves must be world readable.  More serious errors
+      are put in a separate error log.  So you might want to try the command
+      "<code>wnd&nbsp;-L&nbsp;file&nbsp;-l&nbsp;file2</code>" and then type the
+      <code>GET</code> requests described above.
+    </p>
+
+    <p>
+      If this succeeds you should run the server for real, either under <a
+      href="#inetd"><code>inetd(8)</code></a> or <a
+      href="#stand-alone">stand-alone</a>.  In order to use port 80 the server
+      must be started by <code>root</code>.  It will then switch to user
+      <code>nobody</code>.  It does this immediately after connecting to port
+      80, before it does anything else including opening its log file.  If you
+      get a message that the server cannot open its log file then either you
+      have specified putting the log file in a directory where user
+      <code>nobody</code> does not have permission to create files or you have
+      specified an existing file which the server does not have permission to
+      write.
+    </p>
+
+    <p>
+      After starting the server a useful test is to use the UNIX <a
+      href="/cgi-bin/man2html/usr/man/man1/telnet.1.gz"><code>telnet(1)</code></a>
+      utility to connect to your server at port on which you are running.  You
+      should get a connection message and a pause for input.  If you get a
+      "<code>Connection refused</code>" message and you are running under
+      <code>inetd(8)</code>, it is likely there is a problem with your
+      <code>inetd(8)</code> setup or for some reason your system can't find or
+      can't execute the <code>wnd</code> binary.  If you are using
+      <code>wnsd</code> this message means that <code>wnsd</code> is not in
+      fact running.
+    </p>
+
+    <p>
+      If you still have problems feel free to ask questions on the <a
+      href="http://hopf.math.northwestern.edu/listserv.html"><em>WN</em> list
+      server</a>.  There are many helpful people there.  But it is a good idea
+      to try the steps above first and to include the relevant log file
+      messages with your request.
+    </p>
+
+
+    <!-- #end -->
+    <hr size="4">
+
+    <address>
+      <em>WN</em> version 2.4.7
+      <br>
+      Copyright &copy; 1998-2005 <a href="mailto:john@math.northwestern.edu">John Franks
+      &lt;john@math.northwestern.edu&gt;</a>
+      <br>
+      licensed under the <a
+        href="http://www.gnu.org/copyleft/fdl.txt">GNU Free Documentation License</a>
+      <br>
+<!-- hhmts start -->
+Last modified: Sat June  18 2005
+<!-- hhmts end -->
+    </address>
+
+    <!-- pnuts --> <a href="overview.html">[Previous]</a> <a href="index_desc.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+  </body>
+</html>

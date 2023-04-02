@@ -1,0 +1,547 @@
+<!doctype html public "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+  <head>
+    <title>WN Utility Programs</title>
+
+    <link rev="made" href="mailto:john@math.northwestern.edu">
+
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <meta http-equiv="last-modified" content="Sat June 18 2005">
+    <meta http-equiv="keywords" content="WN utility programs">
+  </head>
+
+  <body bgcolor="#FFFFFF">
+    <p>
+      <a href="http://hopf.math.northwestern.edu/"><img
+        src="images/powered.jpg"
+        border="0"
+        width="190"
+        height="41"
+        align="right"
+        alt="WN home page"
+      ></a>
+    </p>
+
+    <strong>Version 2.4.7</strong>
+
+    <br>
+
+    <!-- pnuts --> <a href="multi.html">[Previous]</a> <a href="module.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+
+
+
+    <br clear="right">
+
+    <hr size="4">
+    <!-- #start -->
+
+    <h2 align="center"><em>WN</em> Utility Programs</h2>
+    <hr size="4">
+
+    <p>
+      The main utility program used by <em>WN</em> is <code>wndex</code> which
+      is used to produce the <code>index.cache</code> files from <a
+      href="index_desc.html#index"><code>index.wn</code></a> files.  Its use is
+      described in detail in the section on "<a
+      href="index_desc.html#wndex">Using the <code>wndex</code> Utility</a>" in
+      this guide.  In this chapter we consider some other utilities, mostly <a
+      href="http://www.perl.org/">perl</a> programs, which are useful in
+      maintaining your server.
+    </p>
+
+
+    <h3>13.1 <a name="wn_mkdigest"><code>wn_mkdigest</code></a></h3>
+
+    <p>
+      <code>wn_mkdigest</code> is a <a href="http://www.perl.org/">perl</a>
+      program which can be found in the bin directory of the distribution. This
+      program is designed to work with the <a href="range.html">range</a>
+      feature of the <em>WN</em> server and with <a
+      href="search.html#list">list searches</a>. It produces a list of anchors
+      or links to sections of a structured plain text document like an address
+      list or a mail file.
+    </p>
+
+    <p>
+      Here is how it works.  The <code>wn_mkdigest</code> utility is executed
+      with three (or more) arguments.  The first two arguments are regular
+      expressions. The first regular expression should match the section
+      separator of the structured file and the second should match the
+      beginning of the line to be used as the section title.  (More about this
+      below.)  The next argument is the name of a structured file, like a mail
+      file, news digest or address list.  Instead of a single structured file
+      several files can be listed and <code>wn_mkdigest</code> will process
+      their concatenation.
+    </p>
+
+    <p>
+      Now more about the regular expressions: Suppose our structured file is a
+      mail file in its usual format with a number of messages.  The first
+      regular expression should match just the lines which are the beginning of
+      each section (in this case each message).  For a mail file a good choice
+      would be "<code>^From&nbsp;</code>" which matches the word
+      "<code>From</code>" followed by a space at the beginning of a line.
+    </p>
+
+    <p>
+      The second regular expression matches start of the line which you would
+      like to be the title of the section. It is convenient to have the link
+      text be everything <em>after</em> the occurrence of the matching pattern
+      for this regular expression.  So for the mail file we would choose
+      "<code>^Subject:</code>" for this regular expression.  Then the program
+      will produce a list of links one for each message with the text in the
+      anchor the contents of the message Subject line (minus the word
+      "<code>Subject:</code>").  Each link when accessed will produce a plain
+      text document containing just that mail message.
+    </p>
+
+    <p>
+      So if our mail file is named <code>foo</code> we should execute the
+      command:
+    </p>
+
+    <blockquote>
+      <code>
+        wn_mkdigest&nbsp;"^From&nbsp;"&nbsp;"^Subject:"&nbsp;foo
+      </code>
+    </blockquote>
+
+    <p>
+      Note the quotation marks which are needed to get the space after
+      "<code>From</code>".  It produces a file named
+      <code>foo.index.html</code> which consists primarily of an unordered
+      list.  Each item in the list is an anchor referring to a line range in
+      <code>foo</code> -- the ranges being delimited by lines which match the
+      first regular expression argument.  In this case that means each range
+      will start with a line beginning with "<code>From&nbsp;</code>" which is
+      the marker in a mail file designating the start of a new message. The
+      anchor label for each range is taken from the first line in the range
+      which contains a match for the second regular expression and, in fact, as
+      mentioned above, it will consist of everything on that line
+      <em>after</em> the matched regular expression.
+    </p>
+
+    <p>
+      The first line of each range or section is a line which matches the first
+      regular expression and the next matching line will begin the next
+      section.  Normally the search for the match for the anchor title regular
+      expression begins with this first line.  However, it is sometimes useful
+      to skip this first line in the search for a title match.  This can be
+      done by starting the second regular expression with the character
+      '<code>$</code>'.  For example the command:
+    </p>
+
+    <blockquote>
+      <code>
+        wn_mkdigest&nbsp;^$&nbsp;$^&nbsp;foo
+      </code>
+    </blockquote>
+
+    <p>
+      is a common one.  It says to divide <code>foo</code> into sections (line
+      ranges) which are separated by blank lines (the regular expression
+      '<code>^$</code>' matches a blank line).  To obtain an anchor title for
+      each section the blank line is skipped (since the second regular
+      expression starts with '<code>$</code>') and then everything on the next
+      line is taken as the title (since '<code>^</code>' matches the beginning
+      of the next line).  The regular expressions of this example would be
+      useful, for example, for an address list <code>foo</code> which consisted
+      of multi-line records separated by blank lines with an individual's name
+      on the first line of each record.  The <code>wn_mkdigest</code> utility
+      would then produce a <code>foo.index.html</code> file with an unordered
+      list of anchors, one for each individual in the list.  Selecting an
+      anchor would present the record for that individual.  Using a <a
+      href="search.html#list">list search</a> for this file would allow a form
+      user to enter a name or regular expression and obtain a list of anchors
+      for matching items.
+    </p>
+
+    <p>
+      The <code>wn_mkdigest</code> command can have any number of files listed
+      after the regular expressions and it will produce a single file whose
+      name is the name of the first file with "<code>.index.html</code>"
+      appended.  This file will contain a list of links to all the sections of
+      all the files given on the command line.
+    </p>
+
+    <p>
+      When <code>wn_mkdigest</code> writes the index file (e.g.,
+      <code>foo.index.html</code>), it adds two HTML comments to mark the start
+      and end of the lines containing links to the records in your structured
+      document.  The markers look like this, where <code>VERSION</code> is the
+      current version of <code>wn_mkdigest</code>:
+    </p>
+
+    <blockquote>
+      <code>
+        &lt;!--&nbsp;Range&nbsp;list&nbsp;generated&nbsp;by&nbsp;wn_mkdigest/VERSION&nbsp;--&gt;
+        <br>
+        <br>
+        &lt;!--&nbsp;End&nbsp;of&nbsp;range&nbsp;list&nbsp;generated&nbsp;by&nbsp;wn_mkdigest/VERSION&nbsp;--&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      The first time <code>wn_mkdigest</code> writes an index file, it writes a
+      default leader and trailer before and after the link lines.  If
+      <code>wn_mkdigest</code> finds an existing index file when it runs, it
+      uses the information preceding the first marker and following the second
+      marker as the leader and trailer for the new index file.  This means you
+      can run <code>wn_mkdigest</code> to create the initial index file, then
+      edit the beginning and/or end of the file to modify the leader and
+      trailer.  Subsequent invocations of <code>wn_mkdigest</code> will retain
+      your modifications each time the index file is recreated.
+    </p>
+
+    <p>
+      If you add the <code>-b</code> argument when you use
+      <code>wn_mkdigest</code> (i.e. run the command
+      "<code>wn_mkdigest&nbsp;-b&nbsp;regexp1&nbsp;regexp2&nbsp;foo</code>"
+      then it will produce a file <code>foo.index.html</code> which uses byte
+      ranges rather than the default line ranges.  This functions the same
+      except the server will log the number of bytes actually sent when a
+      request is served (the server won't bother to count the bytes in a line
+      range request).
+    </p>
+
+    <p>
+      There are fancier tools than <code>wn_mkdigest</code> for displaying mail
+      archives, but this utility has great flexibility for dealing with a wide
+      variety of structured files.
+    </p>
+
+
+    <h3>13.2 <a name="wnpnuts"><code>wnpnuts</code></a></h3>
+
+    <p>
+      PNUTS (pronounced "peanuts") is an acronym for previous, next, up, top,
+      search.  <code>wnpnuts</code> is a <a
+      href="http://www.perl.org/">perl</a> program which takes as argument the
+      name of a file describing the hierarchical structure of a group of HTML
+      files constituting a single virtual document.  The <code>wnpnuts</code>
+      program then searches these files for lines which begin with optional
+      whitespace followed by the string:
+    </p>
+
+    <blockquote>
+      <code>
+        &lt;!--&nbsp;pnuts&nbsp;--&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      which it replaces with this string followed by a sequence of anchors
+      like:
+    </p>
+
+    <blockquote>
+      <code>
+        [<a href="multi.html">previous</a>]
+        [<a href="module.html">next</a>]
+        [<a href="utility.html">up</a>]
+        [<a href="manual.html">top</a>]
+        [<a href="dosearch.html">search</a>]
+        [<a href="docindex.html">index</a>]
+      </code>
+    </blockquote>
+
+    <p>
+      with links to the relevant files in the virtual document.  Actually it
+      replaces this line with a single line starting with
+      <code>&lt;!--&nbsp;pnuts&nbsp;--&gt;</code>, followed by the anchors.
+      That way the next time it is run, say after inserting a new chapter in
+      your document, the <code>&lt;!--&nbsp;pnuts&nbsp;--&gt;</code> line will
+      be replaced by a new one with the appropriate links.
+    </p>
+
+    <p>
+      The <code>wnpnuts</code> program is run with a command like:
+    </p>
+
+    <blockquote>
+      <code>
+        wnpnuts&nbsp;-s&nbsp;dosearch.html&nbsp;-i&nbsp;docindex.html&nbsp;foo.pnuts
+      </code>
+    </blockquote>
+
+    <p>
+      The argument "<code>-s&nbsp;dosearch.html</code>" is optional and
+      supplies a URL for the "<code>[search]</code>" anchor to be substituted.
+      Thus if just "<code>dosearch.html</code>" is used this will be an anchor
+      linking to a relative URL.  Instead you could use a full URL like
+      "<code>http://hostname/dir/file</code>".  If there is no
+      '<code>-s</code>' argument then there will be no search item in the list
+      of items inserted by <code>wnpnuts</code>.  The optional argument
+      "<code>-i docindex.html</code>" is similar to the '<code>-s</code>'
+      option except it provides the URL (relative or absolute) which should be
+      anchored to "<code>[index]</code>".  This URL typically points to an an
+      HTML document created with <a href="#wnindexmaker">wnindexmaker</a>.
+    </p>
+
+    <p>
+      The file <code>foo.pnuts</code> contains the information by which
+      <code>wnpnuts</code> knows which files to process and what the order of
+      those files should be.  It consists of a list of files relative to the
+      current directory, one per line, in the order which should be reflected
+      in the "<code>[next]&nbsp;[previous]</code>" links.  If a file is
+      hierarchically one level lower than the previous file this should be
+      indicated by preceding its name with one more "<code>&lt;tab&gt;</code>"
+      character than the preceding file.  Here is an example:
+    </p>
+
+    <blockquote>
+      <code>
+        top.html
+        <br>
+        second.html
+        <br>
+        &lt;tab&gt;firstsub.html
+        <br>
+        &lt;tab&gt;&lt;tab&gt;subsub.html
+        <br>
+        &lt;tab&gt;secondsub.html
+        <br>
+        third.html
+      </code>
+    </blockquote>
+
+    <p>
+      If this list is supplied to <code>wnpnuts</code> it will insert anchors
+      into all these files wherever <code>&lt;!--&nbsp;pnuts&nbsp;--&gt;</code>
+      occurs.  All those named <code>[top]</code> will point to the file
+      <code>top.html</code>.  In <code>firstsub.html</code> and
+      <code>secondsub.html</code> the <code>[up]</code> link will point to
+      <code>second.html</code>.  The <code>[previous]</code> and
+      <code>[next]</code> links will reflect the order <code>top.html</code>,
+      <code>second.html</code>, <code>firstsub.html</code>,
+      <code>subsub.html</code>, <code>secondsub.html</code>,
+      <code>third.html</code>.
+    </p>
+
+
+    <h3>13.3 <a name="wnindexmaker"><code>wnindexmaker</code></a></h3>
+
+    <p>
+      This is a <a href="http://www.perl.org/">perl</a> program whose function
+      is to produce an index (in the usual sense not the <em>WN</em> sense) for
+      a virtual document consisting of a number of HTML files in a single
+      directory. The <a href="docindex.html">index to this guide</a> is a good
+      example of how an index produced by <code>wnindexmaker</code> works.
+    </p>
+
+    <p>
+      The <code>wnindexmaker</code> program is run with a command like:
+    </p>
+
+    <blockquote>
+      <code>
+        wnindexmaker&nbsp;-d&nbsp;path&nbsp;-t&nbsp;"Index&nbsp;Title"&nbsp;-o&nbsp;outputfile&nbsp;words
+      </code>
+    </blockquote>
+
+    <p>
+      Here the <code>-d</code>, <code>-t</code> and <code>-o</code> arguments
+      are optional. The <code>-t</code> option supplies the title for the HTML
+      document produced.  If no <code>-t</code> argument is given then
+      "<code>Index</code>" is used as the title.  The <code>-o</code> option
+      provides a name for the output HTML file -- the default being
+      <code>docindex.html</code>.
+    </p>
+
+    <p>
+      The <code>-d</code> option should be the directory containing the files
+      being indexed.  It should either begin with a '<code>/</code>' and be
+      relative to the <em>WN</em> root directory or not begin with a
+      '<code>/</code>' and be relative to the directory which will contain the
+      <code>docindex.html</code> file.  If there is no <code>-d</code> option
+      then the <code>docindex.html</code> file must reside in the same
+      directory as the files being indexed.  If this is done then it is a good
+      idea to add an <code><a
+      href="appendixB.html#fdir.attributes.nosearch">Attributes=nosearch</a></code>
+      to the <code>docindex.html</code> record in the <a
+      href="index_desc.html#index"><code>index.wn</code></a> file for the
+      directory.  Otherwise <code>docindex.html</code> will index itself in
+      addition to the other files in the directory.
+    </p>
+
+    <p>
+      The final argument to <code>wnindexmaker</code> is the file
+      <code>words</code>.  It is a list of words or phrases, in alphabetical
+      order, one per line, which you wish to appear in the index.  One way to
+      produce it is to use UNIX utilities to produce a list of all words in the
+      files, then run UNIX <a
+      href="http://linux-howto.com/man/man1/sort.1.html"><code>sort(1)</code></a>
+      utility with the options <code>-dfu</code> on it and remove unsuitable
+      words from the list.
+    </p>
+
+    <p>
+      What the <code>wnindexmaker</code> program does is produce a long list of
+      anchors, one for each word in the words file.  Each word is linked to a
+      context search for itself.
+    </p>
+
+
+    <h3>13.4 <a name="wn_uncache"><code>wn_uncache</code></a></h3>
+
+    <p>
+      <code>wn_uncache</code> is a <a href="http://www.perl.org/">perl</a>
+      program which reverses the action of <a
+      href="index_desc.html#wndex">wndex</a>.  It will convert an
+      <code>index.cache</code> file to an <a
+      href="index_desc.html"><code>index.wn</code></a> file.  It read from its
+      UNIX <a
+      href="http://linux-howto.com/man/man3/stdio.3.html"><code>stdin(3)</code></a>
+      stream and writes to its UNIX <a
+      href="http://linux-howto.com/man/man3/stdio.3.html"><code>stdout(3)</code></a>
+      stream.
+    </p>
+
+    <p>
+      Thus when invoked with:
+    </p>
+
+    <blockquote>
+      <code>
+        wn_uncache&nbsp;&lt;index.cache&nbsp;&gt;index
+      </code>
+    </blockquote>
+
+    <p>
+      it will create a file named "<code>index.wn</code>" (overwriting any other
+      file of that name).  This file may not be identical to the original
+      <code>index.wn</code> file used to create <code>index.cache</code>, but when
+      <a href="index_desc.html#wndex">wndex</a> is run on this new
+      <code>index.wn</code> file it should produce an <code>index.cache</code>
+      identical to the one used as input for <code>wn_uncache</code>.
+    </p>
+
+
+    <h3>13.5 <a name="wnv2c"><code>wnv2c</code></a></h3>
+
+    <p>
+      The <a href="http://www.perl.org/">perl</a> program <code>wnv2c</code>
+      converts <a name="setup.html#logging">log files</a> produced by the
+      server in the <a href="setup.html#logging">verbose format</a> to files in
+      the common log format handled by most server statistics utilities.  It
+      also can extract the entries for each virtual host of a <a
+      href="multi.html">multi-homed server</a> which uses different data roots
+      for different IP addresses or different <a
+      href="http://www.dns.net/dnsrd/">DNS</a> names:
+    </p>
+
+    <blockquote>
+      <code>
+        wnv2c&nbsp;[-v]&nbsp;[-i&nbsp;nickname]&nbsp;&lt;verboselog&nbsp;&gt;commonlog
+      </code>
+    </blockquote>
+
+    <p>
+      By default this program reads from the UNIX <a
+      href="http://linux-howto.com/man/man3/stdio.3.html"><code>stdin(3)</code></a>
+      stream a <em>WN</em> log file produced in the verbose format and writes a
+      non-verbose one in the "common log format" to UNIX <a
+      href="http://linux-howto.com/man/man3/stdio.3.html"><code>stdout(3)</code></a>
+      stream.  With the "<code>-i&nbsp;nickname</code>" option it writes only
+      those entries from the <a
+      href="multi.html#one_server_many_hosts.compiled">virtual host</a> with
+      specified nickname (e.g. if you have edited the file
+      <code>/wn/vhost.h</code> to contain:
+    </p>
+
+    <blockquote>
+      <pre>
+#ifdef USE_VIRTUAL_HOSTS
+WN_CONST
+char *
+WN_CONST
+vhostlist[][4] =
+{
+    { "realname.com" , "123.123.121.1", ROOT_DIR, "nickname0" },
+    { "virtual1.com" , "123.123.121.1", "/var/data1", "nickname1" },
+    { "virtual2.com" , "123.123.121.1", "/var/data2", "nickname2" },
+    { "another.ip.com", "123.123.123.2", "/var/data3", "nickname3" },
+    { NULL, NULL, NULL, NULL }
+};
+#endif
+      </pre>
+    </blockquote>
+
+    <p>
+      then
+      "<code>wnv2c&nbsp;-i&nbsp;nickname2&nbsp;&lt;logfile&nbsp;&gt;log2</code>"
+      will create <code>log2</code>, the file of log entries for the virtual
+      host with DNS name <code>virtual2.com</code>.  If you have used the empty
+      string in place of nicknames in the file <code>wn/vhost.h</code> the
+      virtual hosts are numbered consecutively in the order they are listed,
+      starting with <code>0</code>.  So you would use
+      "<code>wnv2c&nbsp;-i&nbsp;2&nbsp;&lt;logfile&nbsp;&gt;log2</code>" to get
+      the log entries for the second virtual host.
+    </p>
+
+    <p>
+      Using the "<code>-v</code>" option along with the "<code>-i</code>"
+      option gives the verbose form of log entries for specified virtual host.
+    </p>
+
+
+    <h3>13.6 <a name="wnredir"><code>wnredir</code></a></h3>
+
+    <p>
+      The <a href="http://www.perl.org/">perl</a> program <code>wnredir</code>
+      is a very simple <a href="module.html#db"><code>Cache-Module</code></a>
+      for use with <em>WN</em>.  It's function is to automatically redirect
+      requests for documents in one directory to requests for other URL's.  If
+      you put:
+    </p>
+
+    <blockquote>
+      <code>
+        <a
+        href="appendixB.html#ddir.cache-module">Cache-module=</a>redir&nbsp;http://host/dir/foo.html
+      </code>
+    </blockquote>
+
+    <p>
+      in the <a href="index_desc.html#index"><code>index.wn</code></a> file of a
+      directory then every request for something in that directory will be
+      redirected to a request for <code>http://host/dir/foo.html</code>.
+    </p>
+
+    <p>
+      If you put:
+    </p>
+
+    <blockquote>
+      <code>
+        <a
+        href="appendixB.html#ddir.cache-module">Cache-module=</a>redir&nbsp;http://host/dir/
+      </code>
+    </blockquote>
+
+    <p>
+      then a request for <code>http://this_host/this_dir/whatever.html</code>
+      will be redirected to <code>http://host/dir/whatever.html</code>.  These
+      can be useful if you move the contents of an entire directory.
+    </p>
+
+
+
+    <!-- #end -->
+    <hr size="4">
+
+    <address>
+      <em>WN</em> version 2.4.7
+      <br>
+      Copyright &copy; 1998-2005 <a href="mailto:john@math.northwestern.edu">John Franks
+      &lt;john@math.northwestern.edu&gt;</a>
+      <br>
+      licensed under the <a
+        href="http://www.gnu.org/copyleft/fdl.txt">GNU Free Documentation License</a>
+      <br>
+Last modified: Sat June  18 2005
+    </address>
+
+    <!-- pnuts --> <a href="multi.html">[Previous]</a> <a href="module.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+  </body>
+</html>

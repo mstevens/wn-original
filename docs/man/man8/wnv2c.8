@@ -1,0 +1,87 @@
+.\" source:
+.\"   $Source: /var/cvs/projects/debian/printop/debian/dpkg.src/printop.printop.1.in,v $
+.\"
+.\" revision:
+.\"   @(#) $Id: printop.printop.1.in,v 1.2 1998/04/23 04:31:28 jplejacq Exp $
+.\"
+.\" copyright:
+.\"   Copyright (C) 1998 Jean Pierre LeJacq <jplejacq@quoininc.com>
+.\"
+.\"   Distributed under the GNU GENERAL PUBLIC LICENSE.
+.\"
+.TH wnv2c 8 "Sat, 25 Apr 1998 00:34:33 -0400" "1.18.7-1" "Debian GNU/Linux manual"
+.SH NAME
+wnv2c \- convert logfile for wn HTTP server
+.SH SYNOPSIS
+.B wnv2c
+.RB [\| \-v \|]
+.RB [\| \-i
+.IR ip_address \|]
+.SH DESCRIPTION
+.B wnv2c
+is a
+.BR perl (1)
+program that is part of the
+.BR wn (1)
+HTTP server package.
+.B wnv2c
+converts logfiles produced by the
+.BR wn (1)
+server in the "verbose format" to files in the
+"common format" handled by most non
+.BR wn (1)
+HTTP servers' stats utilities. It also can extract the entries for
+each IP address of a "multi-homed" server (see
+.BR http://dochost/doc/wn/multi.html )
+which uses different data roots for different IP addresses.
+
+By default
+.B wnv2c
+reads from standard input a
+.BR wn (1)
+logfile produced in the "verbose format" and writes a non-verbose one
+in the "common format" to standard output.  With the
+.RB [\| \-i
+.IR ip_address \|]
+option it writes only those entries from the interface with specified
+.I ip_address
+address.  For example, if you have listed three IP addresses and
+corresponding data roots in the
+.BR wn (1)
+source file
+.I wn/vhost.h
+then
+.nf
+        wnv2c -i 123.1.2.3 <logfile >log2
+.fi
+will create
+.I log2
+the file of log entries for the interface with IP address 123.1.2.3.
+Adding the
+.B \-v
+option gives the verbose form of log entries for this interface.
+.SH FILES
+.TP
+.I /var/log/wn
+Directory containing
+.BR wn (1)
+log files.
+.SH SEE ALSO
+.BR wn (1),
+.BR wnconfig (8),
+.BR wndex (8),
+.BR wnpasswd (8),
+.BR wnuncache (8),
+.BR wnupdate-www (8)
+.br
+.B http://dochost/doc/wn/manual.html
+.br
+.B http://dochost/doc/wn/utility.html#v2c
+.br
+.B http://hopf.math.nwu.edu/index.html
+.SH AUTHOR
+.B wn
+is written by John Franks <john@math.nwu.edu>.  Modified by Jean
+Pierre LeJacq <jplejacq@quoininc.com> as part of packaging for the
+Debian GNU/Linux distribution. Manual page also added by Jean Pierre
+LeJacq.

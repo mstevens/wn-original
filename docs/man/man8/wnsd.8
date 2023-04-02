@@ -1,0 +1,452 @@
+.\" source:
+.\"   $Source: /var/cvs/projects/debian/printop/debian/dpkg.src/printop.printop.1.in,v $
+.\"
+.\" revision:
+.\"   @(#) $Id: printop.printop.1.in,v 1.2 1998/04/23 04:31:28 jplejacq Exp $
+.\"
+.\" copyright:
+.\"   Copyright (C) 1998 Jean Pierre LeJacq <jplejacq@quoininc.com>
+.\"
+.\"   Distributed under the GNU GENERAL PUBLIC LICENSE.
+.\"
+.TH wnd 8 "Sat, 25 Apr 1998 00:34:33 -0400" "1.18.7-1" "Debian GNU/Linux manual"
+.SH NAME
+wnd, wnsd \- inetd and stand-alone daemons for wn HTTP server
+.SH SYNOPSIS
+.B wnd
+.RB [\| \-a
+.IR numeric_uid \|]
+.RB [\| \-A
+.IR numeric_gid \|]
+.RB [\| \-d \|]
+.RB [\| \-e \|]
+.RB [\| \-E \|]
+.RB [\| \-h
+.IR hostname \|]
+.RB [\| \-L
+.IR access_logfile \|]
+.RB [\| \-l
+.IR error_logfile \|]
+.RB [\| \-S \|]
+.RB [\| \-t
+.IR trusted_uid \|]
+.RB [\| \-T
+.IR trusted_gid \|]
+.RB [\| \-u \|]
+.RB [\| "\-v common" \||\| "verbose" \||\| "ncsa" \|]
+.RB [\| \-V
+.IR virtual_host_file \|]
+.IR directory
+
+.B wnsd
+.RB [\| \-a
+.IR numeric_uid \|]
+.RB [\| \-A
+.IR numeric_gid \|]
+.RB [\| \-d \|]
+.RB [\| \-e \|]
+.RB [\| \-E \|]
+.RB [\| \-h
+.IR hostname \|]
+.RB [\| \-L
+.IR access_logfile \|]
+.RB [\| \-l
+.IR error_logfile \|]
+.RB [\| \-q
+.IR pid_file \|]
+.RB [\| \-S \|]
+.RB [\| \-t
+.IR trusted_uid \|]
+.RB [\| \-T
+.IR trusted_gid \|]
+.RB [\| \-u \|]
+.RB [\| "\-v common" \||\| "verbose" \||\| "ncsa" \|]
+.RB [\| \-V
+.IR virtual_host_file \|]
+.RB [\| \-p
+.IR port \|]
+.RB [\| \-q
+.IR pid_file \|]
+.IR directory
+.SH DESCRIPTION
+.B wnd
+and
+.B wnsd
+are
+.B C
+programs that are part of the
+.BR wn (1)
+HTTP server package.
+.B wnd
+is an HTTP daemon that is designed to be run from the
+.BR inetd (8)
+internet super-server usually from an entry in the
+.I /etc/inetd.conf
+file.
+.B wnsd
+is a stand-alone HTTP daemon that can be started from a command line
+or from the
+.BR init (8)
+process.
+
+The argument
+.I directory
+is the root data directory that the server will use to server
+documents.
+.SH OPTIONS
+.TP
+.BI "\-a " numeric_uid
+Set trusted numeric uid for authentication.  The server will only
+allow password authentication (see
+http://dochost/doc/wn/access.html#authenticate) if one of the options
+.BR \-a ,
+.BR \-A ,
+.BR \-t ,
+or
+.B \-T
+is used.  Then the
+.I index.cache
+file for a password protected directory must be owned by
+the user id specified with the
+.B \-a
+or
+.B \-t
+option.  The
+.B \-a
+option only affects authentication while
+.B \-t
+has other effects.  The four command line arguments
+.BR \-a ,
+.BR \-A ,
+.BR \-t ,
+and
+.B \-T
+all take a numeric argument.  Thus the command should be
+.nf
+        ./wnsd -a 203
+.fi
+and not
+.nf
+        ./wnsd -a joe
+.fi
+if user
+.I joe
+has user id
+.IR 203 .
+.TP
+.BI "\-A " numeric_gid
+Set trusted numeric gid for authentication.
+This is similar to the
+.B \-a
+option except the group owner (gid) of the
+.I index.cache
+file is used instead of the uid.
+.TP
+.B \-d
+Really verbose log.  When the server is run with this option it will
+include copies of all the client headers plus some additional
+information in the log file.  This is only useful for debugging or if
+you are curious about what clients actually send.
+.TP
+.B \-e
+Forbid CGI and execs.  When the server is run with this option it will
+not execute a CGI script, a filter or any executable in an include.
+In addition the server will reject any request with the
+.B POST
+method.
+.TP
+.B \-E
+Forbid CGI and execs to trusted users.  This is similar to the
+.B \-e
+option except that
+.I index.cache
+files owned by a trusted user id or trusted group id (set with the
+.B \-t
+or
+.B \-T
+option) are exempt from the restrictions.  That is, only scripts
+listed in
+.I index.cache
+files owned by the trusted user or group will be executed.  If neither
+the
+.B \-t
+or
+.B \-T
+are used then no scripts, filters or includes will be executed.  This
+option takes precedence over the
+.B \-u
+option, i.e. if both are used execution of scripts and programs
+behaves as if the
+.B \-u
+were not present (although the
+.B \-u
+option still grants permission for the serving of ordinary files).
+
+.TP
+.BI "\-h " hostname
+Set hostname.
+Tell the server that its name is
+.IR hostname .
+This is only used for two things: to pass to CGI scripts and for
+redirects generated when a trailing '/' is omitted in a URL path to a
+directory.  It is a shame browsers can't handle relative URL
+redirects!
+.TP
+.BI "\-L " access_logfile
+Set access logfile name.  Write log information to the file
+.IR access_logfile .
+This will override the value specified when you ran the configure
+program during installation of
+.BR wn (1)
+HTTP server package.  If the empty string "" is used as the value of
+this option then no transaction logging will be done.
+.TP
+.BI "\-l " error_logfile
+Set error logfile name.
+Write information about errors to the file
+.IR error_logfile .
+This will override the value specified when you ran the configure
+program during installation of
+.BR wn (1)
+HTTP server package.  If the empty string "" is used as the value of
+this option then the logfile given with
+.B \-L
+is used for errors as well as regular transactions.
+.TP
+.BI "\-p " port
+Set the port.  For
+.B wnsd
+only.  Running the command
+.nf
+        ./wnsd -p 8080
+.fi
+will run the server on port
+.I 8080
+rather than the default which is normally
+.I 80
+but can be
+set in
+.IR config.h .
+If a value less than or equal to
+.I 1024
+is used then the server must be run by
+.B root
+(it will change its permissions after opening the port).  This option
+is only used by
+.B wnsd
+since when
+.B wnd
+is run under
+.BR inetd (8)
+the port is determined by the setting in
+.IR  /etc/services .
+.TP
+.BI "\-q " pid_file
+Set the file name which contains the
+.B wnsd
+server process id.  For
+.B wnsd
+only.  Write the process id or "pid" of the main server process to the
+file
+.IR pid_file .
+This file name should be the full path relative to the system root.
+If this is not set either with the
+.B \-q
+option or via the configure script then the pid will be written to
+standard output when the server is started.
+.TP
+.B \-S
+Use the UNIX
+.BR syslogd (8)
+logging facility.  Instead of writing log messages to a file specified
+with
+.B \-L
+or in
+.IR config.h ,
+use the UNIX
+.BR syslogd (8)
+facility.  If
+.B WN_ERRORLOGFILE
+is set to "" and the server is run with the
+.B \-S
+option then error logging will be handled by the
+.BR syslogd (8)
+facility.  If
+.B WN_ERRORLOGFILE
+is given a value or the
+.B \-l
+option is used then errors will be logged there rather than using the
+.BR syslogd (8)
+facility.
+.TP
+.BI "\-t " trusted_uid
+Set trusted numeric user id.  When invoked with the
+.B \-t
+option alone
+.B wnd
+or
+.B wnsd
+will not serve a document unless the
+.I index.cache
+file listing it has the prescribed owner (uid),
+.IR trusted_uid .
+This numeric uid should be that of the maintainer not the one under
+which
+.B wnd
+or
+.B wnsd
+runs if started by
+.BR root .
+Indeed, for security reasons the server will refuse to use an
+.I index.cache
+file whose owner is the uid under which the server is running, in this
+case.  If on your server all
+.I index.cache
+files are created by a single user or a single group this option or
+the
+.B \-T option
+are highly recommended.  This added security is weakened somewhat if
+you also use the
+.B \-u
+option which allows
+.I index.cache
+files owned by untrusted users to permit the serving of files owned by
+the same user.  If both
+.B \-u
+and
+.B \-t
+are used the trusted user specified by
+.B \-t
+is exempt from the
+restrictions imposed by the
+.B \-u
+argument.
+.TP
+.BI "\-T " trusted_gid
+Set trusted numeric group id.  This is similar to the
+.B \-t
+option except the numeric group owner (gid) of the
+.I index.cache
+file is used instead of the numeric uid.
+.TP
+.B \-u
+Restricted untrusted users.  When this option is invoked the server
+requires that every file served (including wrappers and includes) have
+the same owner as the
+.I index.cache
+file which grants it permission to be served.  This means that
+untrusted users can only serve files which they own.  If the
+.B \-t
+or
+.B \-T
+option (described above) is used with
+.B \-u
+then
+.I index.cache
+files owned by the trusted user or trusted group are exempt from this
+requirement and they may grant permission to serve any file the server
+can read.  If the
+.B \-u
+and
+.B \-E
+options are used together then the
+.B \-E
+takes precedence for execution of CGI scripts, filters and executable
+includes, but the
+.B \-u
+still has effect for ordinary files being served.
+
+Notice that if none of
+.BR \-t ,
+.BR \-T ,
+and
+.B \-u
+are used then a user with his own home page can make a symbolic link to
+any file readable by the server and that document will be served.
+This is true even if the linked to document is in a directory with
+limited access (see http://dochost/doc/wn/access.html) or is outside
+the server data hierarchy.
+.PP
+.BR "\-v common" \||\c
+.BR "verbose" \||\c
+.BR "ncsa"
+.RS
+Set access logfile format.  They cause the logfile to be written in
+the so-called common log format, or
+.BR  wn (1)
+verbose format including user agent, referrer and cookies, or in the
+NCSA extended format which includes referrer and user agent.
+.RE
+.TP
+.BI "\-V " virtual_host_file
+Set file name which contains the list of virtual hosts and their root
+directories.  The file
+.I virtual_host_file
+should be the name of the file containing the list of "virtual hosts"
+and their corresponding IP numbers and root directories.  The format
+of this file is one line per virtual host.  Each such line should have
+the form
+.nf
+  hostname           ip_address       root_path
+.fi
+with the three parts separated by white space.  For example an entry
+might be
+.nf
+  myhost.school.edu  111.222.333.444  /usr/local/wn
+.fi
+
+In particular the hostname should be the fully qualified domain name.
+Lines in this file which are empty or start with '#' are ignored.
+
+If the virtual host file is changed you will need to restart the
+server for the change to take effect.
+.SH FILES
+.TP
+.I /etc/wn/wn.conf
+Main configuration file for
+.BR wn (1)
+package.
+.TP
+.I /etc/wn/wn.rc
+.BR sh (1)
+wrapper program to start
+.BR wn (1)
+daemon with proper options.
+.TP
+.I /etc/init.d/wn
+.BR sh (1)
+program to start
+.B wnsd
+stand-alone daemon from
+.BR init (8)
+process.
+.TP
+.I /etc/cron.daily/wn
+.BR sh (1)
+program to re-index standard documentation directories.  It is run
+daily by the
+.BR cron (8)
+daemon.
+.SH SEE ALSO
+.BR wn (1),
+.BR wnconfig (8),
+.BR wndex (8),
+.BR wnpasswd (8),
+.BR wnuncache (8),
+.BR wnupdate-www (8),
+.BR wnv2c (8)
+.br
+http://dochost/doc/wn/manual.html
+.br
+http://dochost/doc/wn/appendixA1.html
+.br
+http://hopf.math.nwu.edu/index.html
+.SH AUTHOR
+.B wn
+is written by John Franks <john@math.nwu.edu>.  Modified by Jean
+Pierre LeJacq <jplejacq@quoininc.com> as part of packaging for the
+Debian GNU/Linux distribution. Manual page also added by Jean Pierre
+LeJacq.
+.SH BUGS
+I'm not sure I have all the interactions of the options properly
+documented.

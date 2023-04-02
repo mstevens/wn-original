@@ -1,0 +1,68 @@
+#!/usr/bin/perl
+
+#########################################################################
+# Usage: wnsectsearch pattern file [file...]
+# Version 0.2
+#
+# This script searches a file or collection of files and produces
+# a document consisting of those sections of the file containing a
+# match for the regular expression in the environment variable QUERY_STRING
+# A new section is determined to begin when a line matching "pattern"
+# is found.  
+#
+# The variables $prefix and $postfix should be set to values you wish to
+# precede and follow the matching text.  They might be "", or
+# "<pre>\n" and "</pre>\n", or "<ul>" and "</ul>", for example.  They
+# must be quoted.
+#
+# This script is intended as an Index search module for the WN HTTP server.
+# The appropriate index file line would be
+#
+# Search-module=/path/to/dir/wnsectsearch pattern foo
+#
+#
+#########################################################################
+
+	$prefix = "<dl>\n";
+	$postfix = "</dl>\n";
+
+	$separator = shift;
+
+	$| = 1; # don't buffer
+	
+	$dir = $ENV{WN_DIR_PATH};
+	$query = $ENV{QUERY_STRING};
+
+	$foundmatch = 0;
+	$firsttime = 1;
+
+	foreach $file (@ARGV) {
+		$file =~ s|^.*/||;
+	
+		$path = $dir."/".$file;
+		open( IN, "<$path") 
+			|| print "Error: Can't open $path\n";
+
+		while ( $line = <IN> ) {
+			if ( $line =~ /$separator/) {
+				if ( $foundmatch ) {
+					&printitem();
+					$foundmatch = 0;
+				}
+				$tempitem = "";
+			}
+			$foundmatch = 1 if $line =~ m/$query/;
+			$tempitem = $tempitem.$line;
+		}
+		&printitem() if $foundmatch;
+	}
+	print $postfix if !$firsttime;
+	exit(0);
+
+sub printitem {
+	if ( $firsttime) {
+		print $prefix;
+		$firsttime = 0;
+	}
+	print $tempitem;
+}

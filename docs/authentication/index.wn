@@ -1,0 +1,8 @@
+Authorization-realm=myrealm@myhost.edu
+Authorization-module=~/wnauth/wnauth -P "wnpasswd"
+Authorization-type=basic
+Default-Attribute=non-cachable
+
+File=index.html
+  Includes=index
+

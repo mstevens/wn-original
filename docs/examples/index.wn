@@ -1,0 +1,45 @@
+File=index.html
+  Keywords=counter, clickable
+  Includes=!counter.cgi
+  Attributes=dynamic,cgi
+  Set-Cookie=Test=test_cookie_value
+
+File=xform.html
+
+File=ismap.html
+  Includes=shape.map,points.map
+
+File=shape.png
+
+File=shape.html
+  Attributes=parse
+
+File=shape.map
+  Attributes=imagemap
+
+File=points.png
+
+File=points.html
+  Attributes=parse
+
+File=points.map
+  Attributes=imagemap
+
+File=counter.html
+  Includes=counter.cgi
+
+File=form.html
+
+File=sample.cgi
+  Title=WN Executable Program Example (Run It)
+  Attributes=cachable
+
+File=nph-sample.cgi
+  Title=WN Executable NPH Program (Run It)
+
+File=doform.cgi     # This is the CGI program which handles the form.
+  Title=WN program used to process form
+  Attributes=nosearch
+
+File=push.cgi
+  Title=WN Server Push Example

@@ -1,0 +1,78 @@
+.\" source:
+.\"   $Source: /var/cvs/projects/debian/printop/debian/dpkg.src/printop.printop.1.in,v $
+.\"
+.\" revision:
+.\"   @(#) $Id: printop.printop.1.in,v 1.2 1998/04/23 04:31:28 jplejacq Exp $
+.\"
+.\" copyright:
+.\"   Copyright (C) 1998 Jean Pierre LeJacq <jplejacq@quoininc.com>
+.\"
+.\"   Distributed under the GNU GENERAL PUBLIC LICENSE.
+.\"
+.TH wnredir 3 "Sat, 25 Apr 1998 00:34:33 -0400" "1.18.7-1" "Debian GNU/Linux manual"
+.SH NAME
+wnredir \- CGI program for redirecting to a new URL for wn HTTP server
+.SH SYNOPSIS
+.B wnredir
+.I url\c
+.RB [\|\c
+.BR / \|]
+.SH DESCRIPTION
+.B wnredir
+is a
+.BR perl (1)
+CGI program that is part of the
+.BR wn (1)
+HTTP server package.  It redirects requests for a file to another
+location.  It looks for the name of a URL in the
+.I url
+argument.  If it ends in an optional
+.BR / ,
+it concatenates the name of the file in the environment variable
+.B WN_KEY
+(see
+.BR http://dochost/doc/wn/appendixD.html ).
+It prints the resulting URL to
+.B wnredir
+standard output.
+
+.B wnredir
+is intended to be used with the Databse Module feature of
+.BR wn (1)
+(see
+.BR http://dochost/doc/wn/module.html#db ).
+This requires that the
+.B Cache-Module
+directive be set in the appropriate
+.I index
+file (see
+.BR http://dochost/doc/wn/appendixB.html ).
+ For example, to redirect all requests to
+.I url
+you would include the following line in the
+.I index
+file for the directory being redirected:
+.nf
+        Cache-Module=redir url
+.fi
+.SH SEE ALSO
+.BR wn (1),
+.BR wnauth (3),
+.BR wncat (3),
+.BR wnsectsearch (3),
+.BR wnseven_m (3)
+.br
+.B http://dochost/doc/wn/manual.html
+.br
+.B http://dochost/doc/wn/module.html#db
+.br
+.B http://dochost/doc/wn/appendixB.html
+.br
+.B http://dochost/doc/wn/appendixD.html
+.B http://hopf.math.nwu.edu/index.html
+.SH AUTHOR
+.B wn
+is written by John Franks <john@math.nwu.edu>.  Modified by Jean
+Pierre LeJacq <jplejacq@quoininc.com> as part of packaging for the
+Debian GNU/Linux distribution. Manual page also added by Jean Pierre
+LeJacq.

@@ -1,0 +1,102 @@
+.\" source:
+.\"   $Source: /var/cvs/projects/debian/printop/debian/dpkg.src/printop.printop.1.in,v $
+.\"
+.\" revision:
+.\"   @(#) $Id: printop.printop.1.in,v 1.2 1998/04/23 04:31:28 jplejacq Exp $
+.\"
+.\" copyright:
+.\"   Copyright (C) 1998 Jean Pierre LeJacq <jplejacq@quoininc.com>
+.\"
+.\"   Distributed under the GNU GENERAL PUBLIC LICENSE.
+.\"
+.TH wnindexmaker 1 "Sat, 25 Apr 1998 00:34:33 -0400" "1.18.7-1" "Debian GNU/Linux manual"
+.SH NAME
+wnindexmaker \- produce index to a set of HTML files for wn HTTP server
+.SH SYNOPSIS
+.B wnindexmaker
+.RB [\| \-t
+.IR title \|]
+.RB [\| \-d
+.IR directory \|]
+.RB [\| \-o
+.IR out_file \|]
+.IR words_file
+.SH DESCRIPTION
+.B wnindexmaker
+is a
+.BR perl (1)
+program that is part of the
+.BR wn (1)
+HTTP server package.  It produces an index (in the usual sense not the
+.BR wn (1)
+sense) for a virtual document consisting of a number of HTML files in
+a single directory.  The index is placed in an output file which
+contains a list of anchors, one for each word in the words file. Each
+word is linked to a context search for itself.  The index to the
+manual
+.B http://dochost/doc/wn/index.html
+is a good example of how an index produced by
+.B wnindexmaker
+works.
+
+.IR words_file
+is the final argument to the
+.B wnindexmaker
+program.  It is a list of words or phrases, in alphabetical order, one
+per line, which you wish to appear in the index. One way to produce it
+is to use UNIX utilities to produce a list of all words in the files,
+then run
+.BR sort (1)
+\-dfu on it and remove unsuitable words from the list.
+.SH OPTIONS
+.TP
+.BI "\-d " directory
+The directory containing the files being indexed.  It should either
+begin with a '/' and be relative to the
+.BR wn (1)
+root directory or not begin with a '/' and be relative to the
+directory which will contain the output file.  If this option is not
+used then the output file must reside in the same directory as the
+files being indexed. If this is done then it is a good idea to add an
+"Attribute=nosearch" to the output file record in the index file for
+the directory. Otherwise the output file will index itself in addition
+to the other files in the directory.
+.TP
+.BI "\-o " out_file
+Sets the name of the output HTML documentation file to
+.IR out_file.
+The default is docindex.html.
+.TP
+.BI "\-t " title
+Sets the title of the output HTML document to
+.IR title.
+The default is "Index".
+.SH FILES
+.TP
+.I out_file
+Output of the
+.B wnindexmaker
+program.
+.TP
+.I words_file
+Input to the
+.B wnindexmaker
+program.
+.SH SEE ALSO
+.BR sort (1),
+.BR wn (1),
+.BR wndigest (1),
+.BR wnhtmlify (1),
+.BR wnpnuts (1)
+.br
+.B http://dochost/doc/wn/index.html
+.br
+.B http://dochost/doc/wn/utility.html#indexmaker
+.br
+.B http://hopf.math.nwu.edu/index.html
+.SH AUTHOR
+.B wn
+is written by John Franks <john@math.nwu.edu>.  Modified by Jean
+Pierre LeJacq <jplejacq@quoininc.com> as part of packaging for the
+Debian GNU/Linux distribution. Manual page also added by Jean Pierre
+LeJacq.

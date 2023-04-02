@@ -1,0 +1,10 @@
+By default nothing in this directory is servable because
+it includes CGI scripts which will run on your server if served.
+To activate these files and scripts run wndex in this directory.
+
+You can look at the latest version of the examples here at
+
+   http://hopf.math.northwestern.edu/docs/examples/
+
+
+John Franks

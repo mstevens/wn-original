@@ -1,0 +1,10 @@
+#!/usr/bin/perl
+
+print "<pre>\n";
+while ( $line = <STDIN>) {
+	$line =~ s/&/&amp;/g;
+	$line =~ s/</&lt;/g;
+	$line =~ s/>/&gt;/g;
+	print $line;
+}
+print "</pre>\n";

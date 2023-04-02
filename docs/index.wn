@@ -1,0 +1,111 @@
+# directory:
+  Searchwrapper=swrapper.html
+  Nomatchsub=nomatch.html
+  Subdirs=authentication,examples,images
+
+File=index.html
+
+File=nomatch.html
+  Attributes=nosearch,parse
+
+File=swrapper.html
+  Attributes=nosearch,parse
+
+File=howindex.html
+
+File=manual.html
+  Attributes=parse
+
+File=overview.html
+
+File=setup.html
+
+File=index_desc.html
+
+File=security.html
+
+File=search.html
+
+File=parse.html
+
+File=filter.html
+
+File=field.html
+
+File=range.html
+
+File=access.html
+
+File=tilde.html
+
+File=multi.html
+
+File=utility.html
+
+File=module.html
+
+File=click.html
+
+File=cgi.html
+
+File=defcache.html
+
+File=support.html
+
+File=config.h.dist
+  Title=Configuration File for the WN Package
+  Content-type=text/plain
+
+File=cacheformat
+  Title=Format of index.cache file for WN
+  Content-type=text/plain
+
+File=appendixA1.html
+
+File=appendixA2.html
+
+File=appendixB.html
+
+File=appendixC.html
+
+File=appendixD.html
+
+File=appendixE.html
+
+File=appendixF.html
+  List-Includes=md5.src.asc
+
+File=configmacros.html
+
+File=docindex.html
+  Attributes=nosearch
+
+File=dosearch.html
+
+File=complete.html
+  Attributes=nosearch,parse
+  List-Includes=manual.html,overview.html,setup.html,index_desc.html,\
+    security.html,search.html,parse.html,field.html,filter.html,range.html,\
+    access.html,tilde.html,multi.html,utility.html,module.html,click.html,\
+    cgi.html,support.html,defcache.html,appendixA1.html,appendixA2.html,\
+    appendixB.html,appendixC.html,appendixD.html,appendixE.html,appendixF.html,\
+    configmacros.html,howindex.html,colophone.html,md5.src.asc
+
+File=changelog
+  Title=Changelog for WN
+  Content-type=text/plain
+
+File=QUICKSTART
+  Title=Quick start
+  Content-type=text/plain
+
+File=Gnu_License
+  Title=GNU Public License
+  Content-type=text/plain
+
+File=fdl.txt
+  Title=GNU Free Documentation License
+
+File=colophone.html
+
+File=colophone.html

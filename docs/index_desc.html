@@ -1,0 +1,649 @@
+<!doctype html public "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+  <head>
+    <title>Creating your WN data directory</title>
+
+    <link rev="made" href="mailto:john@math.northwestern.edu">
+
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <meta http-equiv="last-modified" content="Sat June 18 2005">
+    <meta http-equiv="keywords" content="WN data hierarchy">
+  </head>
+
+  <body bgcolor="#FFFFFF">
+    <p>
+      <a href="http://hopf.math.northwestern.edu/"><img
+        src="images/powered.jpg"
+        border="0"
+        width="190"
+        height="41"
+        align="right"
+        alt="WN home page"
+      ></a>
+    </p>
+
+    <strong>Version 2.4.7</strong>
+
+    <br>
+
+    <!-- pnuts --> <a href="setup.html">[Previous]</a> <a href="security.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+
+    <br clear="right">
+
+    <hr size="4">
+    <!-- #start -->
+
+    <h2 align="center">Creating Your <em>WN</em> Data Directory</h2>
+    <hr size="4">
+
+
+
+    <h3>3.1 <a name="index">The <code>index.wn</code> file</a></h3>
+
+    <p>
+      In each directory of your data hierarchy you create a file called
+      <code>index.wn</code> with information about each file you want to serve.
+      The simplest <code>index.wn</code> file might contain the single line:
+    </p>
+
+    <blockquote>
+      <code>
+        <a
+        href="appendixB.html#ddir.attributes.serveall">Attributes=serveall</a>
+      </code>
+    </blockquote>
+
+    <p>
+      which when properly processed will grant the server permission to serve
+      any file in the directory (but not in subdirectories).  For more
+      information about this directive see the section on the <a
+      href="#serveall"><code>serveall</code></a> attribute below.  A more
+      elaborate <code>index.wn</code> file might look like the following:
+    </p>
+
+    <blockquote>
+      <code>
+        <a
+        href="appendixB.html#ddir.owner">Owner=</a>mailto:webmistress@host.edu
+        <br>
+        <br>
+        <a href="appendixB.html#fdir.file">File=</a>file.txt
+        <br>
+        <a href="appendixB.html#fdir.title">Title=</a>This is a descriptive
+        title for file.txt
+        <br>
+        <br>
+        # This is a comment
+        <br>
+        <a href="appendixB.html#fdir.file">File=</a>file2.html
+        <br>
+        <br>
+        <a href="appendixB.html#fdir.file">File=</a>soundfile
+        <br>
+        <a href="appendixB.html#fdir.title">Title=</a>This plays some sounds
+        <br>
+        <a
+        href="appendixB.html#fdir.content-type">Content-type=</a>audio/basic
+        <br>
+      </code>
+    </blockquote>
+
+    <p>
+      The file contains four groups of lines called records.  The first record
+      (the single line starting <code><a
+      href="appendixB.html#ddir.owner">Owner=</a></code> in this example)
+      describes properties of the directory and is called the <a
+      href="appendixB.html#ddir">directory record</a>.  It can be empty, but in
+      general it is a good idea for the directory record to contain an owner
+      line, like the one above, referring to the maintainer of the directory.
+    </p>
+
+    <p>
+      The remainder of this <code>index.wn</code> file has three <a
+      href="appendixB.html#fdir">file records</a> describing three files,
+      <code>file.txt</code>, <code>file2.html</code> and
+      <code>soundfile</code>, in the directory which we wish to serve. The line
+      starting with '<code>#</code>' is a comment.  Wherever a '<code>#</code>'
+      occurs the remainder of that line is treated as a comment (i.e. ignored).
+    </p>
+
+    <p>
+      The <code>index.wn</code> file is processed with the utility <a
+      href="#wndex"><code>wndex</code></a> (pronounced "windex") to produce a
+      small database called <code>index.cache</code> containing information
+      about this directory and its contents.  Detailed information on the <a
+      href="#wndex"><code>wndex</code> utility</a> is given below, but simply
+      running it with no arguments in a directory containing an
+      <code>index.wn</code> file will produce the <code>index.cache</code> file
+      for that directory.  This file contains all the information in the
+      <code>index.wn</code> file plus additional information gathered
+      automatically about the files to be served.  In particular the
+      <code>index.cache</code> file will list the names of the files given in
+      the <code><a href="appendixB.html#fdir.file">File=</a></code> lines of the
+      <code>index.wn</code> file.  Any file on the server whose name is not listed
+      in an <code>index.cache</code> file will not be served.  This is the
+      basis of <em>WN</em> security.  For security reasons the server will
+      refuse to use any <code>index.cache</code> file which is in reality a
+      symbolic link to another file.
+    </p>
+
+    <p>
+      The <code>index.cache</code> database has a number of other functions
+      beyond its security role.  Attributes of the files listed in the
+      <code>index.wn</code> file which can be computed before they are served and
+      which don't often change are stored in the <code>index.cache</code> file.
+      For example, the <code>MIME</code> content type of <code>soundfile</code>
+      is read from the <code><a
+      href="appendixB.html#fdir.content-type">Content-type=</a></code> line.
+      The other files do not need such a line since <a
+      href="#wndex"><code>wndex</code></a> can deduce from the file name
+      extensions that <code>file.txt</code> has type <code>text/plain</code>
+      and <code>file2.html</code> has type <code>text/html</code>.  This is
+      done once at the time <code>index.cache</code> is created and need not be
+      done every time the file is served.  By the way, if the sound file were
+      named <code>soundfile.au</code> it wouldn't need a
+      <code>Content-type</code> line either.
+    </p>
+
+    <p>
+      The title of a file is another example of information stored in the
+      <code>index.cache</code> file.  With the <em>WN</em> server every file
+      served has a title (even binaries) and optionally has a list of keywords
+      associated with it.  For an HTML document the title and the keywords are
+      automatically extracted by <a href="#wndex"><code>wndex</code></a> from
+      the header of the document and stored in fields of that file's line in
+      <code>index.cache</code>.  These are used for the built-in keyword and
+      title <a href="search.html">searches</a> which the server supports.
+    </p>
+
+
+
+    <h3>3.2 <a name="file_owner">File Ownership and Permissions</a></h3>
+
+    <p>
+      The files which you wish to serve should be owned by you, or by their
+      creator, or by whoever is in charge of maintaining them.  They should not
+      be owned by <code>nobody</code> or whatever user id the server runs under
+      as set in <a href="configmacros.html#USERID"><code>config.h</code></a>.
+      This because the <code>nobody</code> id should have the minimum
+      permissions possible.  It needs to have read access to the files to be
+      served, but it has no need to be able to write to those files or alter
+      them in any way.
+    </p>
+
+    <p>
+      Thus normally the files served might be owned by the maintainer and have
+      their permissions set to be world readable but writable only by the
+      maintainer (or by no one).
+    </p>
+
+    <p>
+      Likewise the <code>index.cache</code> file which controls access to
+      everything in a directory should be owned by the maintainer of that
+      directory and the only permission <code>nobody</code> should have for
+      this file is read permission.  In fact, for security reasons it the
+      server was started as <code>root</code> (and then switched to a safer
+      user like <code>nobody</code>) <code>wnd</code> or <code>wnsd</code> will
+      refuse to use any <code>index.cache</code> file which is owned by the
+      user id (e.g. <code>nobody</code>) under which the server is running.
+      This restriction does not apply if <code>wnsd</code> is run on an
+      unprivileged port by an ordinary user, because such a user might not be
+      able to make <code>index.cache</code> files owned by someone else.
+    </p>
+
+    <p>
+      There is one exception to the rule of having nothing owned by
+      <code>nobody</code> (and that's not a double negative).  The exception is
+      the log files.  These files must be writable by the server and it
+      generally seems sensible to have them owned by the user
+      <code>nobody</code> under whose identity the server runs. The log file
+      and the error log file can be specified on the command line when the
+      server is run or can be set in the <a
+      href="configmacros.html"><code>config.h</code></a> with the <a
+      href="configmacros.html#WN_LOGFILE"><code>#define&nbsp;WN_LOGFILE</code></a>
+      and <a
+      href="configmacros.html#WN_ERRLOGFILE"><code>#define&nbsp;WN_ERRLOGFILE</code></a>
+      macros.
+    </p>
+
+
+
+    <h3>3.3 <a name="wndex">Using the <code>wndex</code> Utility</a></h3>
+
+    <p>
+      Before describing the <code>index.wn</code> file in greater detail we
+      briefly explain the use of the program which reads this file and produces
+      the <code>index.cache</code> database file.  Simply running
+      <code>wndex</code> with no arguments in a directory containing a file
+      named <code>index.wn</code> causes that file to be read and a file called
+      <code>index.cache</code> to be created in that directory.
+    </p>
+
+    <p>
+      There are several command line arguments for <code>wndex</code>.  The <a
+      href="appendixA2.html#r_opt"><code>-r</code></a> option causes
+      <code>wndex</code> to recursively descend your data hierarchy using all
+      subdirectories listed in the <code><a
+      href="appendixB.html#ddir.subdirs">Subdirs=</a></code> line of the
+      directory record in the <code>index.wn</code> file (<a
+      href="#dir_record">see below</a>).
+    </p>
+
+    <p>
+      The <a href="appendixA2.html#i_opt"><code>-i</code></a> and <a
+      href="appendixA2.html#c_opt"><code>-c</code></a> options specify an
+      alternate name for the <code>index.wn</code> file and the
+      <code>index.cache</code> file respectively.  For example the command:
+    </p>
+
+    <blockquote>
+      <code>
+        wndex&nbsp;-i&nbsp;foo&nbsp;-c&nbsp;bar
+      </code>
+    </blockquote>
+
+    <p>
+      will attempt to use <code>foo</code> as the <code>index.wn</code> file and
+      produce the file <code>bar</code> instead of <code>index.cache</code>.
+    </p>
+
+    <p>
+      The <a href="appendixA2.html#d_opt"><code>-d</code></a> option specifies
+      a directory other than the current directory in which to find the
+      <code>index.wn</code> file and in which to create the
+      <code>index.cache</code> and <code>index.html</code> files.
+    </p>
+
+    <p>
+      Finally the <a href="appendixA2.html#q_opt"><code>-q</code></a> option
+      (for quiet) suppresses the printing of any warning or informational
+      messages by <code>wndex</code>.
+    </p>
+
+
+
+    <h3>3.4 <a name="dir_record">The Directory Record</a></h3>
+
+    <p>
+      The first group of lines in an <code>index.wn</code> file provides
+      information about the directory itself and the collection of files it
+      contains rather than about any single file in the directory.  It is
+      called the directory record. This beginning collection of lines might
+      look like:
+    </p>
+
+    <blockquote>
+      <code>
+        <a href="appendixB.html#ddir.owner">Owner=</a>mailto:you@host.edu
+        <br>
+        <a
+        href="appendixB.html#ddir.searchwrapper">SearchWrapper=</a>dir_search_wrap
+        <br>
+        <a href="appendixB.html#ddir.accessfile">Accessfile=</a>/dir/access
+        <br>
+        <a href="appendixB.html#ddir.subdirs">Subdirs=</a>dir1,dir2,directory3
+        <br>
+      </code>
+    </blockquote>
+
+    <p>
+      The <code><a href="appendixB.html#ddir.owner">Owner=</a></code> line
+      specifies the owner of items in the directory (which is used in the <a
+      href="http://www.w3c.org/Protocols/">HTTP/1.1</a> headers sent by the
+      server).
+    </p>
+
+    <p>
+      The <code><a
+      href="appendixB.html#ddir.searchwrapper">SearchWrapper=</a></code> line
+      specifies a "wrapper" for the various searches of the directory. That is
+      an HTML document which provides a customized response listing the
+      matching items in one of the various searches of the directory.  For more
+      details see the chapter "<a href="parse.html">Parsed Text and Server Side
+      Includes on the <em>WN</em> Server</a>" in this guide.
+    </p>
+
+    <p>
+      The <code><a href="appendixB.html#ddir.accessfile">Accessfile=</a></code>
+      line specifies the name of the file which controls access (by IP address)
+      to this directory.  If this item is omitted then items in the directory
+      may be served to anyone.  For more information on using the access
+      mechanism see the chapter "<a href="access.html">Limiting Access to Your
+      <em>WN</em> Hierarchy</a>" in this guide.
+    </p>
+
+    <p>
+      Finally the line starting with <code><a
+      href="appendixB.html#ddir.subdirs">Subdirs=</a></code> specifies the
+      subdirectories of this directory which you wish to have recursively
+      searched when a title or keyword search is done on this directory.  More
+      information about searching can be found in the chapter "<a
+      href="search.html">Setting Up Searches on the <em>WN</em> Server</a>" in
+      this guide.
+    </p>
+
+    <p>
+      For a complete list of the possible lines (called "directives") which a
+      directory can have see the section "<a
+      href="appendixB.html#ddir">Directory Directives</a>" in this guide.
+    </p>
+
+
+
+    <h3>3.5 <a name="file_records">File Records</a></h3>
+
+    <p>
+      After the directory record line group an <code>index.wn</code> file will
+      typically have groups of lines called file records describing a
+      particular file.  A file record can be as simple as a single line like
+      the line "<code><a
+      href="appendixB.html#fdir.file">File=</a>file2.html</code>" in the
+      example above or it can contain several lines describing the file.  For a
+      complete list of the possible lines (called "directives") which a file
+      can have see the section "<a href="appendixB.html#fdir">File Directives</a>"
+      in this guide.
+    </p>
+
+
+
+    <h3>3.6 <a name="default">Your Default Page</a></h3>
+
+    <p>
+      When someone sends a request to your server with only the server name and
+      no file name like:
+    </p>
+
+    <blockquote>
+      <code>
+        http://hopf.math.northwestern.edu/
+      </code>
+    </blockquote>
+
+    <p>
+      the <em>WN</em> server automatically translates this to:
+    </p>
+
+    <blockquote>
+      <code>
+        http://hopf.math.northwestern.edu/index.html
+      </code>
+    </blockquote>
+
+    <p>
+      adding the file name "<code>index.html</code>".  More generally if a
+      request is made for a directory, say with the URL
+      <code>http://host/dir1/dir2/</code>, this will be translated to a request
+      for <code>http://host/dir1/dir2/index.html</code>.
+    </p>
+
+    <p>
+      If you wish the default file name in a particular directory to be
+      something other than "<code>index.html</code>" you can use the <a
+      href="appendixB.html#ddir.default-document"><code>Default-Document=</code></a>
+      directive in the directory record of your <code>index.wn</code> file to
+      change it.  If you wish to change the default file name for all
+      directories on the server you can change the <a
+      href="configmacros.html#INDEXFILE_NAME"><code>#define&nbsp;INDEXFILE_NAME</code></a>
+      line in the <a href="configmacros.html"><code>config.h</code></a> file
+      and recompile.
+    </p>
+
+
+
+    <h3>3.7 <a name="serveall">Serving Files not Listed in an
+    <code>index.wn</code> File</a></h3>
+
+    <p>
+      <em>WN</em> is also able to serve files without explicitly listing them
+      in an <code>index.wn</code> or <code>index.cache</code> file.  This is done
+      by putting the line:
+    </p>
+
+    <blockquote>
+      <code>
+        <a
+        href="appendixB.html#ddir.attributes.serveall">Attributes=serveall</a>
+      </code>
+    </blockquote>
+
+    <p>
+      in the directory record of the <code>index.wn</code> file for a directory or
+      by running <a href="#wndex"><code>wndex</code></a> with the <a
+      href="appendixA2.html#a_opt"><code>-a</code></a> option.  Either of these
+      specify that any file in this directory, which does not start with the
+      character '<code>.</code>', or contain a '<code>~</code>', may be served,
+      not just those listed in the <code>index.wn</code> file.  The files
+      <code>index.wn</code> and <code>index.cache</code> will also not be served.
+      (Indeed if the <a href="appendixA2.html#a_opt"><code>-a</code></a> option
+      is used with <a href="#wndex"><code>wndex</code></a> there need not even
+      be an <code>index.wn</code> file, because an <code>index.cache</code> file
+      will be created just as if the <code><a
+      href="appendixB.html#ddir.attributes.serveall">Attributes=serveall</a></code>
+      directive had been used.)
+    </p>
+
+    <blockquote>
+      <em>Note:</em> When this directive is used in a directory protected by an
+      <a href="access.html#ip"><code>accessfile</code></a> or a <a
+      href="access.html#authenticate">password file</a> be sure that these
+      files have names that start with '<code>.</code>', or contain a
+      '<code>~</code>'.  Or better, put these files in a different directory
+      from which nothing is served.
+    </blockquote>
+
+    <p>
+      When the <code><a
+      href="appendixB.html#ddir.attributes.serveall">Attributes=serveall</a></code>
+      directive is used the server will attempt to set the content type
+      correctly based on the file name suffix using the same default
+      correspondences between type and suffix that <a
+      href="#wndex"><code>wndex</code></a> uses.  Indeed when <a
+      href="#wndex"><code>wndex</code></a> is run on a directory with the
+      <code><a
+      href="appendixB.html#ddir.attributes.serveall">Attributes=serveall</a></code>
+      directive, it behaves as if all files in the directory (except those
+      starting with '<code>.</code>' or containing a '<code>~</code>') were
+      listed with a <code><a href="appendixB.html#fdir.file">File=</a></code>
+      directive.  If the <code><a
+      href="appendixB.html#ddir.attributes.serveall">Attributes=serveall</a></code>
+      line (and the corresponding entry it creates in the
+      <code>index.cache</code> file) are not present then only the files
+      explicitly listed with a <code><a
+      href="appendixB.html#fdir.file">File=</a></code> directive will be
+      served.
+    </p>
+
+    <p>
+      The default correspondences between file name suffixes and MIME types are
+      specified in the "<code>mime.types</code>" file.  A default version of
+      the file is in <code>/lib/mime.types</code>.  The <code>mime.types</code>
+      file should be installed in a known location.  The default location is in
+      the <em>WN</em> <code>src</code> hierarchy, but this can be changed by
+      specifying a different value when the <a
+      href="setup.html#installing.configure"><code>configure</code></a> program
+      is run or by editing the value of <a
+      href="configmacros.html#MIME_TYPE_FILE"><code>#define&nbsp;MIME_TYPE_FILE</code></a>
+      in <a href="configmacros.html"><code>config.h</code></a>.  The
+      <code>mime.types</code> file exists so that you can add to it if you wish
+      to add new kinds of documents to your server.  The format of the file is
+      explained in the file.  If this file cannot be opened then <a
+      href="#wndex"><code>wndex</code></a> will use compiled in defaults which
+      are the same as what is currently in the default version of this file.
+      The <code>mime.types</code> file is read whenever <a
+      href="#wndex"><code>wndex</code></a> is run so <a
+      href="#wndex"><code>wndex</code></a> always knows the latest additions.
+      This file is also read by <code>wnsd</code> (but not <code>wnd</code>) on
+      startup for use with directories with the <code><a
+      href="appendixB.html#ddir.attributes.serveall">Attributes=serveall</a></code>
+      directive.  The <code>wnsd</code> stand-alone server reads this file when
+      it is started or restarted, but only takes note of new suffixes and their
+      MIME types.  You cannot change the MIME type corresponding to one of the
+      standard suffixes (as listed in the default <code>mime.types</code>
+      file).  To do that you need to change the server source and recompile.
+    </p>
+
+    <p>
+      It is fine to have file records in an <code>index.wn</code> file which also
+      has the <code><a
+      href="appendixB.html#ddir.attributes.serveall">Attributes=serveall</a></code>
+      directive.  In this case the file directives take precedence.  Thus if
+      you had an <code>index.wn</code> file consisting of:
+    </p>
+
+    <blockquote>
+      <code>
+        <a
+        href="appendixB.html#ddir.attributes.serveall">Attributes=serveall</a>
+        <br>
+        <br>
+        <a href="appendixB.html#fdir.file">File=</a>foo.html
+        <br>
+        <a
+        href="appendixB.html#fdir.content-type">Content-type=</a>application/postscript
+        <br>
+      </code>
+    </blockquote>
+
+    <p>
+      the server would consult the file record for "<code>foo.html</code>"
+      first and see that it is of type <code>application/postscript</code> (it
+      would be silly to actually do this, of course) and use that type.  But
+      another file "<code>bar.html</code>" in the directory would also be
+      served with the type indicated by its suffix.  Files with no file record
+      in the <code>index.wn</code> file and no recognized suffix will be given the
+      default content type which can set with the <code><a
+      href="appendixB.html#defcon">Default-Content=</a></code> directive.
+    </p>
+
+    <p>
+      When <a href="#wndex"><code>wndex</code></a> is run on an
+      <code>index.wn</code> file with the <code><a
+      href="appendixB.html#ddir.attributes.serveall">Attributes=serveall</a></code>
+      directive all the files currently in that directory which can be served
+      are given entries in the <code>index.cache</code> file.  <a
+      href="search.html#title">Title</a> and <a
+      href="search.html#keyword">keyword</a> searches only see files listed in
+      an <code>index.cache</code> file.  Likewise <a
+      href="search.html#context">context</a> and <a
+      href="search.html#grep">grep</a> searches only seek matches in files
+      listed in the <code>index.cache</code> file.  Thus if a file is added to
+      a directory with the <code><a
+      href="appendixB.html#ddir.attributes.serveall">Attributes=serveall</a></code>
+      directive it will not be visible to searches unless <a
+      href="#wndex"><code>wndex</code></a> is re-run in that directory.  If it
+      has not been re-run the file will still be served, however.  Still, it is
+      good practice to re-run <a href="#wndex"><code>wndex</code></a> every
+      time you add or delete a file in a directory with the <code><a
+      href="appendixB.html#ddir.attributes.serveall">Attributes=serveall</a></code>
+      directive.  (Of course, it is required to do this for a directory without
+      the <code><a
+      href="appendixB.html#ddir.attributes.serveall">Attributes=serveall</a></code>
+      directive.)  There is no need to re-run <a
+      href="#wndex"><code>wndex</code></a> if you only change an existing file,
+      unless you change its title or keywords.
+    </p>
+
+    <p>
+      There is no way to use <a href="parse.html">wrappers or includes</a> for
+      files not listed in the <code>index.wn</code> file.  So generally, the few
+      seconds it takes to add a document's name and a descriptive title to your
+      <code>index.wn</code> file and then to run <a
+      href="#wndex"><code>wndex</code></a> will pay off.
+    </p>
+
+    <p>
+      If you do not wish the <code><a
+      href="appendixB.html#ddir.attributes.serveall">Attributes=serveall</a></code>
+      directive to be allowed on your server you can disable it by uncommenting
+      the "<a
+      href="configmacros.html#NO_SERVEALL"><code>#define&nbsp;NO_SERVEALL</code></a>"
+      line in the <a href="configmacros.html"><code>config.h</code></a> file.
+      This does not affect the ability of <a
+      href="#wndex"><code>wndex</code></a> to write <code>index.cache</code>
+      entries for all files in a directory with the <code><a
+      href="appendixB.html#ddir.attributes.serveall">Attributes=serveall</a></code>
+      directive.  But it means the server will only serve files listed an
+      <code>index.cache</code> file.
+    </p>
+
+
+
+    <h3>3.8 <a name="msgs_error">Customized Error Messages</a></h3>
+
+    <p>
+      There are three situations when the client request will be denied but for
+      which you can supply customized error messages. These are requests for
+      non-existent files, requests for files which require a password but for
+      which no valid password was given, and requests from an invalid host for
+      files limited to certain hosts.  The lines:
+    </p>
+
+    <blockquote>
+      <code>
+        <a
+        href="appendixB.html#ddir.no-such-file-url">No-Such-File-URL=</a>http://host/dir/nosuch.html
+        <br>
+        <a
+        href="appendixB.html#ddir.access-denied-url">Access-denied-URL=</a>http://host/dir/noaccess.html
+        <br>
+        <a
+        href="appendixB.html#ddir.auth-denied-file">Auth-denied-file=</a>~/dir/nopassword.html
+      </code>
+    </blockquote>
+
+    <p>
+      in a <a href="#dir_recore">directory record</a> of an <code>index.wn</code>
+      file specify URL's to which clients are redirected when a non-existent
+      file is requested and when a document protected by an <a
+      href="access.html#ip">access control file</a> is requested from an
+      invalid host.  The last line specifies a file to be sent when a password
+      protected file is requested without a password or with an invalid
+      password.  For technical reasons it wouldn't work to have this be a
+      redirection.
+    </p>
+
+    <p>
+      In the first two lines above (specifying redirection) the URL's given can
+      be relative URL's, so the lines:
+    </p>
+
+    <blockquote>
+      <code>
+        <a
+        href="appendixB.html#ddir.no-such-file-url">No-Such-File-URL=</a>/dir/nosuch.html
+        <br>
+        <a
+        href="appendixB.html#ddir.access-denied-url">Access-denied-URL=</a>noaccess.html
+      </code>
+    </blockquote>
+
+    <p>
+      are valid.  Default values for these three directives may be specified by
+      editing the <a href="configmacros.html"><code>config.h</code></a> file
+      and recompiling the server.  More information on customized error
+      messages can be found in section "<a href="appendixB.html#ddir">Directory
+      Directives</a>" in this guide.
+    </p>
+
+
+
+    <!-- #end -->
+    <hr size="4">
+
+    <address>
+      <em>WN</em> version 2.4.7
+      <br>
+      Copyright &copy; 1998-2005 <a href="mailto:john@math.northwestern.edu">John Franks
+      &lt;john@math.northwestern.edu&gt;</a>
+      <br>
+      licensed under the <a
+        href="http://www.gnu.org/copyleft/fdl.txt">GNU Free Documentation License</a>
+      <br>
+Last modified: Sat June  18 2005
+    </address>
+
+    <!-- pnuts --> <a href="setup.html">[Previous]</a> <a href="security.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+  </body>
+</html>
+
+

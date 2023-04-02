@@ -1,0 +1,84 @@
+#!/usr/bin/perl
+
+#########################################################################
+# Usage: wnseven_m separator_pattern section_pattern file [file...]
+# Version 0.2
+#
+# This script searches a file or collection of files and produces
+# a <ul> HTML list of anchors to sections of the file containing a
+# match for the regular expression in the environment variable QUERY_STRING
+# A new section is determined to begin when a line matching separator_pattern
+# is found.  The text of the anchor is taken from the first line of a 
+# section matching section_pattern.
+#
+# This script is intended as an Index search module for the WN HTTP server.
+# The appropriate index file line would be
+#
+# Search-module=/path/to/dir/wnseven_m  "^From " "^Subject:" foo
+#
+# for a mail format file "foo" in directory dir (with wnseven_m there too).
+#########################################################################
+
+	$separator = shift;
+	$section = shift;
+	$| = 1; # don't buffer
+	
+	$dir = $ENV{WN_DIR_PATH};
+	$query = $ENV{QUERY_STRING};
+
+	$foundmatch = 0;
+	$firsttime = 1;
+
+	if ( $section =~ s/^\$//) {
+		$skip2next = 1;
+	}
+
+	foreach $file (@ARGV) {
+		$file =~ s|^.*/||;
+	
+		$path = $dir."/".$file;
+		open( IN, "<$path") 
+			|| print "Error: Can't open $path\n";
+
+		$startline = 0;
+		$linecnt = 0;
+		while ( $line = <IN> ) {
+			$linecnt++;
+			if ( $line =~ /$separator/) {
+				if ( $startline > 0 ) {
+					&printline();
+				}
+				$startline = $linecnt;
+				if ( $skip2next) {
+					$line = <IN>;
+					$linecnt++;
+				}
+
+				$title = "";
+			}
+			$foundmatch = 1 if $line =~ m/$query/;
+			if ( !$title && $line =~ s/^.*$section//) {
+				$title = $line;
+				chop( $title);
+				$title =~ s/&/&amp;/g;
+				$title =~ s/</&lt;/g;
+				$title =~ s/>/&gt;/g;
+			}
+		}
+		&printline();
+	}
+	printf( "</ul>\n") if !$firsttime;
+	exit(0);
+
+sub printline {
+	if ( $foundmatch) {
+		if ( $firsttime) {
+			printf( "<ul>\n");
+			$firsttime = 0;
+		}
+		$foundmatch = 0;
+		printf(  "    <li> <a href=\"%s;lines=%d-%d\">", 
+			$file, $startline, $linecnt-1 );
+		printf( "%s</a>\n", $title);
+	}
+}

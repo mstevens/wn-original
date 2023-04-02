@@ -1,0 +1,779 @@
+#!/usr/bin/perl
+#####################################################################
+# WN configure 2.4.0
+# This is a perl script to help you configure WN prior to compilation.
+# Run it with the command "perl configure."
+#####################################################################
+
+	eval 'exec perl -wS $0 ${1+"$@"}'
+		if $running_under_some_shell;
+	$version = "2.4.0";
+	$compatversion = "2.3.13";
+	$have_libs = 0;		# whether or not "LIBS=" was found in Makefile
+	$has_snprintf = 0;	# whether or not snprintf was found
+	$has_pam = 0;	# whether or not security/pam_appl.h  was found
+	$solaris_libs = "-lsocket -lnsl";
+	$solaris_ranlib = "/usr/ccs/bin/ranlib";
+	$uxpds_libs = "-lsocket -lnsl";
+	$unixware_libs = "-lsocket -lnsl -lc -lgen -L/usr/ucblib";
+	$sysvr4_libs = "-lsocket -lnsl -lc";
+	$sco_libs = "-lsocket -lsc";
+	$aix_libs = "-lcrypt -lm";
+	$isc_libs = "-lcrypt -linet -lnsl_s -lcposix";
+	$free_bsd_libs = "-lcrypt";
+	$dynix_libs = "-lsocket -linet -lnsl";
+	$cwd = `pwd`;
+	chop($cwd);
+	$mime = $cwd."/lib/mime.types";
+	$servbindir = $cwd."/bin";
+	$wnusername = "nobody";
+	$user = "";
+	$cc = "cc";
+
+	@supported =(AIX, AUX, BSDI, CONVEX_0S, DYNIX, FREE_BSD, HPUX,
+	ISC, LINUX, MAC_OS_X, NET_BSD, NEXT, OPEN_BSD, OSF1, PYRAMID, RISCOS,
+        SCO, SGI, SINIX, SOLARIS, SUN_OS4, SVR4, TRUE64, ULTRIX, UNIXWARE, UXPDS);
+
+	&preconfig();
+
+	if ( ($makefile_ver eq $compatversion)
+		&& ($config_h_ver eq $compatversion)
+		&& $from_config
+		&& (!$from_make_dist) ) {
+	print <<EOF;
+	The version of "config.h" and "Makefile" in the current directory
+	are suitable for use with this version of WN. Would you like to use
+	them instead of making new versions?
+EOF
+
+		$remake = &ask( "No", "");
+
+		exit( 0) if ($remake =~ /^[Yy]/);
+	}
+
+	print <<EOF;
+
+			WN Configuration (version $version)
+	
+	This configuration script asks you several questions.  Default
+	answers are printed in [square brackets] so you can simply press
+	return to enter that value.  (But don't use [square brackets]
+	when you enter a value.)  You can quit at any time by pressing
+	Ctrl-C and nothing should be changed.  An alternative to running
+	this script is to copy Makefile.dist and config.h.dist to
+	Makefile and config.h respectively and edit them manually.  You
+	may rerun this script as many times as you like, but it will only
+	have an effect if you rerun "make".
+
+	Currently supported operating systems are:
+	AIX, AUX, BSDI, CONVEX_0S, DYNIX, FREE_BSD, HPUX, ISC, LINUX,
+	MAC_OS_X, NET_BSD, NEXT, OPEN_BSD, OSF1, PYRAMID, RISCOS, SCO,
+	SGI, SINIX, SOLARIS, SUN_OS4, SVR4, TRUE64, ULTRIX, UNIXWARE
+
+
+EOF
+
+	$os = "SOLARIS"	if ( $os eq "SOLARIS2");
+	$os = "FREE_BSD" if $os =~ /FREE_BSD_2/;
+	$os = &ask( $os, "Under which operating system are you running?\n\t");
+	$os =~ tr/a-z/A-Z/;	# force uppercase
+	while ( grep( /^$os$/, @supported) == 0) {
+		print "\n\t$os is not a supported system.\n\n";
+		$os = &ask( LINUX,
+			"Under which operating system are you running?\n\t");
+		$os =~ tr/a-z/A-Z/;
+	};
+	print "\n";
+
+	$cc = &ask( $cc, 
+			"Which C compiler will you use, gcc or cc?\n\t");
+	$cc =~ s/^gcc.*/gcc/;
+	$cc = "cc" if ($cc ne "gcc");
+	print "\n";
+
+	if ( ($os eq "SOLARIS") && ( $cc eq "cc")) {
+	print <<EOF;
+	NOTE to Solaris users: If you use the SunSoft C compiler be sure
+	to use the Sys V like version rather than the BSD compatible 
+	version.
+
+EOF
+	}
+
+	$wnroot = &ask($wnroot,
+		"Enter the complete path to your data root.\n\t");
+	print "\n";
+
+	&getnobody();
+
+	$maint = &ask($maint, 
+		"Enter an e-mail address for the server maintainer.\n\t");
+	print "\n";
+
+	$defport = &ask( $defport, "What port should be the default? ");
+	print "\n";
+
+	$wnhostname = "syscall" if $wnhostname eq "";
+	$wnhostname = &ask( $wnhostname,
+		"What hostname should the server use? (Answer \"syscall\"\
+	to get hostname from system.)");
+	print "\n";
+
+	$wnhostname =~ s/^syscall$//;
+
+	$wnlog = "none" if $wnlog eq "";
+	$errlog = "none" if $errlog eq "";
+	$pidfile = "none" if $pidfile eq "";
+
+	$oldwnlog = $wnlog;
+	$wnlog = &ask($wnlog,
+		"Enter a complete path to your logfile.\n\t");
+	print "\n";
+
+	if ( $oldwnlog ne $wnlog) {
+		my(@wnlog_ar, @errlog_ar);
+
+		@wnlog_ar = split( '/', $wnlog);
+		@errlog_ar = split( '/', $errlog);
+		$wnlog_ar[$#wnlog_ar] = $errlog_ar[$#errlog_ar];
+		$errlog = join( '/', @wnlog_ar);
+	}
+	if ( $wnlog eq $errlog ) {
+		$errlog = &ask("same as logfile", 
+			"Enter a complete path to your error log file.\n\t");
+		$errlog = $wnlog if ($errlog eq "same as logfile");
+	}
+	else {
+		$errlog = &ask( $errlog,
+			"Enter a complete path to your error log file.\n\t");
+	}
+
+	print "\n";
+
+	$apid = "Enter a complete path to a file in which to store\n\t";
+	$apid = $apid."the process id of the server\n\t";
+	$pidfile = &ask($pidfile, $apid);
+	print "\n";
+
+	if ( $wnlog ne "") {
+
+print <<EOF;
+	If you have specified logfiles and a process id file make
+	sure that they exist and are writable by user $user or that
+	you have specified a directory for them in which $user
+	has write permission.
+
+	Would you like a verbose log file including entries for 
+	'Referrer' and 'User-agent'? 
+EOF
+
+		$verboselog = &ask($verbose ? "Yes" : "No", "");
+	}
+	$verbose = ( $verboselog =~ /^[Yy]/);
+	print "\n";
+
+print <<EOF;
+	Would you like to use all *alphabetic*  Latin-1 characters in
+	the names of files served and in search queries?  'No' is recommended
+	unless you know you need this capability.
+EOF
+
+		$latin1_ans = &ask($latin1 ? "Yes" : "No", "");
+
+	$latin1 = ( $latin1_ans =~ /^[Yy]/);
+	print "\n";
+
+
+	&do_userdirs;
+
+	$servbindir = &ask( $servbindir,
+		"In what directory should server binaries be installed?\n\t");
+	$servbindir = "../bin" if $servbindir eq "./bin";
+	print "\n";
+
+	$bindir = $servbindir if $bindir eq "";
+	$bindir = &ask( $bindir,
+		"In what directory should utility binaries be installed?\n\t");
+	$bindir = "../bin" if $bindir eq "./bin";
+	print "\n";
+
+print <<EOF;
+	The utility wndex needs a "mime.types" file in a known location.
+	This file is in the lib/ directory of the distribution hierarchy.
+	You may wish to move it to another location.  Pick a path now
+	and you can customize it and move it there later if necessary.
+
+EOF
+	$mime = &ask($mime,
+		"Enter a complete path to your mime.types file.\n\t");
+	print "\n";
+
+	$cppflags = "";
+
+	if ($from_make_dist || !$have_libs)
+	{
+		$libs = "";
+		$libs = $solaris_libs if ($os eq "SOLARIS");
+		$libs = $solaris_libs if ($os eq "SINIX");
+		$libs = $uxpds_libs if ($os eq "UXPDS");
+		$libs = $unixware_libs if ($os eq "UNIXWARE");
+		$libs = $sysvr4_libs if ($os eq "SYSVR4");
+		$libs = $sco_libs if ($os eq "SCO");
+		$libs = $isc_libs if ($os eq "ISC");
+		$libs = $aix_libs if ($os eq "AIX");
+		$libs = $dynix_libs if ($os eq "DYNIX");
+		$libs = $free_bsd_libs if ($os eq "FREE_BSD");
+		$libs = $free_bsd_libs if ($os eq "NET_BSD");
+	}
+
+	if ( ($libs !~ /lcrypt/) && (-f "/usr/lib/libcrypt.a" )) {
+			$libs = $libs." -lcrypt";
+	}
+	$libs = "" if ($os eq "MAC_OS_X");
+
+	$cppflags = "-D_POSIX_SOURCE -D_SYSV3" if ($os eq "ISC");
+	$ranlib = "ranlib";
+	$ranlib = $solaris_ranlib if ($os eq "SOLARIS");
+	$ranlib = "/bin/echo" if ($os eq "SGI");
+
+	print "\tNew versions of 'config.h' and 'Makefile' will be written.\n";
+	print "\tOld versions will be saved as 'config.h.bak'";
+	print "and 'Makefile.bak'.\n";
+	$ans = &ask( "Yes", "Do this now? ");
+	die "\n\tThe files Makefile and config.h are unchanged\n\n"
+			if !($ans =~ /^\s*[Yy]/);
+
+	open( STDIO_H, "</usr/include/stdio.h")
+				|| die "Can't open /usr/include/stdio.h";
+	while ($line = <STDIO_H>) {
+		if ( $line =~ m|snprintf|) {
+			$has_snprintf = 1;
+			last;
+		}
+	}
+
+	if ( -x "/usr/bin/md5sum" ) {
+			$md5exec = "/usr/bin/md5sum";
+	}
+	if ( -x "/sbin/md5" ) {
+			$md5exec = "/sbin/md5";
+	}
+
+	if ( -r "/usr/include/security/pam_appl.h") {
+		$has_pam = 1;
+	}
+
+	$md5lib = "../md5/md5lib.a";
+	if ( -f "/usr/local/ssl/lib/libcrypto.a") {
+		$md5lib = "/usr/local/ssl/lib/libcrypto.a";
+	}
+	if ( -f "/usr/lib/libcrypto.a") {
+		$md5lib = "-lcrypto";
+	}
+
+
+	if ( -r "./config.h") {
+		rename( "./config.h", "./config.h.bak")
+				|| die "Can't rename old config.h";
+	}
+
+	open( INCONFIG, "<./config.h.dist")
+				|| die "Can't open config.h.dist: $!";
+
+	open( OUTCONFIG, ">./config.h") || die "Can't open config.h: $!";
+
+	while ($line = <INCONFIG>) {
+		if ( $line =~ m|/\* Operating System \*/|) {
+			$line =~ s/^#define\s*[A-Z0-9_]*/#define $os/;
+		}
+		$line =~ s/(^#define ROOT_DIR).*$/$1\t\"$wnroot\"/;
+		$line =~ s/(^#define WN_USERNAME).*$/$1\t\"$wnusername\"/ if $wnusername;
+		$line =~ s/(^#define USERID).*$/$1\t\($wnuid\)/ if $wnuid;
+		$line =~ s/(^#define GROUPID).*$/$1\t\($wngid\)/ if $wngid;
+		$line =~ s/(^#define WN_LOGFILE).*$/$1\t\"$wnlog\"/;
+		$line =~ s/(^#define WN_ERRLOGFILE).*$/$1\t\"$errlog\"/;
+		$line =~ s/(^#define SWN_PID_FILE).*$/$1\t\"$pidfile\"/;
+		$line =~ s/(^#define WN_HOSTNAME).*$/$1\t\"$wnhostname\"/;
+		$line =~ s/(^#define MAINTAINER).*$/$1\t\"mailto:$maint\"/;
+		$line =~ s/(^#define MIME_TYPE_FILE).*$/$1\t\"$mime\"/;
+		$line =~ s/^#define ACCESS_DENIED_URL.*/$acc_denied_url/ if $acc_denied_url;
+		$line =~ s/^#define NO_SUCH_FILE_URL.*/$nosuch/ if $nosuch;
+		$line =~ s/^#define AUTH_DENIED_FILE.*/$authdenied/ if $authdenied;
+		$line =~ s/^#define WN_SU_EXEC.*$/$wnsuexec/ if $wnsuexec;
+		$line =~ s/^#define SUEXEC_HANDLER.*$/$suexechandler/ if $suexechandler;
+		$line =~ s/^#define SUEXEC_KEY_FILE.*$/$suexeckey/ if $suexeckey;
+		$line =~ s/^#define RANDOM_DATA_FILE.*$/$rnddata/ if $rnddata;
+		$line =~ s/^#define USE_DEF_CACHE_LIST.*$/$usedefcl/ if $usedefcl;
+		$line =~ s/^#define DEFAULT_CACHEFILE_LIST.*$/$clistfile/ if $clistfile;
+		$line =~ s/^#define USE_VIRTUAL_HOSTS.*$/$usevhost/ if $usevhost;
+		$line =~ s/^#define VIRTUAL_HOSTS_FILE.*$/$vhostfile/ if $vhostfile;
+		$line =~ s/^#define PARSE_EXT.*$/$parse_ext/ if $parse_ext;
+
+		if ($line =~ /#define VERBOSELOG/)
+		{
+			$line = "#define VERBOSELOG\t(TRUE)\n";
+			$line = "#define VERBOSELOG\t(FALSE)\n" if !$verbose;
+		}
+
+		if ($line =~ /#define HAS_SNPRINTF/)
+		{
+			$line = "#define HAS_SNPRINTF\t(TRUE)\n";
+			$line = "#define HAS_SNPRINTF\t(FALSE)\n" if !$has_snprintf;
+		}
+
+		if ($line =~ /#define WN_PAM_ENABLED/)
+		{
+			$line = "#define WN_PAM_ENABLED\t(TRUE)\n";
+			$line = "#define WN_PAM_ENABLED\t(FALSE)\n" if !$has_pam;
+		}
+
+		if ($line =~ /#define USE_LATIN1/)
+		{
+			$line = "#define USE_LATIN1\t(FALSE)\n";
+			$line = "#define USE_LATIN1\t(TRUE)\n" if $latin1;
+		}
+
+		if ($line =~ /#define NO_CC_CONST/) {
+			if ( $cc eq "gcc") {
+				$line = "#define NO_CC_CONST\t(FALSE)\n";
+			}
+			if ( ($cc eq "cc") 
+				&& (($os eq "SUN_OS4") || ($os eq "ISC")) ) {
+				$line = "#define NO_CC_CONST\t(TRUE)\n";
+			}
+		}
+		$line =~ s/(^#define DEFAULT_PORT).*$/$1\t($defport)/;
+
+		if ($line =~ /#define\s*USE_TILDE_PWFILE/)
+		{
+			$line = "#define USE_TILDE_PWFILE\t(FALSE)\n";
+			$line = "#define USE_TILDE_PWFILE\t(TRUE)\n"
+				if $use_tilde_pwfile;
+		}
+
+		if ($line =~ /#define\s*USE_TILDE_TABLE/)
+		{
+			$line = "#define USE_TILDE_TABLE\t(FALSE)\n";
+			$line = "#define USE_TILDE_TABLE\t(TRUE)\n"
+				if $use_tilde_table;
+		}
+
+		$line =~ s/^#define TILDE_TABLE.*$/#define TILDE_TABLE\t$tilde_table/
+			if $tilde_table;
+
+		$line =~  s/^#define TILDE_USER_STRING.*$/#define TILDE_USER_STRING\t$tilde_string/
+			if  $tilde_string;
+
+		$line =~ s/^#define PUB_HTML.*$/#define PUB_HTML\t$pubhtml/
+			if $pubhtml;
+
+		print OUTCONFIG $line;
+	}
+	close( INCONFIG);
+	close( OUTCONFIG);
+
+	if ( -r "Makefile") {
+		rename( "Makefile", "Makefile.bak")
+				|| die "Can't rename old Makefile";
+	}
+	open( INMAKE, "<./Makefile.dist") 
+				|| die "Can't open ./Makefile.dist";
+
+
+	open( OUTMAKE, ">./Makefile") || die "Can't open ./Makefile";
+
+	while ($line = <INMAKE>) {
+		$line =~ s/^ *LIBS\s*=.*$/LIBS = $libs/;
+		$line =~ s/^ *SERVBINDIR\s*=.*$/SERVBINDIR = $servbindir/;
+		$line =~ s/^ *BINDIR\s*=.*$/BINDIR = $bindir/;
+		$line =~ s/^ *RANLIB\s*=.*$/RANLIB = $ranlib/;
+		$line =~ s/^ *SUEXEC\s*=.*$/$mf_suexec/ if $mf_suexec;
+		$line =~ s/^ *MD5LIB\s*=.*$/MD5LIB = $md5lib/;
+		if ( ($cc eq "gcc") || ($os eq "LINUX")) {
+			$line=~ s/^ *CFLAGS\s*=\s*(-O3)?(.*)$/CFLAGS = -O3 $2/;
+		}
+		if ( $cppflags ne "") {
+			$line =~ s/^ *CC\s*=.*$/CC = $cc $cppflags/;
+		}
+		else {
+			$line =~ s/^ *CC\s*=.*$/CC = $cc/;
+		}
+		$line =~ s/^##\s*Makefile.dist/##    Customized Makefile (configure)/;
+		$line =~ s/^ *INCLUDES\s*=.*$/INCLUDES = $includes/;
+		print OUTMAKE $line;
+	}
+
+	close( INMAKE);
+	close( OUTMAKE);
+
+	open( INMD5, "<./wnauth/wn_md5passwd.dist") 
+				|| die "Can't open ./wnauth/wn_md5passwd.dist";
+	open( OUTMD5, ">./wnauth/wn_md5passwd") 
+				|| die "Can't open ./wnauth/wn_md5passwd";
+	while ($line = <INMD5>) {
+		if ( $md5exec ne "") {
+			$line =~ s/YOUR_MD5_GOES_HERE/$md5exec/;
+		}
+		print OUTMD5 $line;
+	}
+
+	close( INMD5);
+	close( OUTMD5);
+
+	open( INMAKEWN, "<./wn/Makefile.wn.dist") 
+				|| die "Can't open ./wn/Makefile.wn.dist";
+	open( OUTMAKEWN, ">./wn/Makefile") 
+				|| die "Can't open ./wn/Makefile";
+	open( OUTMAKEWNSSL, ">./wnssl/Makefile") 
+				|| die "Can't open ./wnssl/Makefile";
+	while ($line = <INMAKEWN>) {
+		if ( $line =~ /^CFLAGS/ ) {
+			print OUTMAKEWN $line;
+			$line =~ s/CFLAGS\s*=/CFLAGS = -DMAKE_WNSSL /;
+			print OUTMAKEWNSSL $line;
+			next;
+		}
+		if ( $line =~ /^HEADERS/ ) {
+			print OUTMAKEWN $line;
+			$line =~ s/config.h/config_ssl.h/;
+			print OUTMAKEWNSSL $line;
+			next;
+		}
+		if ( $has_pam ) { 
+			if (($os eq "LINUX") || ($os eq "SOLARIS")) {
+				$line =~ s/^ *PAMLIBS\s*=.*$/PAMLIBS = -lpam -ldl/;
+			}
+			else {
+				$line =~ s/^ *PAMLIBS\s*=.*$/PAMLIBS = -lpam/;
+			}
+		}
+		print OUTMAKEWN $line;
+		print OUTMAKEWNSSL $line;
+	}
+	close( INMAKEWN);
+	close( OUTMAKEWN);
+	close( OUTMAKEWNSSL);
+
+print <<EOF;
+
+	Configuration is now complete.  You can now run 'make' or
+	'make install' to do the compilation.  Further configuration
+	is possible by manually editing the files config.h and Makefile.
+	NOTE: IT IS NECESSARY TO RUN MAKE FOR THE CHANGES MADE BY RUNNING
+	THIS SCRIPT TO TAKE EFFECT.
+
+EOF
+
+
+	
+	exit();
+
+
+########################
+# ask
+########################
+
+sub ask {
+
+	local( $default, $quest) = @_;
+
+	$quest .= "[$default]: " if  $default ne "";
+	print "\t$quest";
+	$response = <STDIN>;
+	chop( $response);
+	$response = $default if $response eq "";
+	$response = "" if $response eq "";
+	$response = "" if $response eq "none";
+	$response;
+}
+
+########################
+# preconfig
+########################
+
+sub preconfig {
+
+	if ( -r "./config.h") {
+		open( PRECONFIG, "<./config.h")
+				|| die "Can't open config.h: $!";
+		$from_config = 1;
+	}
+	else {
+		open( PRECONFIG, "<./config.h.dist")
+				|| die "Can't open config.h.dist: $!";
+		$from_config = 0;
+		$using_dist = 1;
+	}
+
+	while ($line = <PRECONFIG>) {
+		$config_h_ver = $1 
+			if $line =~ /wn-config.h.dist-version\s*([.0-9]*)/;
+		$os = $1 if $line =~ /^#define ([A-Z0-9_]*).*Operating System/;
+		$wnroot = $1 
+			if $line =~ /^#define ROOT_DIR\s*\"(\S*)\"/;
+		$wnlog = $1 
+			if $line =~ /^#define WN_LOGFILE\s*\"(\S*)\"/;
+		$errlog = $1 
+			if $line =~ /^#define WN_ERRLOGFILE\s*\"(\S*)\"/;
+		$pidfile = $1 
+			if $line =~ /^#define SWN_PID_FILE\s*\"(\S*)\"/;
+
+		chop( $acc_denied_url = $line)
+			if $line =~ /^#define ACCESS_DENIED_URL.*/;
+		chop( $nosuch = $line)
+			if $line =~ /^#define NO_SUCH_FILE_URL.*/;
+		chop( $authdenied = $line)
+			if $line =~ /^#define AUTH_DENIED_FILE.*/;
+
+		chop( $wnsuexec = $line) 
+			if $line =~ /^#define WN_SU_EXEC.*/;
+		chop( $suexechandler = $line) 
+			if $line =~ /^#define SUEXEC_HANDLER.*/;
+		chop( $suexeckey = $line) 
+			if $line =~ /^#define SUEXEC_KEY_FILE.*/;
+		chop( $rnddata = $line)
+			if $line =~ /^#define RANDOM_DATA_FILE.*/;
+		chop( $usedefcl = $line) 
+			if $line =~ /^#define USE_DEF_CACHE_LIST.*[TF].*$/;
+		chop( $clistfile = $line) 
+			if $line =~ /^#define DEFAULT_CACHEFILE_LIST.*$/;
+		chop( $usevhost = $line) 
+			if $line =~ /^#define USE_VIRTUAL_HOSTS.*[TF].*$/;
+		chop( $vhostfile = $line) 
+			if $line =~ /^#define VIRTUAL_HOSTS_FILE.*$/;
+		chop( $parse_ext = $line) 
+			if $line =~ /^#define PARSE_EXT.*$/;
+		$maint = $1 
+			if $line =~ /^#define MAINTAINER\s*\"mailto:(\S*)\"/;
+		$wnusername = $1 
+                      if $line =~ /^#define WN_USERNAME\s*\"(\S*)\"/;
+		$wnhostname = $1 
+			if $line =~ /^#define WN_HOSTNAME\s*\"(\S*)\"/;
+		$defport = $1
+			if $line =~ /DEFAULT_PORT\s*\(([0-9]*)\)/;
+		$mime = $1
+			if (($line =~ /^#define MIME_TYPE_FILE\s+\"(\S*)\"/)
+				&& $from_config);
+
+		if ($line =~ /#define\s+VERBOSELOG/)
+		{
+			$verbose = 1;
+			$verbose = 0 if  ($line =~ /^\/\*.*\*\//);
+			# determine whether line was commented or not
+			$verbose = 0 if  ($line =~ /^#define.*FALSE.*$/);
+		}
+
+		if ($line =~ /^#define\s+USE_TILDE_PWFILE.*[TF].*$/)
+		{
+			$use_tilde_pwfile = ($line =~ /TRUE/);
+		}
+
+		if ($line =~ /^#define\s+USE_TILDE_TABLE.*[TF].*$/)
+		{
+			$use_tilde_table = ($line =~ /TRUE/);
+		}
+
+		chop( $tilde_table = $line)
+			if ($line =~ s|^#define\s+TILDE_TABLE\s*(.*)|$1|);
+
+		chop( $tilde_string = $line)
+			if $line =~ s|^#define\s+TILDE_USER_STRING\s*(.*)|$1|;
+
+		chop( $pubhtml = $line)
+			if $line =~ s|^#define\s+PUB_HTML\s*(.*)|$1|;
+	}
+	close( PRECONFIG);
+
+	if ( -r "./Makefile") {
+		open( PRECONFIG, "<./Makefile")
+				|| die "Can't open Makefile: $!";
+		$from_make_dist = 0;
+	}
+	else {
+		open( PRECONFIG, "<./Makefile.dist")
+				|| die "Can't open Makefile.dist: $!";
+		$from_make_dist = 1;
+		$using_dist = 1;
+	}
+
+	while ($line = <PRECONFIG>) {
+		$makefile_ver = $1 
+			if $line =~ /wn-Makefile.dist-version\s*([.0-9]*)/;
+		if ( $from_make_dist == 0 ) {
+			$servbindir = $1
+				if $line =~ /^ *SERVBINDIR\s*=\s*(.*)/;
+			$bindir = $1 if $line =~ /^ *BINDIR\s*=\s*(.*)/;
+		}
+		# The following values are extracted and used to write the
+		# new Makefile later, even though configure doesn't solicit
+		# the user for new values.  This allows the user to edit the
+		# Makefile after running configure and have the edited values
+		# propagate through subsequent configure runs.  $libs is an
+		# exception; its value may be overridden with an $<osname>_libs
+		# value if it comes from Makefile.dist rather than Makefile.
+
+		$libs = $1, $have_libs = 1 if $line =~ /^ *LIBS\s*=\s*(.*)/;
+		$cc = $1 if $line =~ /^ *CC\s*=\s*(.*)/;
+		$mf_suexec = $line if $line =~ /^SUEXEC = suexec.*$/;
+		$includes = $1 if $line =~ /^ *INCLUDES\s*=\s*(.*)/;
+	}
+	close( PRECONFIG);
+}
+
+########################
+# getnobody
+########################
+
+sub getnobody {
+
+	local(  $xx, $uid, $gid) = ( "", "", "", "");
+
+print <<EOF;
+
+	When run as root the standalone server 'wnsd' will immediately change
+	its user id giving itself only the permissions of of an unpriviliged
+	user, usually 'nobody'. Most systems already have a user nobody and I
+	recommend you use it.  If you choose another user it should not be the
+	owner of any of your data files. NOTE: HPUX users must choose a user
+        other than 'nobody'!
+
+EOF
+
+	while ( $user eq "" ) {
+		$user = &ask($wnusername,
+		"With which user's permissions should the server run? ");
+
+		( $user, $xx, $uid, $gid) = getpwnam( $user);
+
+		if ($uid == 0) {
+			print "\n\tFor security reasons the server should";
+			print " not be run as root.\n\n";
+			$user = "";
+		}
+	}
+      $wnusername = $user;
+
+	if ( ($uid ne "") && ($gid ne "") ){
+
+print <<EOF;
+
+	User $user with user id $uid and group id $gid was found.  These
+	values will be used when the server is run standalone (i.e. when
+	using wnsd). For use with inetd you must set the user in your
+	inetd.conf.
+
+EOF
+
+		$wnuid = $uid;
+		$wngid = $gid;
+	}
+	else {
+print <<EOF;
+
+	User $user was not found.  A default numeric user id will be
+	used.  You can change it by editing config.h later.
+
+EOF
+
+	}
+}
+
+########################
+# do_userdirs
+########################
+
+sub do_userdirs {
+local ($default, $response);
+
+print <<EOF;
+
+	USER HOMEPAGES:
+
+	Do you want to:
+
+	1) Not allow user home pages
+	2) Look up user directories in the password file
+	3) Look up user directories in a lookup table
+EOF
+
+	$default = 1;
+	$default = 2 if $use_tilde_pwfile;
+	$default = 3 if $use_tilde_table;
+	for (;;)
+	{
+		$response = int (&ask ($default, ""));
+		last if $response >= 1 && $response <= 3;
+		print "\tPlease type a number between 1 and 3\n";
+	}
+
+	if ($response == 1)			# no user pages
+	{
+		$use_tilde_pwfile = 0;
+		$use_tilde_table = 0;
+	}
+	elsif ($response == 2)			# password file
+	{
+		$use_tilde_pwfile = 1;
+		$use_tilde_table = 0;
+		&get_tilde_string;
+		&get_pubhtml;
+	}
+	elsif ($response == 3)			# lookup table
+	{
+		$use_tilde_pwfile = 0;
+		$use_tilde_table = 1;
+		&get_tilde_string;
+		&get_pubhtml;
+
+print <<EOF;
+		In what file do you want to look up user home page
+		directories?
+EOF
+
+		print "\t";
+		$tilde_table = &ask( $tilde_table, "");
+		$tilde_table = "\"$tilde_table\"" if !( $tilde_table =~ /^\".*\"$/);
+		
+	}
+
+	print "\n";
+}
+
+sub get_tilde_string
+{
+print <<EOF;
+
+		What string should be used to indicate that a URL
+		refers to a user home directory?  E.g. if you want
+		URLs to be like http://host/~user/index.html where
+		"user" is the user name then this string should be
+		"/~" (without the quotes).  If you want the URL to
+		be http://host/homepages/user/index.html then this
+		string should be "/homepages/".  The string should
+		be everything which goes before the user's name.
+EOF
+
+		print "\t";
+		$tilde_string = &ask( $tilde_string, "");
+		$tilde_string = "\"$tilde_string\"" if !( $tilde_string =~ /^\".*\"$/);
+		print "\n";
+}
+
+sub get_pubhtml
+{
+print <<EOF;
+
+		In what subdirectory of the user's home directory
+		should homepages be kept?  E.g. if you want URLs to
+		be like http://host/~user/index.html to refer to
+		~user/public_html/index.html then this value should
+		be set to "/public_html".  This has the effect of
+		setting the data hierarchy root to ~user/public_html
+EOF
+
+		print "\t";
+		$pubhtml = &ask( $pubhtml, "");
+		$pubhtml = "\"$pubhtml\"" if !( $pubhtml =~ /^\".*\"$/);
+		print "\n";
+}
+

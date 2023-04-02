@@ -1,0 +1,542 @@
+<!doctype html public "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+  <head>
+    <title>CGI and other Environment Variables for the WN Server</title>
+
+    <link rev="made" href="mailto:john@math.northwestern.edu">
+
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <meta http-equiv="last-modified" content="Sat June 18 2005">
+    <meta http-equiv="keywords" content="CGI, environment variables">
+  </head>
+
+  <body bgcolor="#FFFFFF">
+    <p>
+      <a href="http://hopf.math.northwestern.edu/"><img
+        src="images/powered.jpg"
+        border="0"
+        width="190"
+        height="41"
+        align="right"
+        alt="WN home page"
+      ></a>
+    </p>
+
+    <strong>Version 2.4.7</strong>
+
+    <br>
+
+    <!-- pnuts --> <a href="appendixC.html">[Previous]</a> <a href="appendixE.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+
+
+
+    <br clear="right">
+
+    <hr size="4">
+    <!-- #start -->
+
+    <h2 align="center">CGI and other Environment Variables for the <em>WN</em>
+    Server</h2>
+    <hr size="4">
+
+    <p>
+      This is a list of environment variables set by <em>WN</em>.  These
+      variables are set automatically when a CGI program is called.  They will
+      also be set for use by <a href="filter.html">filters</a> or <a
+      href="parse.html">server-side includes</a> which executes files if an
+      "<code><a
+      href="appendixB.html#fdir.attributes.cgi">Attribute=cgi</a></code>" line
+      is added to the file record of a document in the <code><a
+      href="index_desc.html#index">index.wn</a></code> file.
+    </p>
+
+
+    <h3>D.1 <a name="cgi">Standard CGI Variables</a></h3>
+
+    <p>
+      This is a list of standard <a
+      href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a> environment
+      variables set by <em>WN</em>.
+    </p>
+
+    <dl>
+      <dt>
+        <a name="cgi.AUTH_TYPE"><code>AUTH_TYPE</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains the type of authentication being used to limit access to
+          the current document.  For example, "<code>Basic</code>" or
+          "<code>Digest</code>".
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.CONTENT_LENGTH"><code>CONTENT_LENGTH</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains the length of information provided by a client <a
+          href="http://www.htmlhelp.com/reference/wilbur/block/form.html"><code>POST</code></a>.
+          The length is an ASCII string representing the number of bytes.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.CONTENT_TYPE"><code>CONTENT_TYPE</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains the content type supplied by the client with <a
+          href="http://www.htmlhelp.com/reference/wilbur/block/form.html"><code>POST</code></a>
+          data.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.GATEWAY_INTERFACE"><code>GATEWAY_INTERFACE</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains "<code>CGI/1.1</code>".
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.HTTP_ACCEPT"><code>HTTP_ACCEPT</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains the contents of any "<code>Accept:</code>" headers supplied
+          by the client.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.HTTP_ACCEPT_CHARSET"><code>HTTP_ACCEPT_CHARSET</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains the contents of any "<code>Accept-Charset:</code>" headers
+          supplied by the client.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.HTTP_ACCEPT_LANGUAGE"><code>HTTP_ACCEPT_LANGUAGE</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains the contents of any "<code>Accept-Language:</code>" headers
+          supplied by the client.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.HTTP_COOKIE"><code>HTTP_COOKIE</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains the contents of any "<code>Cookie:</code>" header supplied
+          by the client.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.HTTP_FROM"><code>HTTP_FROM</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains the contents of the "<code>From:</code>" header supplied by
+          the client.  This may contain the e-mail address of the client user.
+          This is generally unreliable, as usually users choose not to supply
+          this information.  If they do give it they can choose any e-mail
+          address they want -- there is no guarantee that this is, in fact,
+          the real e-mail address of the client user.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.HTTP_HOST"><code>HTTP_HOST</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains the contents of the "<code>Host:</code>" header supplied by
+          the client.  This should contain the one of the aliases for the host
+          on which the server is running.  It should be the hostname from the
+          URL that the client is requesting.  Thus a client seeking
+          "<code>http://www.serverhost.com:8000/foo.html</code>" should supply
+          "<code>www.serverhost.com</code>" in this header.  Many browsers do
+          not do this.  It is required in <a
+          href="http://www.w3c.org/Protocols/">HTTP/1.1</a>.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.HTTP_RANGE"><code>HTTP_RANGE</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains the contents of any "<code>Range:</code>" header supplied
+          by the client.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.HTTP_REFERER"><code>HTTP_REFERER</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains the contents of the "<code>Referer:</code>" header supplied
+          by the client.  This is supposed to contain the URL of the document
+          from which a link to this program activated.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.HTTP_USER_AGENT"><code>HTTP_USER_AGENT</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains the contents of the "<code>User-Agent:</code>" header
+          supplied by the client.  This is supposed to contain the name of the
+          browser which the client is using to make this request
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.PATH_INFO"><code>PATH_INFO</code></a>
+      </dt>
+      <dd>
+        <p>
+          Extra information in the "path" of a CGI URL.  More precisely
+          everything after the actual name of the program.  For example, the
+          URL "<code>http://host/dir/foo.cgi/stuff1/stuff2/stuff3</code>"
+          would have "<code>/stuff1/stuff2/stuff3</code>" in the
+          <code>PATH_INFO</code> variable.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.PATH_TRANSLATED"><code>PATH_TRANSLATED</code></a>
+      </dt>
+      <dd>
+        <p>
+          This assumes that <a href="#cgi.PATH_INFO"><code>PATH_INFO</code></a>
+          is the path of a file relative to your <em>WN</em> root and provides
+          the path relative to the system root.  For example, the URL
+          "<code>http://host/dir/foo.cgi/stuff1/stuff2/stuff3</code>" would
+          have "<code>wnroot/stuff1/stuff2/stuff3</code>" in the
+          <code>PATH_TRANSLATED</code> variable.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.QUERY_STRING"><code>QUERY_STRING</code></a>
+      </dt>
+      <dd>
+        <p>
+          The contents of the "query" part of an <a
+          href="http://www.w3c.org/Protocols/">HTTP/1.1</a> <code>GET</code>
+          request.  This is whatever comes after the '<code>?</code>' in the
+          URL.  For example, the URL
+          "<code>http://host/dir/foo.cgi/stuff1/stuff2/stuff3?dingbat</code>"
+          would have "<code>dingbat</code>" in the <code>QUERY_STRING</code>
+          variable.  If the request was generated by an HTML "<code><a
+          href="http://www.htmlhelp.com/reference/wilbur/block/form.html">&lt;form&gt;</a></code>"
+          this contains all the form information encoded as
+          "<code>name1=value1&amp;name2=value2...</code>".
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.REMOTE_ADDR"><code>REMOTE_ADDR</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains the IP address of the client or proxy making the request.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.REMOTE_HOST"><code>REMOTE_HOST</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains the hostname of the client or proxy making the request, if
+          the server can determine it.  Otherwise it contains the IP address.
+          If "<code><a
+          href="configmacros.html#NO_DNS_HOSTNAMES">#define&nbsp;NO_DNS_HOSTNAMES</a></code>"
+          is defined in <code><a href="configmacros.html">config.h</a></code>
+          before compilation then no attempt will be made to determine the
+          hostname and <code>REMOTE_HOST</code> will contain the IP address.
+          (This would reduce the load on the server.)
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.REMOTE_IDENT"><code>REMOTE_IDENT</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains the user name supplied by a <a
+          href="http://linux-howto.com/rfc/rfc0500-0999/rfc0931.txt">RFC
+          931</a> <a
+          href="/cgi-bin/man2html/usr/man/man8/identd.8.gz"><code>identd(8)</code></a>
+          server on the client (if there is one and you have compiled the
+          server with "<code><a
+          href="configmacros.html#RFC931_TIMEOUT">#define&nbsp;RFC931_TIMEOUT</a></code>"
+          macro enabled in the <code><a
+          href="configmacros.html">config.h</a></code> file).
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.REQUEST_METHOD"><code>REQUEST_METHOD</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains either "<code>GET</code>", "<code>POST</code>" or
+          "<code>PUT</code>", depending on the method of the client request.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.REMOTE_USER"><code>REMOTE_USER</code></a>
+      </dt>
+      <dd>
+        <p>
+          If the CGI program is <a href="access.html#authenticate">password
+          protected</a> this will contain the user name provided by the client.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.SCRIPT_FILENAME"><code>SCRIPT_FILENAME</code></a>
+      </dt>
+      <dd>
+        <p>
+          The name of the CGI program being executed and its path relative to
+          the system root.  For example, the URL
+          "<code>http://host/dir/foo.cgi/stuff1/stuff2/stuff3</code>" would
+          have "<code>wnroot/dir/foo.cgi</code>" in the
+          <code>SCRIPT_FILENAME</code> variable.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.SCRIPT_NAME"><code>SCRIPT_NAME</code></a>
+      </dt>
+      <dd>
+        <p>
+          The name of the CGI program being executed and its path relative to
+          the <em>WN</em> root data directory.  For example, the URL
+          "<code>http://host/dir/foo.cgi/stuff1/stuff2/stuff3</code>" would
+          have "<code>/dir/foo.cgi</code>" in the <code>SCRIPT_NAME</code>
+          variable.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.SERVER_NAME"><code>SERVER_NAME</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains the name of the "virtual host" currently being accessed, if
+          <a href="multi.html">virtual hosting</a> is in use. Otherwise it
+          contains the name of host on which server is running.  The value of
+          this variable will be identical to the value of <a
+          href="#cgi.HTTP_HOST"><code>HTTP_HOST</code></a> if the client
+          supports the "<code>Host header:</code>".  Otherwise it will be
+          determined by the IP address to which the request was made and the
+          corresponding entry in the virtual hosts table.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.SERVER_PORT"><code>SERVER_PORT</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains port on which server is running.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.SERVER_PROTOCOL"><code>SERVER_PROTOCOL</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains "<code>HTTP/0.9</code>", "<code>HTTP/1.0</code>" or
+          "<code>HTTP/1.1</code>" depending on which protocol the client is
+          using.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="cgi.SERVER_SOFTWARE"><code>SERVER_SOFTWARE</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains "<code>WN&nbsp;&lt;version&gt;</code>".  For example,
+          "<code>WN&nbsp;2.0.0</code>".  Recall that version numbers of the
+          form "<code>a.b.c</code>" with '<code>b</code>' even are intended to
+          be stable releases while '<code>b</code>' odd indicates a release
+          with new and less tested features.
+        </p>
+      </dd>
+    </dl>
+
+
+    <h3>D.2 <a name="wn_cgi"><em>WN</em> Specific CGI Variables</a></h3>
+
+    <p>
+      The following are not standard <a
+      href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a> environment
+      variables but are provided by the <em>WN</em> server when CGI variables
+      are set:
+    </p>
+
+    <dl>
+      <dt>
+        <a name="wn_cgi.DOCUMENT_ROOT"><code>DOCUMENT_ROOT</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains the path to your <em>WN</em> root data directory relative to
+          the system root.  For example, the URL
+          "<code>http://host/dir/foo.cgi/stuff1/stuff2/stuff3</code>" would
+          have "<code>wnroot</code>" in the <code>DOCUMENT_ROOT</code>
+          variable.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="wn_cgi.HTTP_POST_FILE"><code>HTTP_POST_FILE</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains the path to the temporary file containing the data sent by
+          the client via the <a
+          href="http://www.htmlhelp.com/reference/wilbur/block/form.html"><code>POST</code></a>
+          method.  This file is removed after the CGI program terminates.  A
+          CGI program can move it or copy it.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="wn_cgi.HTTP_PUT_FILE"><code>HTTP_PUT_FILE</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains the path to the temporary file containing the data sent by
+          the client via the <code>PUT</code> method.  This file is removed
+          after the CGI program terminates.  A CGI program can move it or copy
+          it.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="wn_cgi.HTTP_VIA"><code>HTTP_VIA</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains the contents of any "Via" header supplied by the
+	  client.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="wn_cgi.HTTP_X_FORWARDED_FOR"><code>HTTP_X_FORWARDED_FOR</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains the contents of any "X-Forwarded-For" header supplied by the
+	  client.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="wn_cgi.URL_SCHEME"><code>URL_SCHEME</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains "<code>http</code>" normally or "<code>https</code>" in
+          case the server has been <a
+          href="http://hopf.math.northwestern.edu/">modified</a> to use the <a
+          href="http://www.netscape.com/newsref/std/SSL.html">Secure Sockets
+          Layer (SSL) protocol</a>.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="wn_cgi.WN_DIR_PATH"><code>WN_DIR_PATH</code></a>
+      </dt>
+      <dd>
+        <p>
+          Contains the path to the directory containing the program relative to
+          the system root.  For example, the URL
+          "<code>http://host/dir/foo.cgi/stuff1/stuff2/stuff3</code>" would
+          have "<code>wnroot/dir</code>" in the <code>WN_DIR_PATH</code>
+          variable.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="wn_cgi.WN_ROOT"><code>WN_ROOT</code></a>
+      </dt>
+      <dd>
+        <p>
+          Deprecated.  See <a
+          href="#wn_cgi.DOCUMENT_ROOT"><code>DOCUMENT_ROOT</code></a>.
+        </p>
+      </dd>
+    </dl>
+
+
+    <h3>D.3 <a name="wn_key"><em>WN</em> Specific Database Variables</a></h3>
+
+    <p>
+      One further environment variable is used by <em>WN</em> in conjunction
+      with external databases.
+    </p>
+
+    <dl>
+      <dt>
+        <a name="wn_key.WN_KEY"><code>WN_KEY</code></a>
+      </dt>
+      <dd>
+        <p>
+          <code>WN_KEY</code> is used in conjunction with external databases
+          and either "<code><a
+          href="appendixB.html#ddir.cache-module">Cache-Module=</a></code>" or
+          "<code><a
+          href="appendixB.html#ddir.file-module">File-Module=</a></code>"
+          directory directives.  For more details on these see the chapter "<a
+          href="module.html"><em>WN</em> Auxiliary Modules</a>" in this guide.
+        </p>
+      </dd>
+    </dl>
+
+
+
+    <!-- #end -->
+    <hr size="4">
+
+    <address>
+      <em>WN</em> version 2.4.7
+      <br>
+      Copyright &copy; 1998-2005 <a href="mailto:john@math.northwestern.edu">John Franks
+      &lt;john@math.northwestern.edu&gt;</a>
+      <br>
+      licensed under the <a
+        href="http://www.gnu.org/copyleft/fdl.txt">GNU Free Documentation License</a>
+      <br>
+<!-- hhmts start -->
+Last modified: Sat June  18 2005
+<!-- hhmts end -->
+    </address>
+
+    <!-- pnuts --> <a href="appendixC.html">[Previous]</a> <a href="appendixE.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+  </body>
+</html>

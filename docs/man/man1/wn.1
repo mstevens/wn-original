@@ -1,0 +1,212 @@
+.\" source:
+.\"   $Source: /var/cvs/projects/debian/printop/debian/dpkg.src/printop.printop.1.in,v $
+.\"
+.\" revision:
+.\"   @(#) $Id: printop.printop.1.in,v 1.2 1998/04/23 04:31:28 jplejacq Exp $
+.\"
+.\" copyright:
+.\"   Copyright (C) 1998 Jean Pierre LeJacq <jplejacq@quoininc.com>
+.\"
+.\"   Distributed under the GNU GENERAL PUBLIC LICENSE.
+.\"
+.TH wn 1 "Sat, 25 Apr 1998 00:34:33 -0400" "1.18.7-1" "Debian GNU/Linux manual"
+.SH NAME
+wn \- server for the Hypertext Transfer Protocol (HTTP)
+.SH DESCRIPTION
+.B wn
+is a server for the Hypertext Transfer Protocol (HTTP).  Its primary
+design goals are security and functionality usually available only
+with complex CGI scripts without the necessity of writing or using
+these scripts.  This includes extensive security checks, full text
+searching and conditionally served text.
+
+Despite this extensive functionality the
+.B wn
+executable is substantially smaller than the CERN or NCSA servers.
+Both a stand-alone daemon
+.BR wnswnd (8)
+and a version
+.BR wnwnd (8)
+intended for use under
+.BR inetd (8)
+are provided.  The
+.BR inetd (8)
+version is designed to minimize the use of system resources and it is
+appropriate for moderate or lightly loaded servers which cannot be
+totally dedicated to Web serving.
+
+The
+.B wn
+security model is based on the use of a small flat database in each
+directory with information about the files in that directory.  Fields
+associated with a file include its title, and may include keywords,
+expiration date and any user defined fields like author or document
+id.  Unlike other servers, the default action for
+.B wn
+is to deny access to a file.  A file can only be served if explicit
+permission to do so has been granted by entering it in this database.
+
+There is extensive documentation on
+.B wn
+mainly in HTML format in
+.B http://dochost/doc/wn/index.html
+page.  There
+are also
+.BR man (1)
+pages on most components.
+
+The
+.B wn
+package is organized into the following components:
+.TP
+.B DAEMONS
+The actual HTTP servers.
+.TP
+.B SERVER UTILITIES
+Programs to assist in the maintenance of a server.
+.TP
+.B HTML UTILITES
+Programs to assist in the construction of HTML documents.
+.TP
+.B CGI PROGRAMS
+Programs to provide additional capabilites to the basic server.
+.SH DAEMONS
+.TP
+.BR wnwnd (8)
+The
+.BR inetd (8)
+based daemon.
+.TP
+.BR wnswnd (8)
+The stand-alone daemon.
+.SH SERVER UTILITES
+.TP
+.BR wnconfig (8)
+Simple run-time configuration of
+.B wn
+HTTP server.
+.TP
+.BR wndex (8)
+Create access control file for
+.B wn
+HTTP server.
+.TP
+.BR wnpasswd (8)
+Create and manage password files for
+.B wn
+HTTP server.
+.TP
+.BR wnuncache (8)
+Decompile access control file for
+.B wn
+HTTP server.
+.TP
+.BR wnupdate-www (8)
+Enable access to standard directories through
+.B wn
+HTTP server.
+.TP
+.BR wnv2c (8)
+Convert logfile for
+.B wn
+HTTP server.
+.SH HTML UTILITES
+.TP
+.BR wndigest (1)
+Produce HTML links to document sections for
+.B wn
+HTTP server.
+.TP
+.BR wnhtmlify (1)
+Produce simple HTML document from text for
+.B wn
+HTTP server.
+.TP
+.BR wnindexmaker (1)
+Produce index to a set of HTML files for
+.B wn
+HTTP server.
+.TP
+.BR wnpnuts (1)
+Produce navigation links to a set of HTML files for
+.B wn
+HTTP server.
+.SH CGI PROGRAMS
+.TP
+.BR wnauth (3)
+CGI program for Basic authorization for
+.B wn
+HTTP server.
+.TP
+.BR wncat (3)
+CGI program for listing (un)compressed files for
+.B wn
+HTTP server.
+.TP
+.BR wnredir (3)
+CGI program for redirecting to a new URL for
+.B wn
+HTTP server.
+.TP
+.BR wnsectsearch (3)
+CGI program for searching files for sections for
+.B wn
+HTTP server.
+.TP
+.BR wnseven_m (3)
+CGI program for searching files for sections for
+.B wn
+HTTP server.
+.SH FILES
+.TP
+.I /etc/wn/wn.conf
+Main configuration file for
+.BR wn (1)
+package.
+.TP
+.I /etc/wn/wn.rc
+.BR sh (1)
+wrapper program to start
+.BR wn (1)
+daemon with proper options.
+.TP
+.I /etc/init.d/wn
+.BR sh (1)
+program to start
+.B wnswnd
+stand-alone daemon from
+.BR init (8)
+process.
+.TP
+.I /etc/cron.daily/wn
+.BR sh (1)
+program to re-index standard documentation directories.  It is run
+daily by the
+.BR cron (8)
+daemon.
+.SH SEE ALSO
+.BR wndigest (1),
+.BR wnhtmlify (1),
+.BR wnindexmaker (1),
+.BR wnpnuts (1),
+.BR wnauth (3),
+.BR wncat (3),
+.BR wnredir (3),
+.BR wnsectsearch (3),
+.BR wnseven_m (3),
+.BR wnconfig (8),
+.BR wndex (8),
+.BR wnpasswd (8),
+.BR wnuncache (8),
+.BR wnupdate-www (8),
+.BR wnv2c (8)
+.br
+.B http://dochost/doc/wn/manual.html
+.br
+.B http://hopf.math.nwu.edu/index.html
+.SH AUTHOR
+.B wn
+is written by John Franks <john@math.nwu.edu>.  Modified by Jean
+Pierre LeJacq <jplejacq@quoininc.com> as part of packaging for the
+Debian GNU/Linux distribution. Manual page also added by Jean Pierre
+LeJacq.

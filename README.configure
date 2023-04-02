@@ -1,0 +1,144 @@
+		RUNNING THE WN CONFIGURATION SCRIPT
+
+If your system supports perl, the quickest way to get your server
+configured is to run the perl script "configure" which is in the main
+source directory.  Do this with the command
+
+     perl configure
+
+This script will ask you various questions, like what version of
+UNIX you are using and the path to the directory you want to be
+the root of your data hierarchy.  The complete dialog is printed below.
+
+Default answers are printed in square brackets [] so you can
+simply press return to enter that value.  You can quit at
+any time by pressing Ctrl-C and nothing should be changed.
+
+This script creates two files: "config.h" and "Makefile" which
+are customized based on the answers you gave.  You may rerun this
+script as many times as you like.  The first time you run the
+script the default values are those in the file config.h.dist.
+Subsequent times the default values are taken from the most
+recent config.h you have produced (if it still exists in the
+current directory).
+
+Here is the script dialog (the questions you will be asked) together
+with the default answers.
+
+An alternative to running this script is to copy Makefile.dist and
+config.h.dist to Makefile and config.h respectively and edit them
+manually.
+
+Here is a listing of the configure script dialog:
+
+********************************************************************
+
+			WN Configuration (version 2.0.0)
+	
+	This configuration script asks you several questions.  Default
+	answers are printed in [square brackets] so you can simply press
+	return to enter that value.  (But don't use [square brackets]
+	when you enter a value.)  You can quit at any time by pressing
+	Ctrl-C and nothing should be changed.  An alternative to running
+	this script is to copy Makefile.dist and config.h.dist to
+	Makefile and config.h respectively and edit them manually.  You
+	may rerun this script as many times as you like, but it will only
+	have an effect if you rerun "make".
+
+	Currently supported operating systems are:
+	AIX, AUX, BSDI, CONVEX_0S, DYNIX, FREE_BSD_2, HPUX, ISC, LINUX,
+	NET_BSD, NEXT, OPEN_BSD, OSF1, PYRAMID, RISCOS, RTU, SCO, SGI,
+	SINIX, SOLARIS2, SUN_OS4, SVR4, ULTRIX, UNIXWARE
+
+
+	Under which operating system are you running?
+	[LINUX]: 
+
+	Which C compiler will you use, gcc or cc?
+	[cc]: 
+
+	Enter the complete path to your data root.
+	[/usr/local/wn]: 
+
+	When run as root the standalone server 'wnsd' will immediately change
+	its user id giving itself only the permissions of of an unpriviliged
+	user, usually 'nobody'. Most systems already have a user nobody and I
+	recommend you use it.  If you choose another user it should not be the
+	owner of any of your data files. NOTE: HPUX users must choose a user
+        other than 'nobody'!
+
+	With which user's permissions should the server run? [nobody]: 
+	User nobody with user id 99 and group id 99 was found.  These
+	values will be used when the server is run standalone (i.e. when
+	using wnsd). For use with inetd you must set the user in your
+	inetd.conf.
+
+	Enter an e-mail address for the server maintainer.
+	[webmaster@your.host]: 
+
+	What port should be the default? [80]: 
+
+	What hostname should the server use? (Answer "syscall"
+	to get hostname from system.)[syscall]: 
+
+	Enter a complete path to your logfile.
+	[/usr/local/wnlogs/wn.log]: 
+
+	Enter a complete path to your error log file.
+	[/usr/local/wnlogs/wn.log.err]: 
+
+	Enter a complete path to a file in which to store
+	the process id of the server
+	[/usr/local/wnlogs/wn.pid]: 
+
+	If you have specified logfiles and a process id file make
+	sure that they exist and are writable by user nobody or that
+	you have specified a directory for them in which nobody
+	has write permission.
+
+	Would you like a verbose log file including entries for 
+	'Referrer' and 'User-agent'? 
+	[No]: 
+
+	Would you like to use all *alphabetic*  Latin-1 characters in
+	the names of files served?  'No' is recommended unless you 
+	know you need this capability.
+	[No]: 
+
+	USER HOMEPAGES:
+
+	Do you want to:
+
+	1) Not allow user home pages
+	2) Look up user directories in the password file
+	3) Look up user directories in a lookup table
+
+	[1]: 
+
+	In what directory should server binaries be installed?
+	[/usr/local/src/wn-2.0.0pre/bin]: 
+
+	In what directory should utility binaries be installed?
+	[/usr/local/src/wn-2.0.0pre/bin]: 
+
+	The utility wndex needs a "mime.types" file in a known location.
+	This file is in the lib/ directory of the distribution hierarchy.
+	You may wish to move it to another location.  Pick a path now
+	and you can customize it and move it there later if necessary.
+
+	Enter a complete path to your mime.types file.
+	[/usr/local/src/wn-2.0.0pre/lib/mime.types]: 
+
+	New versions of 'config.h' and 'Makefile' will be written.
+	Old versions will be saved as 'config.h.bak'and 'Makefile.bak'.
+	Do this now? [Yes]: 
+
+	Configuration is now complete.  You can now run 'make' or
+	'make install' to do the compilation.  Further configuration
+	is possible by manually editing the files config.h and Makefile.
+	NOTE: IT IS NECESSARY TO RUN MAKE FOR THE CHANGES MADE BY RUNNING
+	THIS SCRIPT TO TAKE EFFECT.
+
+********************************************************************
+
+

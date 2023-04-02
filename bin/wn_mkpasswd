@@ -1,0 +1,113 @@
+#!/usr/bin/perl
+
+# wn_mkpasswd version 0.4  part of the WN server package
+# Usage: wn_mkpasswd [-n] [-d] [-D] [pwfile]
+# "-n" creates new password file, "-d" removes user from file
+# "-D" uses DBM data base format.
+
+	require "getopts.pl";
+	$pwfilename = "wnpasswd";
+	&Getopts('hndD');
+
+	if ( $opt_h ) {
+		print "Usage: wn_mkpasswd [-n] [-d] [-D] [-h] [pwfile]\n";
+		print "\t'-n' creates new password file\n";
+		print "\t'-d' removes user from file\n";
+		print "\t'-D' uses DBM data base format\n";
+		print "\t'-h' prints this message\n\n";
+		exit( 0);
+	}
+
+	$arg = shift;
+	$pwfilename = $arg if ( $arg ne "" );
+
+	print "Enter user name: ";
+	$name = <STDIN>;
+	chop( $name);
+
+	if ( $opt_d ) {
+		print "Remove user $name? [y/n] ";
+		$ans = <STDIN>;
+		$ans =~ /^[Yy]/ || die "User not deleted\n";
+		$opt_n = 0;
+	}
+	else {
+		system 'stty', '-echo';
+
+		print "Enter password: ";
+		chop($pw = <STDIN>);
+		print "\n";
+
+		print "Re-enter password: ";
+		chop($pw2 = <STDIN>);
+		print "\n";
+
+		system 'stty', 'echo';
+
+		die "Password mismatch, not entered\n" if ($pw ne $pw2);
+	}
+	if ( $opt_D ) {
+		dbmopen( %pwdb, $pwfilename, 0644);
+	}
+	else {
+		$bak = "$pwfilename.bak";
+		if ( $opt_n ) {
+			die "$pwfilename already exists" if -e $pwfilename;
+		} else {
+			rename( $pwfilename, $bak) ||
+				die "Can't rename $pwfilename\n";
+		}
+
+		open( OUT, ">$pwfilename") || die "Can't open file: $!\n";
+		if ( ! $opt_n ) {
+			open( IN, "<$bak") || die "Can't open file: $!\n";
+		}	
+	}
+
+	if ( ! $opt_d ) {
+		$let = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		$let = $let."abcdefghijklmnopqrstuvwxyz";
+		srand( time | $$);
+		$val1 = int( rand(64));
+		$val2 = int( rand(64));
+
+		$salt = substr( $let, $val1, 1).substr( $let, $val2, 1);
+	}
+	if ( $opt_D ) {
+		if ( $opt_d) {
+			$pwdb{$name} ne "" ||
+				die "User $name not found in data base\n";
+			 delete $pwdb{$name};
+		}
+		else {
+			$encoded = crypt($pw, $salt);
+			$pwdb{$name} = $encoded;
+		}
+		exit( 0);
+	}
+
+	if ( $opt_n ) {
+		printf( OUT "%s:%s\n", $name, crypt($pw, $salt));
+	}
+	else {
+		while ( $line = <IN> ) {
+			if ( $line =~ /^$name:/ ) {
+				$found = 1;
+				$opt_d || printf( OUT "%s:%s\n",
+						$name, crypt($pw, $salt));
+			}
+			else {
+				printf( OUT $line);
+			}
+		}
+		if ( !$found && !$opt_d ) {
+			printf( OUT "%s:%s\n", $name, crypt($pw, $salt));
+			exit( 0);
+		}
+		if ( !$found && $opt_d ) {
+			printf( "User $name not found in data base\n");
+			exit( 0);
+		}
+	}
+
+

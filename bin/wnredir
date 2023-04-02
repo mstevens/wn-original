@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+
+################################################
+#  wnredir version 0.4  -- a cache module for WN
+#  Usage: (in index file)
+#
+#  Cache-module=wnredir URL    (redirects everything to URL)
+#
+#  or
+#
+#  Cache-module=wnredir URL/    (redirects foo to URL/foo)
+#
+################################################
+
+
+# First get URL (listed in Cache-module line of index file)
+$url = shift;
+
+# Next get the name of file requested from this directory.  It has
+# been place in the environmental variable WN_KEY by the server.
+$basename = $ENV{WN_KEY};
+
+$file="file=$basename&" if ( $basename ne "" );
+
+# If the URL ends in '/' append the file name to it
+$url = $url.$basename if $url =~ m|/$|;
+
+# Return line in index.cache format, e.g. "file=foo&redirect=http://host/bar"
+print "$file"."redirect=$url\n";
+

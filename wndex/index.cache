@@ -1,0 +1,14 @@
+owner=lkjlkjlkj
+
+file=index.html&includes=insert.html&content=text/html; charset=iso-8859-1&title=File index.html&attributes=128
+file=logistic.png&content=image/png&title=File logistic.png
+file=syl1.html&content=text/html; charset=iso-8859-1&title=File syl1.html
+file=syl2.html&content=text/html; charset=iso-8859-1&title=File syl2.html
+file=syl3.html&content=text/html; charset=iso-8859-1&title=File syl3.html
+file=syl4.html&content=text/html; charset=iso-8859-1&title=File syl4.html
+file=maple1.mws&content=application/maple-v-r4&title=File maple1.mws
+file=sierpinski.mws&content=application/maple-v-r4&title=File sierpinski.mws
+file=logistic.mws&content=application/maple-v-r4&title=File logistic.mws
+file=bifurcation.mws&content=application/maple-v-r4&title=File bifurcation.mws
+file=henon.mws&content=application/maple-v-r4&title=File henon.mws
+file=grades.html&includes=<none>&content=text/html; charset=iso-8859-1&title=File grades.html

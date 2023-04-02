@@ -1,0 +1,88 @@
+.\" source:
+.\"   $Source: /var/cvs/projects/debian/printop/debian/dpkg.src/printop.printop.1.in,v $
+.\"
+.\" revision:
+.\"   @(#) $Id: printop.printop.1.in,v 1.2 1998/04/23 04:31:28 jplejacq Exp $
+.\"
+.\" copyright:
+.\"   Copyright (C) 1998 Jean Pierre LeJacq <jplejacq@quoininc.com>
+.\"
+.\"   Distributed under the GNU GENERAL PUBLIC LICENSE.
+.\"
+.TH wnconfig 8 "Sat, 25 Apr 1998 00:34:33 -0400" "1.18.7-1" "Debian GNU/Linux manual"
+.SH NAME
+wnconfig \- simple run-time configuration of wn HTTP server.
+.SH SYNOPSIS
+.B wnconfig
+.SH DESCRIPTION
+.B wnconfig
+is a
+.BR sh (1)
+program that is part of the
+.BR wn (1)
+HTTP server package.
+It helps you configure the
+.BR wn (1)
+HTTP server. Its user interface is patterned after the Linux kernel
+configuration program.  All questions have help which can be accessed
+by entering "?" without the quotes. All other answers must have double
+quotes around them. You need to define the values of several variable
+defining directories and options used by the
+.BR wn (1)
+daemon and utilities. There is a standard configuration that you can
+choose as a short cut. Once you're happy with the configuration you
+can save the configuration. This also modifies the running system. You
+can always exit without saving the configuration. You can rerun this
+program again later by invoking
+.B wnconfig
+from a command line.
+
+This is a very simple program which doesn't provide for extensive
+customization. Advanced users are encouraged to edit the Debian
+configuration files under
+.I /etc/wn
+directly instead of using this program.
+.SH FILES
+.TP
+.I /etc/wn/wn.conf
+Main configuration file for
+.BR wn (1)
+package.
+.TP
+.I /etc/wn/wn.rc
+.BR sh (1)
+wrapper program to start
+.BR wn (1)
+daemon with proper options.
+.TP
+.I /etc/init.d/wn
+.BR sh (1)
+program to start
+.BR wnswnd (8)
+stand-alone daemon from
+.BR init (8)
+process.
+.TP
+.I /etc/cron.daily/wn
+.BR sh (1)
+program to re-index standard documentation directories.  It is run
+daily by the
+.BR cron (8)
+daemon.
+.SH SEE ALSO
+.BR wn (1),
+.BR wndex (8),
+.BR wnpasswd (8),
+.BR wnuncache (8),
+.BR wnupdate-www (8),
+.BR wnv2c (8)
+.br
+.B http://dochost/doc/wn/manual.html
+.br
+.B http://hopf.math.nwu.edu/index.html
+.SH AUTHOR
+.B wn
+is written by John Franks <john@math.nwu.edu>.  Modified by Jean
+Pierre LeJacq <jplejacq@quoininc.com> as part of packaging for the
+Debian GNU/Linux distribution. Manual page also added by Jean Pierre
+LeJacq.

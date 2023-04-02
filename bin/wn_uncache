@@ -1,0 +1,110 @@
+#!/usr/bin/perl
+
+###################################################################
+# wn_uncache version 1.2 (part of the WN server package)
+#
+# This script undoes what wndex does. More precisely, it reads an 
+# index.cache file from standard input and writes an index file to
+# standard output.
+#
+# Usage:  wn_uncache < index.cache > index
+#
+############################
+
+	$version = "1.1";
+	print "#############################################\n";
+	print "# Index file created by wn_uncache version $version\n";
+	print "#############################################\n\n";
+
+	$rand = time|$$;
+	$mark = "WN"."$rand"."WN";
+	$dtoken{accessfile} = "Accessfile";
+	$dtoken{dwrapper} = "Searchwrapper";
+	$dtoken{nomatchsub} = "Nomatchsub";
+	$dtoken{subdirs} = "Subdirs";
+	$dtoken{owner} = "Owner";
+	$dtoken{cachemod} = "Cache-cachemod";
+	$dtoken{filemod} = "File-module";
+	$dtoken{indexmod} = "Search-module";
+	$dtoken{authtype} = "Authorization-type";
+	$dtoken{authrealm} = "Authorization-realm";
+	$dtoken{authmod} = "Authorization-module";
+	$dtoken{default_content} = "Default-Content";
+	$dtoken{default_document} = "Default-Document";
+	$dtoken{attributes} = "Attributes";
+	$dtoken{nosearch} = "nosearch:error";
+	$dtoken{serveall} = "serveall:error";
+
+	$token{file} = "File";
+	$token{title} = "Title";
+	$token{url} = "URL";
+	$token{header} = "Header";
+	$token{parse} = "Parse";
+	$token{redirect} = "Redirect";
+	$token{keywords} = "Keywords";
+	$token{content} = "Content-Type";
+	$token{encoding} = "Content-Encoding";
+	$token{field} = "Field";
+	$token{includes} = "Includes";
+	$token{wrappers} = "Wrappers";
+	$token{swrapper} = "Searchwrapper";
+	$token{nomatchsub} = "Nomatchsub";
+	$token{filter} = "Filter";
+	$token{expires} = "Expires";
+	$token{Set-Cookie} = "setcookie";
+	$token{refresh} = "Refresh";
+
+	$line = <STDIN>;
+	chop($line);
+	if ($line ) {
+		$foundamp = 1 if $line =~ s/\\&/$mark/g;
+		@mylist = split( /&/, $line);
+		foreach $item ( @mylist) {
+			$item =~ s/$mark/&/g if $foundamp;
+			( $itoken, $value) = split( /=/, $item, 2);
+			if ( ($value eq "true") && ($dtoken{$itoken} =~ /:/)) {
+				($value, $junk)
+					= split( /:/, $dtoken{$itoken}, 2);
+				$itoken = "attributes";
+			}
+			if ( ($value eq "false") && ($dtoken{$itoken}=~ /:/)) {
+				($junk, $value)
+					= split( /:/, $dtoken{$itoken}, 2);
+				$itoken = "attributes";
+			}
+			print "$dtoken{$itoken}=$value\n";
+		}
+	}
+	while ( $line = <STDIN>) {
+		$foundamp = 0;
+		$foundamp = 1 if $line =~ s/\\&/$mark/g;
+		chop( $line);
+		next if $line eq "";
+		@mylist = split( /&/, $line);
+		foreach $item ( @mylist) {
+			$item =~ s/$mark/&/g if $foundamp;
+			( $itoken, $value) = split( /=/, $item, 2);
+			print "\n" if $itoken eq "file" || $itoken eq "url";
+			if ( $itoken =~ s/^field/Field/ ) {
+				$token{$itoken} = $itoken 
+			}
+			if ($itoken eq "attributes") {
+				$attrline = "Attributes=";
+				$attrline .= "dynamic," if
+					(($value & 1) && !($value & 2));
+				$attrline .= "non-dynamic," if ($value & 2);
+				$attrline .= "nosearch," if ($value & 64);
+				$attrline .= "parse," if
+					(($value & 128) && !($value & 256));
+				$attrline .= "noparse," if ($value & 256);
+				$attrline .= "cgi," if ($value & 512);
+				$attrline .= "imagemap," if ($value & 1024);
+				$attrline =~ s/,$//;
+				print "$attrline\n";
+		
+			}
+			else {
+				print "$token{$itoken}=$value\n";
+			}
+		}
+	}

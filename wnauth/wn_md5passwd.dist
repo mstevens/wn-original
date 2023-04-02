@@ -1,0 +1,200 @@
+#!/usr/bin/perl
+# wn_md5passwd version 0.5  part of the WN server package
+# Usage: wn_md5passwd [-n] [-d] [-D] [pwfile]
+
+	$MD5EXEC = "YOUR_MD5_GOES_HERE";
+	$REALM_NAME = "wndigest_realm";
+	$PASSWORD_FILE = "wnpasswd";
+
+	require "getopts.pl";
+	&Getopts('ndD');
+
+	umask( 077);
+	$arg = shift;
+	$pwfilename = $PASSWORD_FILE;
+	$pwfilename = $arg if ( $arg ne "" );
+
+	if ( $opt_n ) {
+		&do_new();
+		exit( 0);
+	}
+
+	if ( $opt_D ) {
+		dbmopen( %pwdb, $pwfilename, 0600);
+		($realm, $random_key) = split( ":", $pwdb{$REALM_NAME});
+		&my_abort( "Realm not in password file\n") if ( $realm eq "");
+		&my_abort( "Random key not in password file\n")
+					if ( $random_key eq "");
+	}
+	else {
+		$tempfile = "$pwfilename.tmp";
+		$bakfile = "$pwfilename.bak";
+		&my_abort( "Password file $pwfilename does not exist\n" )
+					if ( ! -f $pwfilename);
+		open( IN, "<$pwfilename") || &my_abort( "Can't open file: $!\n" );
+		open( OUT, ">$tempfile") || &my_abort( "Can't open file: $!\n" );
+		$line = <IN>;
+		if ( $line =~ /^$REALM_NAME/ ) {
+			chop( $line);
+			($junk, $realm, $random_key) = split( ":", $line);
+		}
+
+		&my_abort( "Realm not in password file\n" ) if ( $realm eq "");
+		&my_abort( "Random key not in password file\n" )
+					if ( $random_key eq "");
+	}
+
+	print "Enter user name: ";
+	$name = <STDIN>;
+	chop( $name);
+	$oldha1 = "";
+	if ( $opt_D ) {
+		$oldha1 = $pwdb{$name};
+        }
+	else {
+		seek( IN, 0, 0);
+		while ( $line = <IN> ) {
+			if ( $line =~ /^$name:/ ) {
+				($junk, $junk2, $oldha1) = split( ":", $line);
+				last;
+			}
+		}
+	}
+
+	if ( $opt_d ) {
+		print "Remove user `$name'? [y/n] ";
+		$ans = <STDIN>;
+		$ans =~ /^[Yy]/ || &my_abort( "User not deleted\n" );
+		if ( $opt_D) {
+			delete $pwdb{$name};
+			system 'stty', 'echo';
+			exit( 0);
+		}
+		else {
+			seek( IN, 0, 0);
+			$found = undef;
+			while ( $line = <IN> ) {			
+				if ( $line =~ /^$name:/ ) {				
+				      $found = 1;
+				      next;
+				}
+				printf( OUT "$line");
+			}
+			rename( $pwfilename, $bakfile) ||
+				&my_abort( "Can't rename $pwfilename\n" );
+			rename( $tempfile, $pwfilename) ||
+				&my_abort( "Can't rename $tempfile\n" );
+			if (defined $found) {
+ 			        print "User `$name' successfully deleted.\n";
+			} else {
+			        print "User `$name' not found.\n";
+			}
+			exit(0);
+		}
+	}
+	else {
+		system 'stty', '-echo';
+		print "Enter new password: ";
+		chop($pw = <STDIN>);
+		print "\n";
+		print "Re-enter new password: ";
+		chop($pw2 = <STDIN>);
+		print "\n";
+		system 'stty', 'echo';
+		&my_abort( "Password mismatch, not entered\n" ) if ($pw ne $pw2);
+
+		$A1 = $name.":".$realm.":".$pw;
+		&my_abort( "Can't exec $MD5EXEC\n" ) if ( ! -x $MD5EXEC );
+		open( MD5, "echo -n $A1 | $MD5EXEC |");
+		$HA1 = <MD5>;
+		chop( $HA1);
+		$HA1 =~ s/^MD5.* = //;
+		$HA1 =~ s/[\s\t]*-.*$//;    #remove trailing white and '-'
+	}
+
+
+	if ( $opt_D ) {
+		$pwdb{$name} = $HA1;
+		exit( 0);
+	}
+
+	seek( IN, 0, 0);
+	$found = 0;
+	while ( $line = <IN> ) {
+		if ( $line =~ /^$name:/ ) {
+			printf( OUT "%s:%s\n", $name, $HA1);
+			$found = 1;
+		}
+		else {
+			printf( OUT $line);
+		}
+	}
+	
+	
+	printf( OUT "%s:%s\n", $name, $HA1) if ( !$found);
+
+	rename( $pwfilename, $bakfile) || &my_abort( "Can't rename $pwfilename\n" );
+	rename( $tempfile, $pwfilename) || &my_abort( "Can't rename $tempfile\n" );
+
+	print "Authentication information for ";
+	if ( $found) {
+		print "`$name' successfully updated.\n";
+	}
+	else {
+		print "`$name' successfully installed.\n";
+	}
+
+	exit( 0);
+
+
+
+sub do_new {
+	if ( $opt_D ) {
+		die "Data base already exists; remove it first.\n"
+			if ( dbmopen( %pwdb, $pwfilename, undef ));
+		dbmopen( %pwdb, $pwfilename, 0600);
+		print "Enter realm: ";
+		$realm = <STDIN>;
+		chop( $realm);
+		&set_random();
+		$pwdb{$REALM_NAME} = $realm.":".$random_key;
+		printf( "New password data base created\n");
+		return;
+	}
+	die "$pwfilename already exists; remove it first.\n" if -e $pwfilename;
+	print "Enter realm: ";
+	$realm = <STDIN>;
+	chop( $realm);
+	open( OUT, ">$pwfilename") || die "Can't open file: $!\n";
+	&set_random();
+	printf( OUT "%s:%s:%s\n", $REALM_NAME, $realm, $random_key);
+	close( OUT);
+	printf( "New password file %s created\n", $pwfilename);
+
+}
+
+sub set_random {
+	local( $com);
+	if ( -r "/dev/urandom") {
+		$com = "dd if=/dev/urandom count=1 bs=512";
+	}
+	else {
+		$com = "ps axl &ps -el &netstat -na &echo $y &netstat -s &w";
+	}
+
+	open(SEED, "($com) 2>/dev/null | $MD5EXEC |")
+		|| &my_abort( "Cannot run random key command\n" );
+	($random_key = <SEED>) || &my_abort( "Cannot run random key command\n" );
+	chop( $random_key);
+	$random_key =~ s/^MD5.* = //;
+	$random_key=~ s/ -.*$//;
+}
+
+sub my_abort {
+	local( $msg) = pop( @_ );
+	close( IN);
+	close( OUT);
+	unlink( $tempfile);
+	system 'stty', 'echo';
+	die $msg;
+}

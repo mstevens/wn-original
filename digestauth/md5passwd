@@ -1,0 +1,107 @@
+#!/usr/local/bin/perl
+#md5passwd version 0.1  part of the WN server package
+#Usage: md5passwd [-n] [-d] [-D] [pwfile]
+
+	require "getopts.pl";
+	$pwfilename = "wnpasswd";
+	&Getopts('ndD');
+
+	$arg = shift;
+	$pwfilename = $arg if ( $arg ne "" );
+
+
+	print "Enter user name: ";
+	$name = <STDIN>;
+	chop( $name);
+
+	if ( $opt_d ) {
+		print "Remove user $name? [y/n] ";
+		$ans = <STDIN>;
+		$ans =~ /^[Yy]/ || die "User not deleted\n";
+		$opt_n = 0;
+	}
+	else {
+		print "Enter realm: ";
+		$realm = <STDIN>;
+		chop( $realm);
+
+		system 'stty', '-echo';
+
+		print "Enter password: ";
+		chop($pw = <STDIN>);
+		print "\n";
+
+		print "Re-enter password: ";
+		chop($pw2 = <STDIN>);
+		print "\n";
+
+		system 'stty', 'echo';
+
+		die "Password mismatch, not entered\n" if ($pw ne $pw2);
+	}
+	if ( $opt_D ) {
+		dbmopen( %pwdb, $pwfilename, 0644);
+	}
+	else {
+		$bak = "$pwfilename.bak";
+		if ( $opt_n ) {
+			die "$pwfilename already exists" if -e $pwfilename;
+		} else {
+			rename( $pwfilename, $bak) ||
+				die "Can't rename $pwfilename\n";
+		}
+
+		open( OUT, ">$pwfilename") || die "Can't open file: $!\n";
+		if ( ! $opt_n ) {
+			open( IN, "<$bak") || die "Can't open file: $!\n";
+		}	
+	}
+
+	if ( ! $opt_d ) {
+		$A1 = $name.":".$realm.":".$pw;
+		open( MD5, "./md5 -s$A1 |") || die "Can't exec md5: $!\n";
+		$HA1 = <MD5>;
+		chop( $HA1);
+#print "HA1 = ", $HA1, "\n";
+		$HA1 =~ s/^MD5.* = //;
+#print "HA1 = ", $HA1, "\n";
+	}
+	if ( $opt_D ) {
+		if ( $opt_d) {
+			$pwdb{$name} ne "" ||
+				die "User $name not found in data base\n";
+			 delete $pwdb{$name};
+		}
+		else {
+#print "Old passwd = ", $pwdb{$name}, "\n";
+			$pwdb{$name} = $HA1;
+#print "New passwd = ", $pwdb{$name}, "\n";
+		}
+		exit( 0);
+	}
+
+	if ( $opt_n ) {
+		printf( OUT "%s:%s\n", $name, $HA1);
+	}
+	else {
+		while ( $line = <IN> ) {
+			if ( $line =~ /^$name:/ ) {
+				$found = 1;
+				$opt_d || printf( OUT "%s:%s\n",
+						$name, $HA1);
+			}
+			else {
+				printf( OUT $line);
+			}
+		}
+		if ( !$found && !$opt_d ) {
+			printf( OUT "%s:%s\n", $name, $HA1);
+			exit( 0);
+		}
+		if ( !$found && $opt_d ) {
+			printf( "User $name not found in data base\n");
+			exit( 0);
+		}
+	}
+
+

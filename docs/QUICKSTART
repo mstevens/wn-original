@@ -1,0 +1,72 @@
+WN QUICKSTART (version 2.1.0)
+
+----------------------------
+1. In the directory where you found this file (the top directory of
+the WN distribution) run the command "perl configure" and answer the
+questions.  You can run it multiple times if you wish.
+
+----------------------------
+2. In this same directory run "make" or "make install".
+
+----------------------------
+3. Create an HTML file, name it index.html and put it in the directory
+you have designated as your data root.  Add other HTML files if you
+want.
+
+----------------------------
+
+4. In your data root directory create a file named "index" that
+contains only the line
+
+	Attribute=serveall
+
+Now in that directory run the command "wndex".  This creates a data
+base "index.cache" of information about files you are serving.  The
+serveall directive grants permission to serve all files in this
+directory (your data root directory).  If you used the line 
+"File=index.html" instead of "Attribute=serveall" then only the file
+index.html could be served. 
+
+  NOTE: If you did "make install" the wndex program and the server
+  binaries "wnd" and "wnsd" are located in the directory where you told
+  'configure' to put the binaries (probably "bin" in the top source
+  directory).
+
+----------------------------
+5. Start the server using "wnsd" (this is the standalone version of
+WN).  If your default port is 80 you will need to be root to do this.
+If you can't become root try "wnsd -p 8080" which will run the server
+on port 8080.  A good test to start is 
+
+	wnsd -p 8080 -v verbose -L /tmp/log -l /tmp/errlog 
+
+The -v verbose option requests verbose logging (you only need to use
+it if you didn't request verbose logging in answer to the configure script
+questions).  The -L and -l options specify log files.  They will have
+useful information if anything goes wrong (the most common problem is
+permissions set incorrectly on the files you want to serve -- they
+should be world readable).
+
+----------------------------
+6. Try it with a browser.  The URL will be 
+
+	http://yourhost/  
+	
+or http://yourhost:8080/ if you used the -p 8080 option.
+
+----------------------------
+7.  Now read the documentation in the docs/ directory. The quickest
+way to do this is with a Web browser and the URL
+
+	file:/path/2/WN_src/docs/manual.html
+
+If you do this searching won't work (because the WN server does the
+searching and using "file://..." bypasses the server.  So a better
+way assuming your server is going is to put a symbolic link in your
+data root directory to /path/2/WN_src/docs/ and then use the URL
+
+	http://yourhost/docs/manual.html
+
+
+
+John Franks

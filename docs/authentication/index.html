@@ -1,0 +1,99 @@
+<!doctype html public "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+  <head>
+    <title>WN Password Protected Directory Example</title>
+
+    <link rev="made" href="mailto:john@math.nwu.edu">
+
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <meta http-equiv="last-modified" content="Sun, 19 Dec 1999 14:51:46 GMT">
+    <meta http-equiv="keywords" content="WN access example">
+  </head>
+
+  <body bgcolor="#FFFFFF">
+    <p>
+      <a href="http://hopf.math.nwu.edu/"><img
+        src="../images/powered.jpg"
+        border="0"
+        width="190"
+        height="41"
+        align="right"
+        alt="WN home page"
+      ></a>
+    </p>
+
+    <strong>Version 2.2.4</strong>
+
+    <br>
+
+    <!-- pnuts --> <a href="../examples/index.html">[Up]</a> <a href="../index.html">[Top]</a>
+
+    <br clear="right">
+
+    <hr size="4">
+
+    <h2 align="center"><em>WN</em> Password Protected Directory Example</h2>
+    <hr size="4">
+
+    <p>
+      This file is accessible only to user <code>santa</code> with password
+      <code>red-nosed</code> or user <code>rudolph</code> with password
+      <code>NorthPole</code>.
+    </p>
+
+    <p>
+      Here is what the <code>index.wn</code> file for this directory looks like:
+    </p>
+
+    <blockquote>
+      <pre>
+<!-- #include -->
+      </pre>
+    </blockquote>
+
+    <p>
+      The realm lets the client know that the same user/password pair is valid
+      for any other directory with the same realm. The "<code><a
+      href="../appendixB.html#ddir.authorization-module">Authorization-module=</a></code>"
+      line specifies that we are using the module <code><a
+      href="../module.html#authorization">wnauth</a></code> which comes as part
+      of the <em>WN</em> package.  The <code>-P</code> option indicates that
+      the next argument is the name of the password file we are using.  A UNIX
+      NDBM database can also be used for a password file.  You can also control
+      access by groups.
+    </p>
+
+    <p>
+      Finally all documents in this directory, being password protected, should
+      not be cached so we give the directory the "<code><a
+      href="../appendixB.html#ddir.default-attributes">Default-Attributes=</a><a
+      href="../appendixB.html#fdir.attributes.non-cachable">non-cachable</a></code>".
+      This is done for security reasons on the client as not all clients
+      adequately protect the documents they cache.
+    </p>
+
+    <p>
+      You can read the section "<a href="../access.html#authenticate">Limiting
+      Access by Password Authentication</a>" from the "<a
+      href="../manual.html">User's Guide for the <em>WN</em> Server</a>" for
+      more information about password protecting documents under <em>WN</em>.
+    </p>
+
+
+    <hr size="4">
+
+    <address>
+      <em>WN</em> version 2.2.4
+      <br>
+      Copyright &copy; 1998 <a href="mailto:john@math.nwu.edu">John Franks
+      &lt;john@math.nwu.edu&gt;</a>
+      <br>
+      licensed under the <a href="http://www.gnu.org/copyleft/gpl.html">GNU
+      General Public License</a>
+      <br>
+      Last modified: Sat, 11 Sep 1999 13:09:13 GMT
+    </address>
+
+    <!-- pnuts --> <a href="../examples/index.html">[Up]</a> <a href="../index.html">[Top]</a>
+  </body>
+</html>

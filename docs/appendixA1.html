@@ -1,0 +1,559 @@
+<!doctype html public "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+  <head>
+    <title>Command Line Options for the WN Server</title>
+
+    <link rev="made" href="mailto:john@math.northwestern.edu">
+
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <meta http-equiv="last-modified" content="Sat June 18 2005">
+    <meta http-equiv="keywords" content="WN server options">
+  </head>
+
+  <body bgcolor="#FFFFFF">
+    <p>
+      <a href="http://hopf.math.northwestern.edu/"><img
+        src="images/powered.jpg"
+        border="0"
+        width="190"
+        height="41"
+        align="right"
+        alt="WN home page"
+      ></a>
+    </p>
+
+    <strong>Version 2.4.7</strong>
+
+    <br>
+
+    <!-- pnuts --> <a href="support.html">[Previous]</a> <a href="appendixA2.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+
+
+
+    <br clear="right">
+
+    <hr size="4">
+    <!-- #start -->
+
+    <h2 align="center">Command Line Options for the <em>WN</em> Server</h2>
+    <hr size="4">
+
+    <p>
+      These are the command line options for both the UNIX <a
+        href="/cgi-bin/man2html/usr/man/man8/inetd.8.gz"><code>inetd(8)</code></a>
+      system utility based daemon, <code>wnd</code>, and the stand-alone
+      daemon, <code>wnsd</code>.
+    </p>
+
+    <dl>
+      <dt>
+        <a name="a_opt"><code><b>-a</b> <i>numeric_uid</i></code></a> -- Set
+        trusted numeric uid for authentication
+      </dt>
+      <dd>
+        <p>
+          The server will only allow <a
+          href="access.html#authenticate">password authentication</a> if one of
+          the options <code><b>-a</b></code>, <a
+          href="#A_opt"><code><b>-A</b></code></a>, <a
+          href="#t_opt"><code><b>-t</b></code></a>, or <a
+          href="#T_opt"><code><b>-T</b></code></a> is used.  Then the <a
+          href="index_desc.html#index"><code>index.cache</code></a> file for a
+          password protected directory must be owned by the user id specified
+          with the <code><b>-a</b></code> (or <a
+          href="#t_opt"><code><b>-t</b></code></a>) option.  The
+          <code><b>-a</b></code> option only affects authentication while <a
+          href="#t_opt"><code><b>-t</b></code></a> has other effects.  The four
+          command line arguments <code><b>-a</b></code>, <a
+          href="#A_opt"><code><b>-A</b></code></a>, <a
+          href="#t_opt"><code><b>-t</b></code></a>, <a
+          href="#T_opt"><code><b>-T</b></code></a> all take a numeric argument.
+          Thus the command should be "<code>./wnsd&nbsp;-a&nbsp;203</code>" and
+          <em>not</em> "<code>./wnsd&nbsp;-a&nbsp;joe</code>" if user
+          "<code>joe</code>" has user id "<code>203</code>".
+        </p>
+      </dd>
+
+      <dt>
+        <a name="A_opt"><code><b>-A</b> <i>numeric_gid</i></code></a> -- Set
+        trusted numeric gid for authentication
+      </dt>
+      <dd>
+        <p>
+          This is similar to the <a
+          href="#a_opt"><code><code><b>-a</b></code></code></a> option except
+          the group owner (gid) of the <a
+          href="index_desc.html#index"><code>index.cache</code></a> file is
+          used instead of the uid.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="d_opt"><code><b>-d</b></code></a> -- Really verbose log
+      </dt>
+      <dd>
+        <p>
+          When the server is run with this option it will include copies of all
+          the client headers plus some additional information in the log file.
+          This is only useful for debugging or if you are curious about what
+          clients actually send.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="e_opt"><code><b>-e</b></code></a> -- Forbid CGI and execs
+      </dt>
+      <dd>
+        <p>
+          When the server is run with this option it will not execute a <a
+          href="cgi.html">CGI program</a>, a <a href="filter.html">filter</a>
+          or any executable in an <a href="parse.html">include</a>.  In
+          addition the server will reject any request with the HTML <a
+          href="http://htmlhelp.com/reference/wilbur/block/form.html"><code>&lt;form&nbsp;action="post"&gt;</code></a>
+          method.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="E_opt"><code><b>-E</b></code></a> -- Restrict CGI and execs to
+        trusted users
+      </dt>
+      <dd>
+        <p>
+          This is similar to the <a href="#e_opt"><code><b>-e</b></code></a>
+          option except that <a
+          href="index_desc.html#index"><code>index.cache</code></a> files owned
+          by a trusted user id or trusted group id (set with the <a
+          href="#t_opt"><code><b>-t</b></code></a> or <a
+          href="#T_opt"><code><b>-T</b></code></a> option) are exempt from the
+          restrictions.  That is, only programs listed in <a
+          href="index_desc.html#index"><code>index.cache</code></a> files owned
+          by the trusted user or group will be executed.  If neither the <a
+          href="#t_opt"><code><b>-t</b></code></a> or <a
+          href="#T_opt"><code><b>-T</b></code></a> are used then no programs,
+          filters or includes will be executed.  This option takes precedence
+          over the <a href="#u_opt"><code><b>-u</b></code></a> option, i.e. if
+          both are used execution of programs and programs behaves as if the <a
+          href="#u_opt"><code><b>-u</b></code></a> were not present (although
+          the <a href="#u_opt"><code><b>-u</b></code></a> option still grants
+          permission for the serving of ordinary files).
+        </p>
+      </dd>
+
+      <dt>
+        <a name="F_opt"><code><b>-F</b></code></a> -- Run server in foreground
+      </dt>
+      <dd>
+        <p>
+          The server (<code>wnsd</code> only) will run in the foreground 
+	  rather than the background which is the default.  This is useful
+	  for things like <code>daemontools</code>.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="h_opt"><code><b>-h</b> <i>hostname</i></code></a> -- Set
+        hostname
+      </dt>
+      <dd>
+        <p>
+          Tell the server that its name is
+          <code><i>hostname</i></code>.  This is only used for a few
+          things: to pass to <a href="cgi.html">CGI programs</a> and
+          for redirects generated when a trailing '/' is omitted in a
+          URL path to a directory.  Also if the <a
+          href="appendixA1.html#i_opt"><code>-i</code></a> option is
+          not used then the server will ascertain the IP address on
+          which to listen for connections by using the first IP
+          address obtained from the UNIX <code>gethostbyname(3)</code>
+          system call with this name.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="i_opt"><code><b>-i</b> <i>IP_addr</i> or <i>all</i></code></a> --
+	 Set the dotted quad IP address on which the server listens 
+	 (<code>wnsd</code> only).
+      </dt>
+      <dd>
+        <p>
+          Tell the server to listen for incoming connections on the
+	  dotted quad IP address <code><i>IP_addr</i></code>.  This is
+	  only used by <code>wnsd.</code> It is useful if your server
+	  has more than one internet interface. If
+	  <code><i>all</i></code> is used in place of an IP address
+	  the server will listen on all available interfaces. If this
+	  option is not used the server will ascertain the appropriate
+	  IP address by using the first IP address obtained from 
+	  the UNIX <code>gethostbyname(3)</code>  system call with the
+	  name supplied with the
+	  <a href="appendixA1.html#h_opt"><code>-h</code></a> option.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="L_opt"><code><b>-L</b> <i>logfile</i></code></a> -- Set
+        log file name
+      </dt>
+      <dd>
+        <p>
+          Write log information to the file <code><i>logfile</i></code>.  This
+          will override the value specified when you ran the <a
+          href="setup.html#installing.configure"><code>configure</code></a>
+          program or by setting the macro <a
+          href="configmacros.html#WN_LOGFILE"><code>#define&nbsp;WN_LOGFILE</code></a>
+          in <a href="configmacros.html"><code>config.h</code></a>.  If the
+          empty string <code><i>""</i></code> is used as the value of this
+          option then no transaction logging will be done.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="l_opt"><code><b>-l</b> <i>error_log</i></code></a> -- Set
+        error log file name
+      </dt>
+      <dd>
+        <p>
+          Write information about errors to the file
+          <code><i>error_log</i></code>.  This will override the value
+          specified when you ran the <a
+          href="setup.html#install"><code>configure</code></a> program or by
+          setting the macro <a
+          href="configmacros.html#WN_ERRLOGFILE"><code>#define&nbsp;WN_ERRLOGFILE</code></a>
+          in <a href="configmacros.html"><code>config.h</code></a>.  If the
+          empty string <code><i>""</i></code> is used as the value of this
+          option then the log file given with <a
+          href="#L_opt"><code><b>-L</b></code></a> is used for errors as well
+          as regular transactions.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="n_opt"><code><b>-n</b> <i>effective_uid</i></code></a> -- Set
+        effective user numeric id (<code>wnsd</code> only)
+      </dt>
+      <dd>
+        <p>
+          This option only has an effect when the server is run by
+          <code>root</code> in the stand-alone version,
+          i.e. <code>wnsd</code>.  When invoked with the <code><b>-n</b></code>
+          option and a numeric user id (not a user name) the server will change
+          the user id under which it runs to the specified numeric value.  If
+          you do not use this option the user id is changed from
+          <code>root</code> to the value you set when you ran the <a
+          href="setup.html#install"><code>configure</code></a> program (this is
+          usually the numeric id of the user "<code>nobody</code>"; the
+          '<code><b>n</b></code>' in <code><b>-n</b></code> is a mnemonic for
+          "<code>nobody</code>") or edited <a
+          href="configmacros.html#USERID"><code>#define&nbsp;USERID</code></a>
+          in <a href="configmacros.html"><code>config.h</code></a>.  The
+          <code><b>-n</b></code> option allows you to override that default
+          when you run the server.  In normal use this option is not necessary
+          and should not be used unless you have a specific need.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="N_opt"><code><b>-N</b> <i>effective_gid</i></code></a> -- Set
+        effective group numeric id (<code>wnsd</code> only)
+      </dt>
+      <dd>
+        <p>
+          This option only has an effect when the server is run by
+          <code>root</code> in the stand-alone version, i.e. <code>wnsd</code>.
+          This option is identical to the <a
+          href="#n_opt"><code><b>-n</b></code></a> option except it sets the
+          numeric group id under which the server runs rather than the user id.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="p_opt"><code><b>-p</b> <i>port</i></code></a> -- Set the port
+        (<code>wnsd</code> only)
+      </dt>
+      <dd>
+        <p>
+          Running the command "<code>wnsd&nbsp;-p&nbsp;8080</code>" will run
+          the server on port <code>8080</code> rather than the default which is
+          normally <code>80</code> but can be set in <a
+          href="configmacros.html"><code>config.h</code></a> by editing the <a
+          href="configmacros.html#DEFAULT_PORT"><code>#define&nbsp;DEFAULT_PORT</code></a>
+          macro.  If a value less than or equal to <code>1024</code> is used
+          then the server must be run by <code>root</code> (it will change its
+          permissions after opening the port).  This option is only used by
+          <code>wnsd</code> since when <code>wnd</code> is run under the UNIX
+          <a
+          href="/cgi-bin/man2html/usr/man/man8/inetd.8.gz"><code>inetd(8)</code></a>
+          system utility, the port is determined by the setting in the UNIX <a
+          href="/cgi-bin/man2html/usr/man/man5/services.5.gz"><code>services(5)</code></a>
+          configuration file normally found in <code>/etc</code>.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="P_opt"><b>-P</b></a> -- Enable the 
+       <code>PUT, MOVE</code> and <code>DELETE</code> methods on the server.
+      </dt>
+      <dd>
+        <p>
+          If this option is not used the server will reject any requests
+          for the HTTP methods <code>PUT, MOVE</code> and <code>DELTE.</code>
+        </p>
+        <p>
+	  In the directory where objects are to be PUT, the "<code><a
+	  href="appendixB.html#ddir.put-authorization-module">
+	  Put-Authorization-Module, Put-Authorization-Realm, and
+	  Put-Authorization-Type</a></code> directives must be used.
+	  Finally in this same directory, the "<code><a
+	  href="appendixB.html#ddir.default-attributes">
+	  Default-Attributes=put</a></code>" directive must be used
+	  (or in the case of a single file the "<code> <a
+	  href="appendixB.html#fdir.attributes.put">Attributes=put</a></code>"
+	  directive.)
+        </p>
+      </dd>
+
+      <dt>
+        <a name="q_opt"><code><b>-q</b> <i>pid_file</i></code></a> -- Set file
+        name which contains the (<code>wnsd</code>) server process id.
+      </dt>
+      <dd>
+        <p>
+          Write the process id or "pid" of the main server process to the file
+          "<code><i>pid_file</i></code>".  This file name should be the full
+          path relative to the system root.  If this is not set either with the
+          <code><b>-q</b></code> option, via the <a
+          href="setup.html#installing.configure"><code>configure</code></a>
+          program, or by editing the macro <a
+          href="configmacros.html#SWN_PID_FILE"><code>#define&nbsp;SWN_PID_FILE</code></a>
+          in the <a href="configmacros.html"><code>config.h</code></a> file
+          then the pid will be written to the UNIX <a
+          href="/cgi-bin/man2html/usr/man/man3/stdio.3.gz"><code>stdout(3)</code></a>
+          stream when the server is started.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="S_opt"><code><b>-S</b></code></a> -- Use the UNIX <a
+        href="/cgi-bin/man2html/usr/man/man8/syslogd.8.gz"><code>syslogd(8)</code></a>
+        system utility for logging (deprecated).
+      </dt>
+      <dd>
+        <p>
+	  This option is deprecated; use the <a
+	  href="#v_opt"><code>-v option</code></a> instead.
+        </p>
+        <p>
+	  Instead of writing log messages to a file specified with <a
+	  href="#L_opt"><code><b>-L</b></code></a> or in <a
+	  href="configmacros.html"><code>config.h</code></a>, use the
+	  UNIX <code>syslog(3)</code> facility.  If <a
+	  href="configmacros.html#WN_ERRLOGFILE"><code>#define&nbsp;WN_ERRLOGFILE</code></a>
+	  is set to <code>""</code> and the server is run with the
+	  <code><b>-S</b></code> option then error logging will be
+	  handled by the <code>syslog(3)</code> facility.  If <a
+	  href="configmacros.html#WN_ERRLOGFILE"><code>#define&nbsp;WN_ERRLOGFILE</code></a>
+	  is given a value or the <a
+	  href="#l_opt"><code><b>-l</b></code></a> option is used then
+	  errors will be logged there rather than using the UNIX <a
+	  href="/cgi-bin/man2html/usr/man/man8/syslogd.8.gz"><code>syslogd(8)</code></a>
+	  system utility.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="t_opt"><code><b>-t</b> <i>trusted_uid</i></code></a> -- Set
+        trusted numeric uid
+      </dt>
+      <dd>
+        <p>
+          When invoked with the <code><b>-t</b></code> option alone
+          <code>wnd</code> or <code>wnsd</code> will not serve a document
+          unless the <a
+          href="index_desc.html#index"><code>index.cache</code></a> file
+          listing it has the prescribed owner (uid).  This numeric uid should
+          be that of the maintainer not the one under which <code>wnd</code> or
+          <code>wnsd</code> runs if started by <code>root</code>.  Indeed, for
+          security reasons the server will refuse to use an <a
+          href="index_desc.html#index"><code>index.cache</code></a> file whose
+          owner is the uid under which the server is running, in this case.  If
+          on your server all <a
+          href="index_desc.html#index"><code>index.cache</code></a> files are
+          created by a single user or a single group this option or the <a
+          href="#T_opt"><code><b>-T</b></code></a> option are highly
+          recommended.  This added security is weakened somewhat if you also
+          use the <a href="#u_opt"><code><b>-u</b></code></a> option which
+          allows <a href="index_desc.html#index"><code>index.cache</code></a>
+          files owned by untrusted users to permit the serving of files owned
+          by the same user.  If both <a
+          href="#u_opt"><code><b>-u</b></code></a> and <code><b>-t</b></code>
+          are used the trusted user specified by <code><b>-t</b></code> is
+          exempt from the restrictions imposed by the <a
+          href="#u_opt"><code><b>-u</b></code></a> argument.  The four command
+          line arguments <a href="#a_opt"><code><b>-a</b></code></a>, <a
+          href="#A_opt"><code><b>-A</b></code></a>, <code><b>-t</b></code>, <a
+          href="#T_opt"><code><b>-T</b></code></a> all take a numeric argument.
+          Thus the command should be "<code>./wnsd&nbsp;-t&nbsp;203</code>" and
+          <em>not</em> "<code>./wnsd&nbsp;-t&nbsp;joe</code>" if user
+          "<code>joe</code>" has user id "<code>203</code>".
+        </p>
+      </dd>
+
+      <dt>
+        <a name="T_opt"><code><b>-T</b> <i>trusted_gid</i></code></a> -- Set
+        trusted numeric gid
+      </dt>
+      <dd>
+        <p>
+          This is similar to the <a href="#t_opt"><code><b>-t</b></code></a>
+          option except the numeric group owner (gid) of the <a
+          href="index_desc.html#index"><code>index.cache</code></a> file is
+          used instead of the numeric uid.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="u_opt"><code><b>-u</b></code></a> -- Restrict untrusted users
+      </dt>
+      <dd>
+        <p>
+          When this option is invoked the server requires that every file
+          served (including wrappers and includes) have the same owner as the
+          <a href="index_desc.html#index"><code>index.cache</code></a> file
+          which grants it permission to be served.  This means that untrusted
+          users can only serve files which they own.  If the <a
+          href="#t_opt"><code><b>-t</b></code></a> or <a
+          href="#T_opt"><code><b>-T</b></code></a> option is used with
+          <code><b>-u</b></code> then <a
+          href="index_desc.html#index"><code>index.cache</code></a> files owned
+          by the trusted user or trusted group are exempt from this requirement
+          and they may grant permission to serve any file the server can read.
+          If the <code><b>-u</b></code> and <a
+          href="#E_opt"><code><b>-E</b></code></a> options are used together
+          then the <a href="#E_opt"><code><b>-E</b></code></a> takes precedence
+          for execution of <a href="cgi.html">CGI program</a>, a <a
+          href="filter.html">filter</a> and executable <a
+          href="parse.html">includes</a>, but the <code><b>-u</b></code> still
+          has effect for ordinary files being served.
+        </p>
+
+        <p>
+          Notice that if none of <a href="#t_opt"><code><b>-t</b></code></a>,
+          <a href="#T_opt"><code><b>-T</b></code></a>, and
+          <code><b>-u</b></code> are used then a user with his own home page can
+          make a symbolic link to any file readable by the server and that
+          document will be served.  This is true even if the linked to document
+          is in a directory with <a href="access.html">limited access</a> or is
+          outside the server data hierarchy.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="v_opt"><code><b>-v</b> <i>log_format</i></code></a> -- Set log
+        format
+      </dt>
+      <dd>
+        <p>
+          The legal values for this option are "<code>nolog</code>",
+          "<code>common</code>", "<code>verbose</code>",
+          "<code>ncsa</code>", "<code>syslog</code>", and
+          "<code>vsyslog</code>".  The first causes no logging to take
+          place.  The next three cause the log file to be written in
+          the so-called common log format, or <em>WN</em>'s verbose
+          format including user agent, referrer, virtual server
+          nickname, and cookies, or in the NCSA extended format which
+          includes referrer and user agent.  The last two cause
+          logging to be done by the <a
+          href="/cgi-bin/man2html/usr/man/man8/syslogd.8.gz"><code>syslogd(8)</code></a>
+          daemon and in the case of <code>vsyslog</code> to include
+          the information in the <code>verbose</code> format.
+	</p>
+	<p>
+	  Each base log type may be optionally followed by a colon and
+	  either <code>nodns</code> or <code>revdns.</code> If neither
+	  of these is present then the default server action is to do
+	  a DNS lookup on the client's IP address to obtain the
+	  hostname of the client for logging purposes.  If the
+	  <code>:revdns</code> extension is present the server will
+	  additionally do a reverse DNS lookup on this name as a check
+	  against name spoofing.  If the <code>:nodns</code> extension
+	  is present the server will do no DNS lookup and will use the
+	  IP address in the log instead of the host name.  For example
+	  the option "<code>-v verbose:nodns</code>" indicates that
+	  the server should use the <code>verbose</code> log format,
+	  but should use IP addresses rather than host names in log
+	  entries.  Obviously, use of <code>:nodns</code> is more
+	  efficient and <code>:revdns</code> is less efficient than
+	  the default.
+	</p>
+	<p>
+          The default can be set with <a
+          href="configmacros.html#VERBOSELOG"><code>#define&nbsp;VERBOSELOG</code></a>
+          macro in <a
+          href="configmacros.html"><code>config.h</code></a>.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="v_opt"><code><b>-V</b> <i>virtual_host_file</i></code></a> --
+        Set file name which contains the list of virtual hosts
+      </dt>
+      <dd>
+        <p>
+          The file "<code><i>virtual_host_file</i></code>" should be the name
+          of the file containing the list of "virtual hosts" and their
+          corresponding IP numbers and root directories.  The format of this
+          file is one line per virtual host.  Each such line should have the
+          form:
+        </p>
+
+        <blockquote>
+          <code>
+            hostname     IP_address     root_path
+          </code>
+        </blockquote>
+
+        <p>
+          with the three parts separated by white space.  For example an entry
+          might be:
+        </p>
+
+        <blockquote>
+          <code>
+            myhost.school.edu     111.222.333.444     /var/wn
+          </code>
+        </blockquote>
+
+        <p>
+          In particular the hostname should be the fully qualified domain name.
+          Lines in this file which are empty or start with '<code>#</code>' are
+          ignored.
+        </p>
+
+        <p>
+          If the virtual host file is changed you will need to restart the
+          server for the change to take effect.
+        </p>
+      </dd>
+    </dl>
+
+
+
+    <!-- #end -->
+    <hr size="4">
+
+    <address>
+      <em>WN</em> version 2.4.7
+      <br>
+      Copyright &copy; 1998-2005 <a href="mailto:john@math.northwestern.edu">John Franks
+      &lt;john@math.northwestern.edu&gt;</a>
+      <br>
+      licensed under the <a
+        href="http://www.gnu.org/copyleft/fdl.txt">GNU Free Documentation License</a>
+      <br>
+Last modified: Sat June  18 2005
+    </address>
+
+    <!-- pnuts --> <a href="support.html">[Previous]</a> <a href="appendixA2.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+  </body>
+</html>

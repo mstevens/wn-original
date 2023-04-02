@@ -1,0 +1,118 @@
+#!/usr/bin/perl
+#################################################
+# wnpnuts version 0.7.1  part of the WN server package
+#################################################
+
+require "getopts.pl";
+
+# Edit these to match your language of choice or to use
+# cute little button.
+
+$prevw="[Previous]";
+$nextw="[Next]";
+$upw="[Up]";
+$topw="[Top]";
+$searchw="[Search]";
+$indexw="[Index]";
+
+$VERSION = "0.7.1";
+
+	&Getopts('s:i:');
+	$search = $opt_s if $opt_s ne "";
+	$index = $opt_i if $opt_i ne "";
+
+	$file = shift;
+	$marker = "<!-- pnuts -->";
+
+
+	open( LIST, "<$file") || die "Can't open file: $!";
+
+
+	$curlevel = 0;
+	$nextfile = <LIST>;
+	chop( $nextfile);
+	$top = $nextfile;
+	$up[0] = "";
+	$up[1] = $nextfile;
+	$curlevel = $nextlevel = 0;
+
+	while ( &getnextfile() ) {
+		$curcopy = $currentfile."~";
+
+		rename( $currentfile, $curcopy)
+			|| die "Can't rename file: $currentfile";
+		open( OLDCURR, "<$curcopy" ) || die "Can't open file: $!";
+		open( NEWCURR, ">$currentfile" ) || die "Can't open file: $!";
+		print "$currentfile\n";
+		while ( $line = <OLDCURR>) {
+			if ( $line =~ /^(\s*$marker)/) {
+				&pnutline($1);
+			}
+			else {
+				print NEWCURR $line;
+			}
+		}
+		close( OLDCURR);
+		close( NEWCURR);
+	}
+
+
+close( LIST);
+exit(0);
+
+sub pnutline {
+	my $markerLine = $_[0];
+
+	printf( NEWCURR  "$markerLine");
+	if ( $previous ) {
+		printf( NEWCURR " <a href=\"%s\">$prevw</a>", $previous);
+	}
+	if ( $nextfile ) {
+		printf( NEWCURR  " <a href=\"%s\">$nextw</a>", $nextfile);
+	}
+	if ( ($curlevel > 0) && $up[$curlevel] ) {
+		printf( NEWCURR  " <a href=\"%s\">$upw</a>",
+				$up[$curlevel]);
+	}
+	if ( $top && ( $top ne $currentfile) ) {
+		printf( NEWCURR  " <a href=\"%s\">$topw</a>", $top);
+	}
+	if ( $search ) {
+		printf( NEWCURR  " <a href=\"%s\">$searchw</a>", $search);
+	}
+	if ( $index ) {
+		printf( NEWCURR  " <a href=\"%s\">$indexw</a>", $index);
+	}
+	printf( NEWCURR "\n");
+}
+
+sub getnextfile {
+	if ( $nextfile eq "") {
+		return 0;
+	}
+	$curlevel = $nextlevel;
+	$previous = $currentfile;
+	$currentfile = $nextfile;
+	$up[$curlevel + 1] = $currentfile;
+	while ( 1 ) {
+		($nextfile = <LIST>) || ($nextfile = "");
+		$nextfile =~ s/(\t*)//;
+		$nextlevel = length( $1);
+		last if $nextfile eq "";
+		chop( $nextfile);
+		if ( -d $nextfile ) {
+			print "$nextfile is directory, ignoring it\n";
+			next;
+		}
+		last;
+	}
+	return 1;
+}
+
+
+
+
+
+
+
+

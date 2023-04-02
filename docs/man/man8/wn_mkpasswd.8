@@ -1,0 +1,171 @@
+.\" source:
+.\"   $Source: /var/cvs/projects/debian/printop/debian/dpkg.src/printop.printop.1.in,v $
+.\"
+.\" revision:
+.\"   @(#) $Id: printop.printop.1.in,v 1.2 1998/04/23 04:31:28 jplejacq Exp $
+.\"
+.\" copyright:
+.\"   Copyright (C) 1998 Jean Pierre LeJacq <jplejacq@quoininc.com>
+.\"
+.\"   Distributed under the GNU GENERAL PUBLIC LICENSE.
+.\"
+.TH wn_mkpasswd 8 "Sat, 25 Apr 1998 00:34:33 -0400" "1.18.7-1" "Debian GNU/Linux manual"
+.SH NAME
+wn_mkpasswd \- create and manage password files for wn HTTP server
+.SH SYNOPSIS
+.B wn_mkpasswd
+.RB [\| \-n
+.RB [\| \-D \|]\c
+.RB \|| \-d
+.RB [\| \-D \|]\c
+.RB \|| \-h \|]
+.RB [\|\c
+.IR passwd_file \|]
+.SH DESCRIPTION
+.B wn_mkpasswd
+is a
+.BR perl (1)
+program that is part of the
+.BR wn (1)
+HTTP server package.
+It is used to create and manage password files for authenticating a
+user through "Basic" authentication described in the HTTP protocol.
+
+.B wn_mkpasswd
+should be used the first time to create the password file:
+.nf
+        wn_mkpasswd -n passwd_file
+.fi
+This prompts you for a user name and password and then creates a
+password file called
+.I passwd_file
+with that entry. On subsequent uses the
+.B \-n
+argument should be omitted so that entries will be added to the
+existing file instead of starting a new one.  If a subsequent entry is
+made with the same user name the entry for that user will be
+replaced. If the
+.I passwd_file
+argument is omitted then the default name
+of
+.I wn_mkpasswd
+is used.
+
+There is another optional argument which may be used with this
+program. The command:
+.nf
+        wn_mkpasswd -n -D passwd_file 
+.fi
+causes a UNIX DBM database to be created or used instead of a simple
+flat file.  This is very useful if you have a very large number of
+password entries. The database resides in the two
+.I passwd_file.dir
+and
+.I passwd_file.pag
+files.  To create a new database you must remove or rename the
+.I .pag
+and
+.I .dir
+files.
+
+To remove a single entry from a password file use the command:
+.nf
+        wn_mkpasswd -d passwd_file 
+.fi
+or
+.nf
+        wn_mkpasswd -d -D passwd_file 
+.fi
+for a UNIX DBM database.
+
+Once you have created your password file and made sure that it is
+readable by the user id under which the
+.BR wn (1)
+server will run, you are ready to set up the
+.BR wnauth (3)
+authentication module.  This is done on a per directory basis by three
+entries in directory record of the
+.I index
+file (see
+.BR http://dochost/doc/wn/access.html#authenticate ).
+.SH WARNING
+I would strongly advise against using basic authentication described
+here to protect sensitive information on a server which runs on system
+on which untrusted users have accounts.  The "Basic" authentication
+protocol sends passwords across the network with no encryption.
+Specifically, you should not use the host password file
+.I /etc/passwd
+as the
+.BR wn (1)
+password file.
+.SH OPTIONS
+.TP
+.B \-D
+Use UNIX DBM database instead of flat file.
+.PP
+.B \-d
+.RB [\|\c
+.I passwd_file\c
+.RB \|]
+.RS
+Delete a user from the
+.I passwd_file
+if the user exists.  If
+.I passwd_file
+is not supplied the default
+.I wn_mkpasswd
+is used instead.  If the password file is a UNIX DBM database, the
+.B \-D
+must also be provided.
+.RE
+.TP
+.B \-h
+Print help message.
+.PP
+.B \-n
+.RB [\|\c
+.I passwd_file\c
+.RB \|]
+.RS
+Create new password database
+.I passwd_file
+or
+.I wn_mkpasswd
+if optional argument is not supplied.  If the
+.B \-D
+option is also supplied, a UNIX DBM database consisting of the files
+.I passwd_file.dir
+and
+.I passwd_file.pag
+is created instead.
+.RE
+.SH FILES
+.PP
+.I passwd_file\c
+.RB [\|\c
+.B .dir\c
+.RB \||\|\c
+.B .pag\c
+.RB \|]
+.RS
+Database of users and corresponding passwords.
+.SH SEE ALSO
+.BR wn (1),
+.BR wnauth (3),
+.BR wnconfig (8),
+.BR wndex (8),
+.BR wnuncache (8),
+.BR wnupdate-www (8),
+.BR wnv2c (8)
+.br
+.B http://dochost/doc/wn/manual.html
+.br
+.B http://dochost/doc/wn/access.html#authenticate
+.br
+.B http://hopf.math.nwu.edu/index.html
+.SH AUTHOR
+.B wn
+is written by John Franks <john@math.nwu.edu>.  Modified by Jean
+Pierre LeJacq <jplejacq@quoininc.com> as part of packaging for the
+Debian GNU/Linux distribution. Manual page also added by Jean Pierre
+LeJacq.

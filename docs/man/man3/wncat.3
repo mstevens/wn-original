@@ -1,0 +1,94 @@
+.\" source:
+.\"   $Source: /var/cvs/projects/debian/printop/debian/dpkg.src/printop.printop.1.in,v $
+.\"
+.\" revision:
+.\"   @(#) $Id: printop.printop.1.in,v 1.2 1998/04/23 04:31:28 jplejacq Exp $
+.\"
+.\" copyright:
+.\"   Copyright (C) 1998 Jean Pierre LeJacq <jplejacq@quoininc.com>
+.\"
+.\"   Distributed under the GNU GENERAL PUBLIC LICENSE.
+.\"
+.TH wncat 3 "Sat, 25 Apr 1998 00:34:33 -0400" "1.18.7-1" "Debian GNU/Linux manual"
+.SH NAME
+wncat \- CGI program for listing (un)compressed files for wn HTTP server
+.SH SYNOPSIS
+.B wncat
+.I directory
+.RB [\|\c
+.IR file \|]
+.SH DESCRIPTION
+.B wncat
+is a
+.BR sh (1)
+CGI program that is part of the
+.BR wn (1)
+HTTP server package.  It looks for a file name in the optional second
+argument
+.I file
+or if not supplied it looks for a file name in the environment
+variable
+.B WN_KEY
+(see
+.BR http://dochost/doc/wn/appendixD.html ).
+.B wncat
+then concatenates
+.I file
+to the directory name
+.I directory
+given in the first
+argument.
+.B wncat
+will then search for either a compressed or
+uncompressed version and print it to standard output.  The
+compressed version is assumed to have the suffix
+.I .gz
+and can be uncompressed with the
+.BR zcat (1)
+program.
+
+.B wncat
+is intended to be used with the File Module feature of
+.BR wn (1)
+(see
+.BR http://dochost/doc/wn/module.html#file ).
+This requires that the
+.B File-Module
+directive be set in the appropriate
+.I index
+file (see
+.BR http://dochost/doc/wn/appendixB.html ).
+For example, to serve both compressed and uncompressed files located
+in the
+.I /usr/doc
+directory from the
+.I /var/www/doc
+directory, you would set the following in the
+.I /var/www/doc/index
+file:
+.nf
+        File-Module=/usr/lib/cgi-bin/wn/wncat /usr/doc
+.fi
+.SH SEE ALSO
+.BR wn (1),
+.BR zcat (1),
+.BR wnauth (3),
+.BR wnredir (3),
+.BR wnsectsearch (3),
+.BR wnseven_m (3)
+.br
+.B http://dochost/doc/wn/manual.html
+.br
+.B http://dochost/doc/wn/module.html#file
+.br
+.B http://dochost/doc/wn/appendixB.html
+.br
+.B http://dochost/doc/wn/appendixD.html
+.br
+.B http://hopf.math.nwu.edu/index.html
+.SH AUTHOR
+.B wn
+is written by John Franks <john@math.nwu.edu>.  Modified by Jean
+Pierre LeJacq <jplejacq@quoininc.com> as part of packaging for the
+Debian GNU/Linux distribution. Manual page also added by Jean Pierre
+LeJacq.

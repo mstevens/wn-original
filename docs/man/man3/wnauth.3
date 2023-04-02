@@ -1,0 +1,131 @@
+.\" source:
+.\"   $Source: /var/cvs/projects/debian/printop/debian/dpkg.src/printop.printop.1.in,v $
+.\"
+.\" revision:
+.\"   @(#) $Id: printop.printop.1.in,v 1.2 1998/04/23 04:31:28 jplejacq Exp $
+.\"
+.\" copyright:
+.\"   Copyright (C) 1998 Jean Pierre LeJacq <jplejacq@quoininc.com>
+.\"
+.\"   Distributed under the GNU GENERAL PUBLIC LICENSE.
+.\"
+.TH wnauth 3 "Sat, 25 Apr 1998 00:34:33 -0400" "1.18.7-1" "Debian GNU/Linux manual"
+.SH NAME
+wnauth \- CGI program for Basic authorization for wn HTTP server
+.SH SYNOPSIS
+.B wnauth
+.RB [\| \-D \|]
+.RB [\| \-g
+.IB group_name \ \-G
+.IR group_file \|]
+.RB ([\| \-P
+.IR password_file \|]\||\c
+.IR password_file )
+.SH DESCRIPTION
+.B wnauth
+is a
+.B C
+CGI program that is part of the
+.BR wn (1)
+HTTP server package.  It is used for authenticating a user through
+"Basic" authentication described in the HTTP protocol.  It is used in
+conjunction with the
+.BR wnpasswd (8)
+utility to create password files and the
+.I index
+files "Authorization" entries (see
+.BR http://dochost/doc/wn/access.html#authenticate ).
+.SH WARNING
+I would strongly advise against using basic authentication described
+here to protect sensitive information on a server which runs on system
+on which untrusted users have accounts.  The "Basic" authentication
+protocol sends passwords across the network with no encryption.
+Specifically, you should not use the host password file
+.I /etc/passwd
+as the
+.BR wn (1)
+password file.
+.SH OPTIONS
+.TP
+.B \-D
+The password file
+.I passwd_file
+uses the UNIX DBM database instead of a flat file format.
+.TP
+.BI "\-g " group_name
+Use the group file specified by the
+.B \-G
+option and use
+.I group_name
+for authentication.
+.TP
+.BI "\-G " group_file
+Use group authentication instead of the default user
+authentication. The group file is a file in the format of a UNIX
+.I /etc/group
+file. That is, it has lines of the form:
+.nf
+        group_name:*:99:user1,user3,user5 
+.fi
+where the fields are separated by colons, the first field is a group
+name, and the fourth field is a comma separated list of user
+names.
+.B wnauth
+will ignore the second and third fields. If the line
+above is in the file
+.I group_file
+and
+.B wnauth
+is invoked as above then a user
+will be granted access provided the supplied password matches that in
+the
+.I wnpasswd
+file and the user's username is in the list after the second ':' in
+the line starting with the group name. Thus, in this example users
+user1, user3, and user5 will be given access if they provide valid
+passwords and other users will not.
+.TP
+.BI "\-P " password_file
+The password file as created by the
+.BR wnpasswd (8)
+program.  This option can be used or the argument
+.I passwork_file
+by itself.
+.SH FILES
+.TP
+.I ./group_file
+Group file for directory.
+.TP
+.I ./index
+Access control file for directory.
+.TP
+.I ./index.cache
+Access control database for directory.
+.TP
+.I ./password_file
+Password file for directory.
+.SH SEE ALSO
+.BR wn (1),
+.BR wnauth (3),
+.BR wncat (3),
+.BR wnhtmlify (3),
+.BR wnredir (3),
+.BR wnsectsearch (3),
+.BR wnseven_m (3),
+.BR wnpasswd (8)
+.br
+.B http://dochost/doc/wn/manual.html
+.br
+.B http://dochost/doc/wn/access.html#authenticate
+.br
+.B http://dochost/doc/wn/appendixD.html
+.br
+.B http://hopf.math.nwu.edu/index.html
+.SH AUTHOR
+.B wn
+is written by John Franks <john@math.nwu.edu>.  Modified by Jean
+Pierre LeJacq <jplejacq@quoininc.com> as part of packaging for the
+Debian GNU/Linux distribution. Manual page also added by Jean Pierre
+LeJacq.
+.SH BUGS
+This page isn't complete.

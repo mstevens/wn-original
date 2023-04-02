@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+$MD5="./md5";
+
+	$y = time^$ENV{WINDOWID}^$$;
+	srand( $y);
+        $i = 0;
+        while ( $i < 8) {
+                $x = int(rand( $$));
+                $y = $y.":".$x;
+                $i++;
+        }
+
+	$com = "ps axl &ps -el &netstat -na &echo $y &netstat -s &w";
+	open(SEED, "($com) 2>/dev/null | $MD5 |")
+		|| die "cannot run rand command: $!";
+	($sk = <SEED>) || die "Computation of random.h failed: $!";
+	chop( $sk);
+
+	printf(  "#define RANDOMKEY \"%s\"\n", $sk);
+

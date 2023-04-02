@@ -1,0 +1,2239 @@
+<!doctype html public "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+  <head>
+    <title>Index File Directives for the WN Server</title>
+
+    <link rev="made" href="mailto:john@math.northwestern.edu">
+
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <meta http-equiv="last-modified" content="Sat June 18 2005">
+    <meta http-equiv="keywords" content="WN server options">
+  </head>
+
+  <body bgcolor="#FFFFFF">
+    <p>
+      <a href="http://hopf.math.northwestern.edu/"><img
+        src="images/powered.jpg"
+        border="0"
+        width="190"
+        height="41"
+        align="right"
+        alt="WN home page"
+      ></a>
+    </p>
+
+    <strong>Version 2.4.7</strong>
+
+    <br>
+
+    <!-- pnuts --> <a href="appendixA2.html">[Previous]</a> <a href="appendixC.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+
+
+
+    <br clear="right">
+
+    <hr size="4">
+    <!-- #start -->
+
+    <h2 align="center">Index File Directives for the <em>WN</em> Server</h2>
+    <hr size="4">
+
+    <p>
+      This is a list of the items which may be placed in an <a
+      href="index_desc.html#index"><code>index.wn</code></a> file to be processed
+      by <a href="index_desc.html#wndex"><code>wndex</code></a>. This file
+      consists of a collection of <em>records</em> each of which consists of a
+      group of lines pertaining to single file.  Each line of a record begins
+      with a <em>directive</em> like "<code><a
+      href="#fdir.title">Title=</a></code>" which indicates that the remainder
+      of that line is to be take as the title of the document whose record
+      contains this line.  The "<code><a href="#fdir.file">File=</a></code>"
+      directive is special in that it indicates the beginning of a new record.
+      The value of the "<code><a href="#fdir.file">File=</a></code>" directive
+      is the name of the file whose record will follow.  Letter case is not
+      significant in directive keywords.
+    </p>
+
+    <p>
+      When the character '<code>#</code>' is encountered in an <a
+      href="index_desc.html#index"><code>index.wn</code></a> file it is assumed to
+      be the start of a comment and everything after it on that line is
+      ignored.  To include the '<code>#</code>' character in, for example, a
+      document title, it must be escaped with the '<code>\</code>' character.
+      That is. when "<code>\#</code>" is encountered it does not signify a
+      comment and the character '<code>#</code>' (without the backslash) is
+      treated as a normal character.  In fact, since all directives contain the
+      character '<code>=</code>', all lines which do not contain this character
+      are silently ignored.  Also a single conceptual line of an <a
+      href="index_desc.html#index"><code>index.wn</code></a> file can be spread
+      over several actual lines by ending all but the last line with the
+      '<code>\</code>' character.  That is, if a line ends with
+      '<code>\</code>' that character is removed and the contents of the next
+      line is considered a continuation of the current line.  The maximum
+      allowed length of a line (including continuation) is 1024 characters.
+      The maximum allowed length of all the records corresponding to one
+      document is 8192 characters.
+    </p>
+
+    <p>
+      The first record in an <a
+      href="index_desc.html#index"><code>index.wn</code></a> file is special and
+      is intended to describe attributes of the entire directory rather than
+      individual files.  It contains lines with directives specifying
+      attributes of the directory as a whole or all the files in it.  The next
+      section is a complete list of these directory directives.
+    </p>
+
+
+
+    <h3>B.1 <a name="ddir">Directory Directives</a></h3>
+
+    <dl>
+      <dt>
+        <a name="ddir.accessfile">Accessfile</a> -- Specify directory
+        access control file.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Accessfile=/dir/accessfile
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that the file <code>/dir/accessfile</code> is to be used to
+          determine access privileges (by hostname or IP address) for this
+          directory.  If this line is omitted access is allowed for everyone.
+          Both the path <code>/dir/accessfile</code> and the path
+          <code>~/dir/accessfile</code> are taken relative to the <em>WN</em>
+          root directory.  In particular the accessfile must be in the
+          <em>WN</em> hierarchy (unlike includes or filters, for example.) If
+          the path does not begin with a '<code>/</code>' or a '<code>~</code>'
+          then it is relative to the directory containing the <a
+          href="index_desc.html#index"><code>index.wn</code></a> file.  See the
+          chapter "<a href="access.html">Limiting Access to Your <em>WN</em>
+          Hierarchy</a>" in this guide.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="ddir.access-denied-url"><code>Access-denied-URL</code></a> --
+        Set URL for requests for which access is denied.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Access-denied-URL=http://host/dir/foo.html
+          </code>
+        </blockquote>
+
+        <p>
+          or the line:
+        </p>
+
+        <blockquote>
+          <code>
+            Access-denied-URL=/dir/foo.html
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that any request for a document in this directory which is
+          denied because of an "<code><a
+          href="#ddir.accessfile">Accessfile=</a></code>" restriction should be
+          redirected to the given URL.  A default value for all directories can
+          be set by uncommenting the "<a
+          href="configmacros.html#ACCESS_DENIED_URL"><code>#define&nbsp;ACCESS_DENIED_URL</code></a>"
+          line in <a href="configmacros.html"><code>config.h</code></a> and
+          recompiling.  If you use this directive be sure that the file
+          <code>foo.html</code> does not have restricted access or you can
+          create an infinite loop.  This line has the special feature that it
+          can also be placed as the first line of the "<code><a
+          href="#ddir.accessfile">Accessfile=</a></code>" controlling the
+          directory.  A line in the accessfile will override any value set in
+          the <a href="index_desc.html#index"><code>index.wn</code></a> file.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="ddir.attributes"><code>Attributes</code></a> -- Set
+        directory attributes.
+      </dt>
+      <dd>
+        <p>
+          Currently there are only two directory attributes,
+          viz. "<code>nosearch</code>" and "<code>serveall</code>".
+          Letter case is not significant in the attribute value.
+        </p>
+
+        <dl>
+          <dt>
+            <a
+            name="ddir.attributes.serveall"><code>Attributes=serveall</code></a>
+          </dt>
+          <dd>
+            <p>
+              Specifies that any file, with a few exceptions, in this
+              directory may be served not just those listed in the <a
+              href="index_desc.html#index"><code>index.wn</code></a> file.  The
+              server will attempt to set the content type correctly based on
+              the file name suffix using the same default correspondences
+              between type and suffix that <a
+              href="index_desc.html#wndex"><code>wndex</code></a> uses.  The
+              exceptions are that files whose name starts with
+              '<code>.</code>' or ends with '<code>~</code>' as well as the
+              files "<code>index.wn</code>" and "<code>index.cache</code>" will
+              not be served.
+            </p>
+
+            <blockquote>
+              <em>Note:</em> When this directive is used in a directory
+              protected by an "<code><a
+              href="#ddir.accessfile">Accessfile=</a></code>" or a <a
+              href="access.html#authenticate">password file</a> be sure that
+              these files have names that start with '<code>.</code>', or
+              contain a '<code>~</code>'.  Or better, put these files in a
+              different directory from which nothing is served.
+            </blockquote>
+          </dd>
+
+          <dt>
+            <a
+            name="ddir.attributes.nosearch"><code>Attributes=nosearch</code></a>
+          </dt>
+          <dd>
+            <p>
+              Specifies that the <code>index.cache</code> databases in the
+              current directory and its subdirectories should not be searched
+              when the server does a <a href="search.html#title">title</a>, <a
+              href="search.html#keyword">keyword</a> or <a
+              href="search.html#fielded">user supplied field</a> search.
+              Likewise <a href="search.html#context">context</a> and <a
+              href="search.html#grep">grep</a> searches will not be allowed in
+              this directory.  In this case when an attempt is made to do so an
+              error message is returned to the client.  It is also possible to
+              exclude only some files from searching with the "<code><a
+              href="#fdir.attributes">Attributes=</a></code>" file directive.
+            </p>
+          </dd>
+        </dl>
+      </dd>
+
+      <dt>
+        <a
+        name="ddir.authorization-module"><code>Authorization-Module</code></a>,
+        <a
+        name="ddir.authorization-realm"><code>Authorization-Realm</code></a>,
+        <a name="ddir.authorization-type"><code>Authorization-Type</code></a>
+        -- Specify authorization module.
+      </dt>
+      <dd>
+        <p>
+          Currently <em>WN</em> includes a "basic" authorization
+          module called <a name="module.html#authorization">
+	  <code>wnauth</code></a>.  Its use is described in the chapter
+          "<a href="access.html#authenticate">Limiting Access to Your
+          <em>WN</em> Hierarchy</a>".  Alternatively you can make your
+          own module to handle authorization.  Data is passed via
+          standard input to this module.  More specifically such a
+          module should expect to read <code>Basic
+          user:password</code> on standard input for Basic
+          authentication, where "user" is the client supplied user
+          name and "password" the client supplied password.  The
+          <em>WN</em> server expects this module to exit with status 0
+          if authorization is granted and with status 1 if access is
+          denied.  See the source of wnauth in /wnauth/wnauth.c for a
+          detailed example.
+        </p>
+
+        <p>
+          For security reasons when you use an
+          "<code>Authorization-Module=</code>" you are required to use either
+          the <a href="appendixA1.html#t_opt"><code>-t</code></a> or <a
+          href="appendixA1.html#T_opt"><code>-T</code></a> options or the <a
+          href="appendixA1.html#a_opt"><code>-a</code></a> or <a
+          href="appendixA1.html#A_opt"><code>-A</code></a> options and to have
+          the <code>index.cache</code> file in the protected directory owned by
+          the trusted user or group.  This is to guard against counterfeit
+          authorization modules.
+        </p>
+      </dd>
+
+      <dt>
+        <a
+        name="ddir.auth-denied-file"><code>Auth-denied-file</code></a>
+        -- Specify the name of an HTML file to be used as the error message
+        when an authentication attempt for a password protected directory
+        fails.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Auth-denied-file=~/dir/foo.html
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that any request for a document in this directory which is
+          denied because of an authorization module restriction results in the
+          file <code>~/dir/foo.html</code> being sent instead.  A default value
+          for all directories can be set by uncommenting the "<a
+          href="configmacros.html#AUTH_DENIED_FILE"><code>#define&nbsp;AUTH_DENIED_FILE</code></a>"
+          line in <a href="configmacros.html"><code>config.h</code></a> and
+          recompiling.  Note that this is not a URL but the name of a file
+          whose content is to be sent as error text when authentication is
+          denied.  If the file name starts with '<code>~/</code>' as above it
+          is assumed to be relative to the <em>WN</em> root directory.
+          Otherwise it is assumed to be a path relative to the directory
+          containing the <a href="index_desc.html#index"><code>index.wn</code></a>
+          file.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="ddir.cache-module"><code>Cache-Module</code></a> --
+        Specify program to be used as interface to database for
+        <code>index.cache</code> entries.
+      </dt>
+      <dd>
+        <p>
+          If this line specifies a program then instead of looking for file
+          entries in the <code>index.cache</code> file this program is executed
+          after putting the base name of the URL in the environment variable <a
+          href="appendixD.html#wn_key.WN_KEY"><code>WN_KEY</code></a>.  This
+          provides a mechanism to use a real database rather than the file
+          <code>index.cache</code>.  Note that the directory directives are
+          still obtained from <code>index.cache</code>.  The output of this
+          module must be in the format of an <code>index.cache</code> line.  <a
+          href="search.html#title">Title</a>, <a
+          href="search.html#keyword">keyword</a> and <a
+          href="search.html#grep">grep</a> are not supported since that would
+          require reading the entire database.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="ddir.default-attributes"><code>Default-Attributes</code></a>
+        -- Specify the default value of <a href="#fdir.attributes">file
+        attributes directive</a> for every file served from this directory.
+        This directive should not be confused with the <a
+        href="#ddir.attributes">directory attributes directive</a>.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Default-Attributes=parse,dynamic
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that files in this directory should be parsed and marked
+          as dynamic documents unless they have an attributes directive
+          specifying the contrary.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="ddir.default-cgi-handler"><code>Default-CGI-Handler</code></a>
+        -- Specify a default value for the "<code><a
+        href="#fdir.cgi-handler">CGI-Handler=</a></code>" file directive.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Default-CGI-Handler=/dir/handler
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that files in this directory should all be treated as if
+          the "<code><a href="#fdir.cgi-handler">CGI-Handler=</a></code>" file
+          directive had been set to <code>/dir/handler</code>.  To
+          override this setting and specify no CGI handler use the
+          "<code>CGI-Handler=&lt;none&gt;</code>" directive.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="ddir.default-charset"><code>Default-Charset</code></a>
+        -- Specify the default character set to be added to the MIME type
+	for documents with content type <code>text/*</code>.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Default-Charset=iso-8859-1
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that documents in this directory which have a MIME
+	  type of <code>text/*</code> should have a character set parameter
+	  with this value appended.  E.g. a document of type text/html
+	  will be sent with a content type header 
+        <blockquote>
+          <code>
+	    Content-type: text/html; charset=iso-8859-1
+          </code>
+        </blockquote>
+        </p>
+	<p>
+	The default value for this is <code>iso-8859-1</code>.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="ddir.default-content"><code>Default-Content</code></a> --
+        Specify the default <a
+        href="http://linux-howto.com/rfc/rfc2000-2499/rfc2045.txt">MIME</a>
+        content type for items in this directory.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Default-content=text/html
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that files in this directory which do not end in a suffix
+          recognizable to <a
+          href="index_desc.html#wndex"><code>wndex</code></a> should be given
+          the type "<code>text/html</code>".  Any legitimate <a
+          href="http://linux-howto.com/rfc/rfc2000-2499/rfc2045.txt">MIME</a>
+          type may be used as the value.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="ddir.default-cookie"><code>Default-Cookie</code></a> --
+        Specify the default cookie or cookie generating script for
+        items in this directory.
+      </dt>
+      <dd>
+        <p>
+          The line
+        </p>
+
+        <blockquote>
+          <code>
+            Default-Cookie=name=value
+          </code><br>
+        </blockquote>
+
+	  or the line
+        <blockquote>
+          <code>
+            Default-Cookie=!my_cookie_script
+          </code> <br>
+
+        </blockquote>
+
+        <p>
+          specify that files in this directory with no
+          <a href="#fdir.cookie"><code>Set-Cookie</code></a> directive
+	  should be treated as if they had such a directive with 
+	  the value <code>name=value</code> or <code>!my_cookie_script</code>.
+        </p>
+      </dd>
+
+      <dt>
+        <a
+        name="ddir.default-document"><code>Default-Document</code></a>
+        -- Specify the default document for this directory.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Default-Document=foo.html
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that a URL pointing to this directory like
+          <code>http://host/dir/</code> will result in serving the document
+          <code>wnroot/dir/foo.html</code> instead of
+          <code>wnroot/dir/index.html</code>.  Uses of this include making the
+          default document a <a href="cgi.html">CGI program</a> with
+          "<code>Default-Document=foo.cgi</code>" or having a directory with
+          HTML files all ending with the suffix "<code>.htm</code>" and using
+          the directive "<code>Default-Document=foo.htm</code>".  This
+          directive applies only to the directory containing the <a
+          href="index_desc.html#index"><code>index.wn</code></a> file, not to any
+          subdirectories.
+        </p>
+
+      <dt>
+        <a name="ddir.default-filter"><code>Default-Filter</code></a> --
+        Specify a default value for the "<code><a
+        href="#fdir.filter">Filter=</a></code>" file directive.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Default-Filter=/path2/filter
+            </code>
+        </blockquote>
+
+        <p>
+          specifies that files in this directory should all be treated as if
+          the "<code><a href="#fdir.filter">Filter=</a></code>" file directive
+          had been set to <code>/path2/filter</code>.  To override this setting
+          and specify no filter use the "<code>Filter=&lt;none&gt;</code>" file
+          directive.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="ddir.default-includes"><code>Default-Includes</code></a> --
+        Specify a default value for the "<code><a
+        href="#fdir.includes">Includes=</a></code>" file directive.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Default-Includes=footer.html
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that this line should be used as the "<code><a
+          href="#fdir.includes">Includes=</a></code>" directive for any
+          document in this directory which does not have an "<code><a
+          href="#fdir.includes">Includes=</a></code>" directive explicitly set.
+          To override this default value simply specify an explicit "<code><a
+          href="#fdir.includes">Includes=</a></code>" directive or use "<code><a
+          href="#fdir.includes">Includes=</a>&lt;none&gt;</code>" to have none.
+        </p>
+      </dd>
+
+      <dt>
+        <a
+        name="ddir.default-list-includes"><code>Default-List-Includes</code></a>
+        -- Specify a default value for the "<code><a
+        href="#fdir.list-includes">List-Includes=</a></code>" file directive.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Default-List-Includes=header.html,footer.html,disclaimer.html
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that this line should be used as the "<code><a
+          href="#fdir.list">List-Includes=</a></code>" directive for any
+          document in this directory which does not have an "<code><a
+          href="#fdir.includes">Includes=</a></code>", "<code><a
+          href="#fdir.wrappers">Wrappers=</a></code>", or "<code><a
+          href="#fdir.list-includes">List-Includes=</a></code>" directive
+          explicitly set.  To override this default value simply specify an
+          explicit "<code><a
+          href="#fdir.list-includes">List-Includes=</a></code>" directive or
+          use "<code><a
+          href="#fdir.list-includes">List-Includes=</a>&lt;none&gt;</code>" to
+          have none.  Note that the example above grants permission for the
+          inclusion of the three files listed.  It does not require their
+          insertion.  However, it does cause all files in the current directory
+          to be parsed for includes unless this "<code><a
+          href="#fdir.attributes">Attributes=</a></code>" is overridden.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="ddir.default-max-age"><code>Default-Max-Age</code></a> --
+        Specify the default value for the "<code><a
+        href="#fdir.max-age">Max-Age=</a></code>" file directive.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Default-Max-Age=2 weeks
+          </code>
+        </blockquote>
+
+        <p>
+          specifies the Cache-Control and Expires headers of all documents
+          served from this directory should be set to expire the document 2
+          weeks after it is served.
+        </p>
+
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Default-Max-Age=2 weeks after last-mod
+          </code>
+        </blockquote>
+
+        <p>
+          specifies the Cache-Control and Expires headers of all documents
+          served from this directory should be set to expire the document 2
+          weeks after the last-modified date of the document. For more details
+          see the "<code><a href="#fdir.max-age">Max-Age=</a></code>" file
+          directive.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="ddir.default-wrappers"><code>Default-Wrappers</code></a> --
+        Specify a default value for the "<code><a
+        href="#fdir.wrappers">Wrappers=</a></code>" file directive.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Default-Wrappers=wrapper.html
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that this line should be used as the "<code><a
+          href="#fdir.wrappers">Wrappers=</a></code>" file directive for any
+          document in this directory which does not have a
+          <code>Wrappers=</code> directive explicitly set.  To override this
+          default value simply specify an explicit "<code><a
+          href="#fdir.wrappers">Wrappers=</a></code>" directive or use
+          "<code><a href="#fdir.wrappers">Wrappers=</a>&lt;none&gt;</code>" to
+          have none.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="ddir.file-module"><code>File-Module</code></a> --
+        Specify program to be used as interface to database for obtaining
+        files.
+      </dt>
+      <dd>
+        <p>
+          If this line specifies a program then instead of looking for a file
+          in the current directory this program is executed after putting the
+          base name of the URL in the environment variable <a
+          href="appendixD.html#WN_KEY"><code>WN_KEY</code></a>.  The output of
+          this program is served as if it were a file. This provides a
+          mechanism to use a real database rather than the file
+          <code>index.cache</code>.
+        </p>
+
+        <p>
+          If you wish the file module to have access to all the standard <a
+          href="appendixD.html">CGI environment variables</a> then use the
+          directive "<code><a
+          href="#ddir.default-attributes">Default-Attributes=cgi</a></code>"
+          with the <code>File-Module=</code> directive
+        </p>
+      </dd>
+
+      <dt>
+        <a name="ddir.logtype"><code>Logtype</code></a> -- Set
+        the type of log entries to be used for this directory
+        matches.
+      </dt>
+      <dd>
+	  
+        <p>
+          As an example, the line:
+        </p>
+
+        <blockquote>
+          <code>
+            Logtype=verbose
+          </code>
+        </blockquote>
+
+        <p>
+	  will cause logging to be done with WN's verbose log format
+	  with no DNS hostnames only IP addresses in the log entries.
+	  The base values possible for this directive are <code>nolog,
+	  common, verbose, ncsa, syslog</code> and
+	  <code>vsyslog</code> which respectively have the effect of
+	  turning off logging or using the common log format, WN's
+	  verbose logging, or the NCSA log format in the log file or
+	  using the syslogd(8) daemon with a standard or verbose
+	  format.  See the <a href="setup.html#logging">"Managing Log
+	  Files"</a> section of this manual. The default value, used
+	  when this directive is not present is set in the source file
+	  config.h when the compile <a
+	  href="setup.html#installing.configure"><code>configure
+	  script</code></a> is run.
+        </p>
+        <p>
+	  Each base log type may be optionally followed by a colon and
+	  either <code>nodns</code> or <code>revdns.</code> If neither
+	  of these is present then the default server action is to do
+	  a DNS lookup on the client's IP address to obtain the
+	  hostname of the client for logging purposes.  If the
+	  <code>:revdns</code> extension is present the server will
+	  additionally do a reverse DNS lookup on this name as a check
+	  against name spoofing.  If the <code>:nodns</code> extension
+	  is present the server will do no DNS lookup and will use the
+	  IP address in the log instead of the host name.  For example
+	  the line
+	</p>
+        <blockquote>
+          <code>
+            Logtype=verbose:nodns
+          </code>
+        </blockquote>
+	<p>
+	  indicates that the server should use <code>verbose</code>
+	  log format, but should use IP addresses rather than host
+	  names in log entries.  Obviously, use of <code>:nodns</code>
+	  is more efficient and <code>:revdns</code> is less efficient
+	  than the default.
+	</p>
+      </dd>
+
+      <dt>
+        <a name="ddir.nomatchsub"><code>Nomatchsub</code></a> -- Set
+        substitute file for searches on this directory which result in no
+        matches.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Nomatchsub=foo.html
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that the HTML file <code>foo.html</code> in the current
+          directory should be used for the output of all searches (<a
+          href="search.html#title">title</a>, <a
+          href="search.html#keyword">keyword</a>, <a
+          href="search.html#context">context</a>, <a
+          href="search.html#grep">grep</a>, etc.) on this directory which
+          return no matches.  It can only be used in conjunction with the
+          "<code><a href="#fdir.searchwrapper">Searchwrapper=</a></code>" file
+          directive.  If <code>Nomatchsub=</code> is used and a "<code><a
+          href="#fdir.searchwrapper">Searchwrapper=</a></code>" has not been
+          defined an error is logged and the nomatchsub file is ignored.  The
+          file <code>foo.html</code> must be in the directory being searched
+          and its name must not contain a '<code>/</code>'.  See also "<code><a
+          href="#fdir.nomatchsub">Nomatchsub=</a></code>" for files.
+        </p>
+      </dd>
+
+      <dt>
+        <a
+        name="ddir.no-such-file-url"><code>No-Such-File-URL</code></a>
+        -- Set substitute URL for requests for non-existent or unservable
+        files.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            No-Such-File-URL=http://host/dir/foo.html
+          </code>
+        </blockquote>
+
+        <p>
+          or the line:
+        </p>
+
+        <blockquote>
+          <code>
+            No-Such-File-URL=/dir/foo.html
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that any request in this directory for a non-existent file
+          or a file not listed in the <a
+          href="index_desc.html#index"><code>index.wn</code></a> file of this
+          directory should be redirected to the given URL.  A default value
+          for all directories and non-existent directories can be set by
+          uncommenting the "<a
+          href="configmacros.html#no_such_file_url"><code>#define&nbsp;NO_SUCH_FILE_URL</code></a>"
+          line in <a href="configmacros.html"><code>config.h</code></a>
+          and recompiling.  The value set here will also be used if an
+          <code>index.cache</code> file does not exist.  If you use this
+          directive be sure that the file <code>foo.html</code> <em>does
+          exist</em> or you can create an infinite loop.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="ddir.owner"><code>Owner</code></a> -- Specify owner
+        of directory items.
+      </dt>
+      <dd>
+        <p>
+          This should be a line like:
+        </p>
+
+        <blockquote>
+          <code>
+            Owner=mailto:maintainer@host
+          </code>
+        </blockquote>
+
+        <p>
+          The "<code>mailto:maintainer@host</code>" may be replaced with a URL
+          referring to the individual who is responsible for the documents in
+          this directory.  This information is used in an HTTP header.  It is
+          not possible to designate the owner of a single file in a file
+          directive.  However, if the file is an HTML file this can be done
+          with a <a
+          href="http://www.htmlhelp.com/???"><code>&lt;link&gt;</code></a> tag
+          in the header of that file.
+        </p>
+      </dd>
+
+      <dt>
+        <a
+        name="ddir.put-authorization-module"><code>Put-Authorization-Module</code></a>,
+        <a
+        name="ddir.put-authorization-realm"><code>Put-Authorization-Realm</code></a>,
+        <a name="ddir.authorization-type"><code>Put-Authorization-Type</code></a>
+        -- Specify authorization module for PUT, MOVE and DELETE methods.
+      </dt>
+      <dd>
+        <p>
+	  In order for the server to honor the <code>PUT</code>,
+	  <code>MOVE</code>, and <code>DELETE</code> methods of HTTP,
+	  the server must be run with the <a
+	  href="appendixA1.html#P_opt"><code>-P</code></a> option and
+	  in addition an authorization mechanism is required.  This
+	  can be the same mechanism used for <a
+	  href="ddir.authorization-module">access authorization</a>,
+	  or different.  Currently <em>WN</em> includes a "basic"
+	  authorization module called <code>wnauth</code>.  Its use is
+	  described in the chapter "<a
+	  href="access.html#authenticate">Limiting Access to Your
+	  <em>WN</em> Hierarchy</a>".  Alternatively you can make your
+	  own module to handle PUT authorization.  Data is placed in
+	  <a href="appendixD.html">CGI environment variables</a>.
+	  <em>WN</em> expects this module to exit with status 0 if
+	  authorization is granted and with status 1 if access is
+	  denied.
+        </p>
+
+        <p>
+          For security reasons when you use a
+          "<code>Put-Authorization-Module</code>" you are required to use either
+          the <a href="appendixA1.html#t_opt"><code>-t</code></a> or <a
+          href="appendixA1.html#T_opt"><code>-T</code></a> options or the <a
+          href="appendixA1.html#a_opt"><code>-a</code></a> or <a
+          href="appendixA1.html#A_opt"><code>-A</code></a> options and to have
+          the <code>index.cache</code> file in the protected directory owned by
+          the trusted user or group.  This is to guard against counterfeit
+          authorization modules.
+        </p>
+        <p>
+	  Finally in the directory where the
+	  <code>Put-Authorization-Module</code> directive is used the
+	  "<code><a
+	  href="#ddir.default-attributes">Default-Attributes=put</a></code>"
+	  directive must be used (or in the case of a single file the
+	  "<code><a href="#fdir.attributes.put">Attributes=put</a></code>"
+	  directive.)
+        </p>
+      </dd>
+
+
+      <dt>
+        <a name="ddir.put-handler"><code>Put-handler</code></a> -- Specify
+	a module to handle the PUT, MOVE and DELETE methods.
+        of directory items.
+      </dt>
+      <dd>
+        <p>
+          The line 
+        </p>
+
+        <blockquote>
+          <code>
+            Put-handler=~/dir/puth
+          </code>
+        </blockquote>
+
+        <p>
+          tells the server to use the module <code>ROOTDIR/dir/puth</code>
+	  to handle the HTTP methods <code>PUT, MOVE</code> and 
+	  <code>DELETE.</code> A sample put-handler called <code>puth</code>
+	  is provided with this distribution.  The precise specification
+	  of what a put-handler should do is still evolving.  The 
+	  examples/roam directory shows an example of its use for support
+	  of the Netscape browser roaming feature.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="ddir.search-module"><code>Search-Module</code></a> --
+        Specify program to be used as a search engine.
+      </dt>
+      <dd>
+        <p>
+          This directive allows you to create your own search engine.  It is
+          invoked with a line like:
+        </p>
+
+        <blockquote>
+          <code>
+            Search-Module=/full/path/to/searchmod
+          </code>
+        </blockquote>
+
+        <p>
+          The program <code>searchmod</code> should read the environment
+          variable <a
+          href="appendixD.html#cgi.QUERY_STRING"><code>QUERY_STRING</code></a>
+          and return an HTML fragment.  In the typical case the program returns
+          an unordered list of links to documents containing a match to the
+          query string.  This list can be wrapped by including a "<code><a
+          href="#ddir.searchwrapper">Searchwrapper=</a></code>" in the
+          directory record.  If it is not, a default wrapper with text like
+          "<code>Here are the matches for your search.</code>" is supplied.
+        </p>
+
+        <p>
+          To use this module you should have a form action which is something
+          like <code>http://host/dir/search=index</code>.  Two simple examples
+          of a search-module (written in <a
+          href="http://www.perl.org">perl</a>) are included in the distribution
+          in the files <code>bin/wnseven_m</code> and
+          <code>bin/wnsectsearch</code>.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="ddir.searchwrapper"><code>Searchwrapper</code></a> --
+        Set wrapper file for searches on this directory.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Searchwrapper=swrap.html
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that the HTML file <code>swrap.html</code> in the current
+          directory should be used as a wrapper for the output of all searches
+          on this directory.
+        </p>
+
+        <p>
+          To specify a wrapper for searches on an individual file use the file
+          directive "<code><a
+          href="#fdir.searchwrapper">Searchwrapper=</a></code>".
+        </p>
+      </dd>
+
+      <dt>
+        <a name="ddir.subdirs"><code>Subdirs</code></a> -- Specify
+        subdirectories for searching and recursive use of <a
+        href="index_desc.html#wndex"><code>wndex</code></a>.
+      </dt>
+      <dd>
+        <p>
+          When you run the <a
+          href="index_desc.html#wndex"><code>wndex</code></a> utility with the
+          <a href="appendixA2.html#r_opt"><code>-r</code></a> option (for
+          recursive), it must know in which subdirectories it should descend
+          to create a new <code>index.cache</code> database file.  Likewise
+          when the server does a <a href="search.html#title">title</a>, <a
+          href="search.html#keyword">keyword</a> or <a
+          href="search.html#fielded">user defined field</a> search it
+          recursively descends the data hierarchy and must know for each
+          directory which subdirectories are part of the hierarchy.
+        </p>
+
+        <p>
+          The maintainer provides this information in a line like:
+        </p>
+
+        <blockquote>
+          <code>
+            Subdirs=subdir1,subdir2,subdir3
+          </code>
+        </blockquote>
+
+        <p>
+          in the directory directives giving a comma separated list of
+          subdirectories of the directory containing the current <a
+          href="index_desc.html#index"><code>index.wn</code></a> file.
+        </p>
+
+        <p>
+          There are two special forms of the "<code>Subdirs=</code>" directive.
+          Using:
+        </p>
+
+        <blockquote>
+          <code>
+            Subdirs=&lt;index&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          is equivalent having a "<code>Subdirs=</code>" directive whose value
+          is a list of all subdirectories which contain a file named
+          "<code>index.wn</code>" (or the name specified with the <a
+          href="appendixA2.html#i_opt"><code>-i</code></a> option to <a
+          href="index_desc.html#wndex"><code>wndex</code></a>).
+        </p>
+
+        <p>
+          Using:
+        </p>
+
+        <blockquote>
+          <code>
+            Subdirs=&lt;all&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          is equivalent having a "<code>Subdirs=</code>" directive whose value
+          is a list of all subdirectories.
+        </p>
+      </dd>
+    </dl>
+
+
+    <h3>B.2 <a name="fdir">File Directives</a></h3>
+
+    <p>
+      A collection of lines in the <a
+      href="index_desc.html#index"><code>index.wn</code></a> file containing
+      information about a single file in the directory of the <a
+      href="index_desc.html#index"><code>index.wn</code></a> file is called a file
+      record.  A new file record begins with a line starting with "<code><a
+      href="#fdir.file">File=</a></code>" and ends with the start of a new file
+      record.  Each line in a record begins with a file directive. Here is the
+      complete list:
+    </p>
+
+    <dl>
+      <dt>
+        <a name="fdir.attributes"><code>Attributes</code></a> -- Set file
+        attributes.
+      </dt>
+      <dd>
+        <p>
+
+          Currently several possible attributes are possible including
+          <code>imagemap</code>, <code>nosearch</code>, <code>parse</code>,
+          <code>noparse</code>, <code>post_only</code>, <code>nopost</code>,
+          <code>dynamic</code>, <code>nondynamic</code>, <code>cachable</code>,
+          <code>no-keepalive</code>, <code>non-cachable</code>, <code>put</code>,
+	  and <code>cgi</code>.
+          Multiple values, separated by commas can be put on a single
+          "<code>Attributes=</code>" line, as in
+          "<code>Attributes=parse,dynamic,nosearch</code>".  Letter case is not
+          significant in the attribute value.  Also "<code>Attribute=</code>"
+          (without the '<code>s</code>') is synonymous with
+          "<code>Attributes=</code>".
+        </p>
+
+        <p>
+          See also the directory "<code><a
+          href="#ddir.attributes">Attributes=</a></code>" directive.
+        </p>
+
+        <dl>
+          <dt>
+            <a
+            name="fdir.attributes.cachable"><code>Attributes=cachable</code></a>
+          </dt>
+          <dd>
+            <p>
+              causes the server not to send the
+              "<code>Pragma:&nbsp;no-cache</code>" and
+              "<code>Cache-control:&nbsp;no-cache</code>" headers when it
+              otherwise might.  For example these headers are sent by default
+              for <a href="cgi.html">CGI</a> output.  If you want the browser
+              "back" button to return users to a a CGI generated page after
+              they have followed a link you may need
+              "<code>Attributes=cachable</code>" since otherwise the browser
+              may not even cache the page in memory.  (See also "<a
+              href="#fdir.attributes.non-cachable"><code>Attributes=non-cachable</code></a>".)
+            </p>
+          </dd>
+
+          <dt>
+            <a name="fdir.attributes.cgi"><code>Attributes=cgi</code></a>
+          </dt>
+          <dd>
+            <p>
+              indicates that the standard <a href="appendixD.html">CGI
+              environment variables</a> should be set up before processing this
+              request.  This is may be useful if there is a "<code><a
+              href="#fdir.filter">Filter=</a></code>" directive for this
+              document or if the document has a "<code><a
+              href="#fdir.includes">Include=</a></code>" which is the output of
+              a program.  In these cases the filter program or include program
+              can access the CGI environment variables.  This line is not
+              necessary if the document it refers to is actually a <a
+              href="cgi.html">CGI program</a> since in that case this attribute
+              is automatically set.  If the document is not actually a <a
+              href="cgi.html">CGI program</a> then the environment variable <a
+              href="appendixD.html#PATH_INFO"><code>PATH_INFO</code></a> will
+              always be empty.  This is because the server always interprets a
+              request without a "<code>.cgi</code>" suffix or a
+              "<code>cgi-bin</code>" directory in it as the longest possible
+              sequence of directories and a terminating file, i.e. a request
+              without <code>PATH_INFO</code>.
+            </p>
+          </dd>
+
+          <dt>
+            <a name="fdir.attributes.dynamic"><code>Attributes=dynamic</code></a>
+          </dt>
+          <dd>
+            <p>
+              indicates that the document may change each time it is sent.
+              This causes the server not to send headers with a content length
+              or a last modified date.  It also will cause the server to ignore
+              any "<code>If-Modified-Since</code>" date sent by the client and
+              always resend the document.  It is not necessary to set
+              <code>Attributes=dynamic</code> for <a href="cgi.html">CGI
+              programs</a> as it is set by default for them.  If you do not
+              wish this done for a <a href="cgi.html">CGI program</a> then use
+              the directive "<code><a
+              href="#fdir.attributes.nondynamic">Attributes=nondynamic</a></code>".
+            </p>
+          </dd>
+
+          <dt>
+            <a
+            name="fdir.attributes.imagemap"><code>Attributes=imagemap</code></a>
+          </dt>
+          <dd>
+            <p>
+              Indicates that the file is an imagemap used to support <a
+              href="click.html">clickable images</a>.
+            </p>
+          </dd>
+
+          <dt>
+            <a name="fdir.attributes.md5"><code>Attributes=MD5</code></a>
+          </dt>
+          <dd>
+            <p>
+              Indicates that <a
+              href="index_desc.html#wndex"><code>wndex</code></a> should
+              calculate an <a
+              href="http://linux-howto.com/rfc/rfc1000-1499//rfc1321.txt">MD5</a>
+              digest or checksum for this file and store it in the
+              <code>index.cache</code> file for use as in a
+              "<code>Content-MD5</code>" header for this document.  If the
+              document is subsequently modified you must <em>re-run</em> <a
+              href="index_desc.html#wndex"><code>wndex</code></a> to
+              recalculate this digest value.  If this is not done and the
+              document is newer than the calculated MD5 digest, the server will
+              omit the "<code>Content-MD5</code>" header and log an error.
+            </p>
+          </dd>
+
+          <dt>
+            <a
+            name="fdir.attributes.nokeepalive"><code>Attributes=no-keepalive</code></a>
+          </dt>
+          <dd>
+            <p>
+              indicates that the server should immediately close the connection after
+	      fulfiling a request for this document and not honor a request
+	      from the client to use a persistent connection.
+            </p>
+              If this is used as a default attribute and you wish to allow 
+	      a persistent connection for a specific document
+              then use the line:
+
+            <blockquote>
+              <code>
+                Attributes=keepalive
+              </code>
+            </blockquote>
+
+            <p>
+              which will override the default.
+            </p>
+          </dd>
+
+          <dt>
+            <a
+            name="fdir.attributes.non-cachable"><code>Attributes=non-cachable</code></a>
+          </dt>
+          <dd>
+            <p>
+              indicates that the server should send the
+              "<code>Pragma:&nbsp;no-cache</code>" and
+              "<code>Cache-control:&nbsp;no-cache</code>" headers attempting
+              to encourage clients and proxies not to cache this document.  It
+              is not necessary to set this for <a href="cgi.html">CGI
+              programs</a> or any document requiring authentication as it is
+              set by default for them.  If you wish to allow the output of a
+              <a href="cgi.html">CGI program</a> or authenticated document to
+              be cached then use the line:
+            </p>
+
+            <blockquote>
+              <code>
+                <a href="#fdir.attributes.cachable">Attributes=cachable</a>
+              </code>
+            </blockquote>
+
+            <p>
+              which will override this default. This may be necessary if you
+              want the browser "back" button to return users to this document
+              after they have followed a link, since otherwise the browser may
+              not even cache the page in memory.
+            </p>
+          </dd>
+
+          <dt>
+            <a name="fdir.attributes.noget"><code>Attributes=noget</code></a>
+          </dt>
+          <dd>
+            <p>
+              indicates that the file referenced by this directive may not be
+              accessed with the <code>GET</code></a>  method.  This might be used
+	      with a <a href="cgi.html">CGI program</a> designed only to be accessed via
+              the <a
+              href="http://www.htmlhelp.com/reference/wilbur/block/form.html"><code>POST</code></a>
+              method.
+            </p>
+          </dd>
+
+          <dt>
+            <a
+            name="fdir.attributes.nondynamic"><code>Attributes=nondynamic</code></a>
+          </dt>
+          <dd>
+            <p>
+              overrides the default CGI setting of "dynamic". If this is done
+              the "<code>Last-Modified</code>" date header of the document
+              will be that of the program.
+            </p>
+          </dd>
+
+          <dt>
+            <a
+            name="fdir.attributes.noparse"><code>Attributes=noparse</code></a>
+          </dt>
+          <dd>
+            <p>
+              indicates that the file referenced by this directive should not
+              be parsed for server includes.  This is used to override a
+              default attributes setting to parse all documents.  Also this
+              might be done to improve efficiency when, for example, a
+              document has a wrapper but nothing is included in it.  Since it
+              has a wrapper parsing will be turned on by default, but it is
+              not necessary since nothing is actually included.
+            </p>
+          </dd>
+
+          <dt>
+            <a name="fdir.attributes.nopost"><code>Attributes=nopost</code></a>
+          </dt>
+          <dd>
+            <p>
+              indicates that the file referenced by this directive may not be
+              accessed with the <a
+              href="http://www.htmlhelp.com/reference/wilbur/block/form.html"><code>POST</code></a>
+              method.  If the item referenced is an ordinary file this
+              directive is assumed and need not be set.  For <a
+              href="cgi.html">CGI programs</a>, if this is set and an attempt
+              to <a
+              href="http://www.htmlhelp.com/reference/wilbur/block/form.html"><code>POST</code></a>
+              to the object is made by a client an error will be returned.
+            </p>
+          </dd>
+
+          <dt>
+            <a
+            name="fdir.attributes.nosearch"><code>Attributes=nosearch</code></a>
+          </dt>
+          <dd>
+            <p>
+              indicates that the file referenced by this directive should not
+              be searched when the server does a <a
+              href="search.html#context">context</a> or <a
+              href="search.html#grep">grep</a> search of the current
+              directory.
+            </p>
+          </dd>
+
+          <dt>
+            <a name="fdir.attributes.parse"><code>Attributes=parse</code></a>
+          </dt>
+          <dd>
+            <p>
+              indicates that the file referenced by this directive should be
+              parsed for <a href="parse.html#if">conditional text</a> or <a
+              href="parse.html#including">server-side includes</a>.  This line
+              is not necessary if there is also a "<code><a
+              href="#fdir.attributes.wrappers">Wrappers=</a></code>" line or an
+              "<code><a href="#fdir.attributes.includes">Includes=</a></code>"
+              line since in that case the parse attribute is assumed.  If you
+              do not wish a document to be parsed when it otherwise would be
+              the "<code><a
+              href="#fdir.attributes.noparse">Attribute=noparse</a></code>" can
+              be used.
+            </p>
+          </dd>
+
+          <dt>
+            <a name="fdir.attributes.post"><code>Attributes=post_only</code></a>
+          </dt>
+          <dd>
+            <p>
+              indicates that the file referenced by this directive may
+              <em>only</em> be accessed with the <a
+              href="http://www.htmlhelp.com/reference/wilbur/block/form.html"><code>POST</code></a>
+              method.  If the item referenced is a <a href="cgi.html">CGI
+              program</a> and an attempt is made to access it with the <a
+              href="http://www.htmlhelp.com/reference/wilbur/block/form.html"><code>GET</code></a>
+              method an error will be returned.  This directive may useful for files
+              which are filtered or "include" an executed program.  In that
+              case the <code>POST</code>ed data will be in placed in a
+              temporary file.  The name of the temporary file can be found by
+              using "<code><a
+              href="#fdir.attributes.cgi">Attributes=cgi</a></code>" which will
+              cause the name to be placed in the environment variable <a
+              href="appendixD.html#WN_POST_FILE"><code>WN_POST_FILE</code></a>.
+            </p>
+          </dd>
+
+          <dt>
+            <a name="fdir.attributes.put"><code>Attributes=put</code></a>
+          </dt>
+          <dd>
+            <p>
+              indicates that the file referenced by this directive may be
+              accessed with the <code>PUT</code> method.  It must be handled by
+              your program.  The <code>PUT</code> data will be in placed in a
+              temporary file.  The name of the temporary file can be found by
+              using "<code><a
+              href="#fdir.attributes.cgi">Attributes=cgi</a></code>" which will
+              cause the name to be placed in the environment variable <a
+              href="appendixD.html#WN_PUT_FILE"><code>WN_PUT_FILE</code></a>.
+            </p>
+          </dd>
+        </dl>
+
+      <dt>
+        <a name="fdir.cgi-handler"><code>CGI-Handler</code></a> -- Specify the
+        <a href="cgi.html">CGI program</a> with which a file is to be
+        processed.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            CGI-Handler=/path/to/bar
+          </code>
+        </blockquote>
+
+        <p>
+          causes the program "<code>/path/to/bar</code>" to be run and
+          its output to be served in place of the document requested.
+          This is a way to designate a <a href="cgi.html">CGI
+          program</a> to handle a file somewhat like a <a
+          href="filter.html">filter</a>.  The name of the program need
+          not be in the URL since it is in the <a
+          href="index_desc.html#index"><code>index.wn</code></a> file.
+          So when <code>http://host/path2/foo.html</code> is requested
+          this will cause the handler, say <code>/path/to/bar</code>, to be
+          run with the CGI environment variable <a
+          href="appendixD.html#PATH_INFO"><code>PATH_INFO</code></a>
+          set to <code>/path2/foo.html</code>.  In normal use the
+          program <code>/path/to/bar</code> will do something to the file
+          <code>foo.html</code> and serve the output.  It is useful if
+          you want a number of files in a directory to be handled by
+          the same <a href="cgi.html">CGI program</a>.  Note the file
+          <code>foo.html</code> need not be used in any way by the
+          program, but it must exist or else the server will treat it
+          as a non-existent file.
+        </p>
+
+        <p>
+	  There is no reason for the CGI-handler program
+	  <code>bar</code> to be in the served data hierarchy and it
+	  is good security practice to have it be elsewhere in a place
+	  where it cannot itself be served.  This prevents its
+	  execution with the CGI environment variable <a
+	  href="appendixD.html#PATH_INFO"><code>PATH_INFO</code></a>
+	  been set by the client.  It should <em>never</em> be located
+	  in a <code>cgi-bin</code> directory. If handler name begins
+	  with a '<code>/</code>' the name is considered as a path
+	  relative to the system root directory.  If it begins with
+	  '<code>~/</code>' as in <code>~/dir/foo</code> it is assumed
+	  to be relative to the <em>WN</em> root directory.  Otherwise
+	  it is assumed to be a path relative to the directory
+	  containing the <a
+	  href="index_desc.html#index"><code>index.wn</code></a> file.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="fdir.charset"><code>Charset</code></a>
+        -- Specify the character set to be added to the MIME type
+	for this document (which should have  content type <code>text/*</code>).
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Charset=iso-8859-1
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that this document, which should have a MIME
+	  type of <code>text/*</code>, should have a character set parameter
+	  with this value appended to its content type.  
+	  E.g. a document of type text/html will be sent with a content type header 
+        <blockquote>
+          <code>
+	    Content-type: text/html; charset=iso-8859-1
+          </code>
+        </blockquote>
+        </p>
+	<p>
+	If no value is specified for this and the <a href="#ddir.default-charset">
+	    Default-Charset directive</a> is not used then the value
+	  <code>iso-8859-1</code> is used.  <em>Note</em>, that if a 
+           content-type file directive is also used, if must occur AFTER 
+           the charset directive.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="fdir.content-encoding"><code>Content-encoding</code></a> --
+        Specify the content encoding for a file.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Content-encoding=x-gzip
+          </code>
+        </blockquote>
+
+        <p>
+          specifies "<code>x-gzip</code>" as the content encoding for the file
+          described by this record.  Only two types of content encoding are
+          supported by common browsers.  They are "<code>x-gzip</code>" and
+          "<code>x-compress</code>".  They indicate that the file has been
+          compressed with the <a href="http://www.gnu.org">GNU</a> <a
+          href="/cgi-bin/man2html/usr/man/man1/gzip.1.gz"><code>gzip(1)</code></a>
+          utility or the UNIX <a
+          href="/cgi-bin/man2html/usr/man/man1/compress.1.gz"><code>compress(1)</code></a>
+          utility.  The file is then sent by the server in the compressed
+          format and will be decompressed automatically by the browser, if it
+          supports this functionality.
+        </p>
+
+        <p>
+          In many cases this is unnecessary to specify this explicitly as the
+          <a href="index_desc.html#wndex"><code>wndex</code></a> program will
+          automatically assign the the content-encoding <code>x-gzip</code> to
+          a file whose name ends with "<code>.gz</code>" and the
+          content-encoding <code>x-compress</code> to a file whose name ends in
+          "<code>.Z</code>".  Supplying the value "<code>none</code>" for the
+          "<code>Content-encoding=</code>" will prevent the server from making
+          this automatic assignment.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="fdir.content-type"><code>Content-type</code></a> -- Specify
+        the <a
+        href="http://linux-howto.com/rfc/rfc2000-2499/rfc2045.txt">MIME</a>
+        content type for a file.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Content-type=audio/basic
+          </code>
+        </blockquote>
+
+        <p>
+          specifies "<code>audio/basic</code>" as the <a
+          href="http://linux-howto.com/rfc/rfc2000-2499/rfc2045.txt">MIME</a>
+          type for the file described by this record.  In many cases this is
+          unnecessary as the <a
+          href="index_desc.html#wndex"><code>wndex</code></a> program will
+          automatically assign the <a
+          href="http://linux-howto.com/rfc/rfc2000-2499/rfc2045.txt">MIME</a>
+          type if the file name ends in a suffix listed in the file
+          <code>lib/mime.types</code> with a corresponding type.  If this line
+          is supplied it will override the default value of the content type
+          determined by the suffix.
+        </p>
+
+        <p>
+          The <code>mime.types</code> file should be installed in a known
+          location.  The default location is in the <em>WN</em>
+          <code>src</code> hierarchy, but this can be changed by specifying a
+          different value when the <a
+          href="setup.html#installing"><code>configure</code></a> program is
+          run or by editing the value of "<a
+          href="configmacros.html#mime_types_file"><code>#define&nbsp;MIME_TYPES_FILE</code></a>"
+          in <a href="configmacros.html"><code>config.h</code></a>.  The
+          <code>mime.types</code> file exists so that you can add to it if you
+          wish to add new kinds of documents to your server.  The format of the
+          file is explained in the file.  A default version of the file is in
+          <code>lib/mime.types</code>.  The internal defaults are the same as
+          what is currently in this file.  The <code>mime.types</code> file is
+          read whenever <a href="index_desc.html#wndex"><code>wndex</code></a>
+          is run so <a href="index_desc.html#wndex"><code>wndex</code></a>
+          always knows the latest additions.  This file is also read by
+          <code>wnsd</code> (but not <code>wnd</code>) on startup for use with
+          directories with the "<code><a
+          href="#ddir.attributes.serveall">Attributes=serveall</a></code>".
+          The <code>wnsd</code> stand-alone server reads this file when it is
+          started or restarted, but only takes note of new suffixes and their
+          <code>mime types</code>.  You cannot change the mime type
+          corresponding to one of the standard suffixes (as listed in the
+          default <code>mime.types</code> file).  To do that you need to change
+          the server source and recompile.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="fdir.expires"><code>Expires</code></a> -- Specify the
+        expiration date of a document or file.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Expires=Mon,&nbsp;01&nbsp;Sep&nbsp;1997&nbsp;14:11:01&nbsp;GMT
+          </code>
+        </blockquote>
+
+        <p>
+          specifies date and time which a document expires.  Current practice
+          is to use the format specified by <a
+          href="http://linux-howto.com/rfc/rfc0500-0999/rfc0850.txt">RFC
+          850</a> and illustrated above.  In particular, GMT should be used.
+          More information about HTTP date formats can be found at <a
+          href="http://linux-howto.com/rfc/rfc1000-1499/rfc1123.txt">RFC
+          1123</a>.  For HTML documents the this information is automatically
+          extracted from the document by <a
+          href="index_desc.html#wndex"><code>wndex</code></a>.  This requires a
+          "<a
+          href="http://www.htmlhelp.com/reference/wilbur/head/meta.html"><code>&lt;meta&gt;</code></a>"
+          line in the head of the HTML document like:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;meta&nbsp;http-equiv="Expires"&nbsp;content="Tue,&nbsp;10&nbsp;Oct&nbsp;1994&nbsp;14:11:01&nbsp;GMT"&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          If the "<code>Expires=</code>" directive is also supplied in the <a
+          href="index_desc.html#index"><code>index.wn</code></a> file it will
+          override the expiration date in the document. See also the "<code><a
+          href="#fdir.max-age">Max-age=</a></code>" file directive.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="fdir.field"><code>Field#n</code></a> -- Specify a user
+        supplied field associated with a file.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Field3=string
+          </code>
+        </blockquote>
+
+        <p>
+          specifies "<code>string</code>" user supplied field <code>3</code>
+          associated with the current document.  These are used for <a
+          href="search.html#fielded">field searches</a>.  The digit
+          <code>3</code> can be replaced with any other single digit allowing
+          a total of 10 user supplied fields.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="fdir.file"><code>File</code></a> -- File name.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            File=foo
+          </code>
+        </blockquote>
+
+        <p>
+          begins a new file record for the file <code>foo</code>.  It
+          indicates that permission is granted for this file to be
+          served. Other <a href="#fdir">file directive</a> lines will apply to
+          this file until a new file record or text segment is started or the
+          end of the <a href="index_desc.html#index"><code>index.wn</code></a>
+          file is reached.  The presence of this line causes an entry for this
+          file to be written in the <code>index.cache</code> file created by
+          <a href="index_desc.html#wndex"><code>wndex</code></a>.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="fdir.filter"><code>Filter</code></a> -- Specify the filter
+        with which a file is to be postprocessed.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Filter=/dir/foo
+          </code>
+        </blockquote>
+
+        <p>
+          causes the contents of the file whose record contains this line to be
+          used as the UNIX <a
+          href="/cgi-bin/man2html/usr/man/man3/stdio.3.gz"><code>stdin(3)</code></a>
+          stream of the program <code>foo</code> and the the UNIX <a
+          href="/cgi-bin/man2html/usr/man/man3/stdio.3.gz"><code>stdout(3)</code></a>
+          stream of that program to be sent to the client instead of the file
+          itself.  A common use of this is to specify a decompressing program
+          like the UNIX <a
+          href="/cgi-bin/man2html/usr/man/man1/zcat.1.gz"><code>zcat(1)</code></a>
+          utility as the filter so that a compressed version of a file can be
+          stored on disk and then be decompressed on the fly before being sent
+          to the client.  Another example would be
+          "<code>Filter=/usr/bin/nroff&nbsp;-man</code>" which would convert a
+          UNIX <a
+          href="/cgi-bin/man2html/usr/man/man1/nroff.1.gz"><code>nroff(1)</code></a>
+          utility to convert a <a
+          href="/cgi-bin/man2html/usr/man/man1/man.1.gz"><code>man(1)</code></a>
+          page to an ASCII text document on the fly.
+        </p>
+
+        <p>
+          If a listed file name begins with a '<code>/</code>' the name is
+          considered as a path relative to the system root directory.  If it
+          begins with '<code>~/</code>' as in '<code>~/dir/foo</code>' it is
+          assumed to be relative to the <em>WN</em> root directory.  Otherwise
+          it is assumed to be a path relative to the directory containing the
+          <a href="index_desc.html#index"><code>index.wn</code></a> file.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="fdir.header"><code>Header</code></a> -- Add a line to the <a
+        href="http://www.w3c.org/Protocols/">HTTP/1.1</a> header for this
+        document.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Header=[some legal HTTP header]
+          </code>
+        </blockquote>
+
+        <p>
+          causes the line "<code>[some legal HTTP header]</code>" to be added
+          to the <a href="http://www.w3c.org/Protocols/">HTTP/1.1</a> header
+          for this item. This directive can be used multiple times to add
+          multiple lines to the header.
+        </p>
+
+        <blockquote>
+          <em>Note:</em> Don't do this unless you know what you are doing!
+        </blockquote>
+      </dd>
+
+      <dt>
+        <a name="fdir.http-status"><code>HTTP-Status</code></a> -- Return a
+        given <a href="http://www.w3c.org/Protocols/">HTTP/1.1</a> status
+        value.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            HTTP-Status=404 Not Found
+          </code>
+        </blockquote>
+
+        <p>
+          causes the response line of the <a
+          href="http://www.w3c.org/Protocols/">HTTP/1.1</a> header to be
+          "<code>HTTP/1.1&nbsp;404&nbsp;Not Found</code>".  This is primarily
+          of use when redirecting requests for non-existent files to an error
+          message which should be returned with status <code>404</code> so
+          robots understand.
+        </p>
+
+        <blockquote>
+          <em>Note:</em> Don't do this unless you know what you are doing!
+        </blockquote>
+      </dd>
+
+      <dt>
+        <a name="fdir.includes"><code>Includes</code></a> -- Specify the files
+        to be included in a text document.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Includes=file1,file2,file3
+          </code>
+        </blockquote>
+
+        <p>
+          causes the file whose record contains this line to be parsed for
+          lines like "<code>&lt;!--&nbsp;#include&nbsp;--&gt;</code>".  When
+          such a marker is found one of the files listed with the
+          "<code>Includes=</code>" file directive is inserted.  Subsequent
+          occurrences of the marker cause the inclusion of subsequent files in
+          the order in which they occur in this directive.
+        </p>
+
+        <p>
+          If a listed file name begins with a '<code>/</code>' the name is
+          considered as a path relative to the system root directory.  If it
+          begins with '<code>~/</code>' as in "<code>~/dir/foo</code>" it is
+          assumed to be relative to the <em>WN</em> root directory.  Otherwise
+          it is assumed to be a path relative to the directory containing the
+          <a href="index_desc.html#index"><code>index.wn</code></a> file.  See
+          the section of the user guide on <a href="parse.html">includes and
+          wrappers</a> for more information.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="fdir.keywords"><code>Keywords</code></a> -- Specify the
+        keywords associated with a document or file.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Keywords=pink, elephant, HTTP
+          </code>
+        </blockquote>
+
+        <p>
+          specifies a list of keywords associated with the current document.
+          These are used for <a href="search.html#keyword">keyword
+          searches</a>.  For HTML documents the keywords are automatically
+          extracted from the document by <a
+          href="index_desc.html#wndex"><code>wndex</code></a>.  This requires
+          a <a
+          href="http://www.htmlhelp.com/reference/wilbur/head/meta.html"><code>&lt;meta&gt;</code></a>
+          line in the head of the HTML document like:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;meta&nbsp;http-equiv="Keywords"&nbsp;content="pink,&nbsp;elephant,&nbsp;HTTP"&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          If the "<code>Keywords=</code>" file directive is also supplied in
+          the <a href="index_desc.html#index"><code>index.wn</code></a> file it
+          will override the keywords in the document.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="fdir.list-includes"><code>List-Includes</code></a> -- Specify
+        files which may be included in a text document.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            List-Includes=file1,file2,file3
+          </code>
+        </blockquote>
+
+        <p>
+          causes the file whose record contains this line to be parsed for
+          lines like
+          '<code>&lt;!--&nbsp;#include&nbsp;"file2"&nbsp;--&gt;</code>'.  When
+          such a marker is found the contents of <code>file2</code> is
+          inserted.  The order of the files listed in the directive is not
+          significant. Note that the example above grants permission for the
+          inclusion of the three files listed.  It does not require their
+          insertion.
+        </p>
+
+        <p>
+          If a listed file name begins with a '<code>/</code>' the name is
+          considered as a path relative to the system root directory.  If it
+          begins with '<code>~/</code>' as in "<code>~/dir/foo</code>" it is
+          assumed to be relative to the <em>WN</em> root directory.  Otherwise
+          it is assumed to be a path relative to the directory containing the
+          <a href="index_desc.html#index"><code>index.wn</code></a> file.  See
+          the section of the user guide on <a href="parse.html">includes and
+          wrappers</a> for more information.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="fdir.max-age"><code>Max-Age</code></a> -- Specify the <a
+        href="http://www.w3c.org/Protocols/">HTTP/1.1</a>
+        <code>Cache-Control</code> and <code>Expires</code> headers for an
+        entry.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Max-Age=10&nbsp;days
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that a <a href="http://www.w3c.org/Protocols/">HTTP/1.1</a>
+          <code>Cache-Control</code> header should be sent to expire the
+          document in the specified time.  If no "<code><a
+          href="#fdir.expires">Expires=</a></code>" file directive has been set
+          elsewhere in the <a
+          href="index_desc.html#index"><code>index.wn</code></a> file or in the
+          file itself, if it is an HTML file, then the <a
+          href="http://www.w3c.org/Protocols/">HTTP/1.1</a>
+          <code>Expires</code> header will also be sent with a value equal to
+          the current time plus the time period of the <a
+          href="http://www.w3c.org/Protocols/">HTTP/1.1</a>
+          <code>Max-Age</code> header.  The time period in the
+          "<code>Max-Age=</code>" file directive can be specified in units of
+          seconds, minutes, hours, days or weeks, but more than one unit (as in
+          2 weeks and 3 days) is not allowed.
+        </p>
+
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Max-Age=10&nbsp;days&nbsp;after&nbsp;last-mod
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that a <a
+          href="http://www.w3c.org/Protocols/">HTTP/1.1</a>
+          <code>Cache-Control</code> header and the <code>Expires</code> header
+          (if none is set elsewhere) should be set to expire the document in
+          the specified amount of time after the <code>last-modified</code>
+          date of the document.  Negative time values for the
+          <code>Cache-Control</code> header will be ignored, but
+          <code>Expires</code> headers with dates in the past will be used.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="fdir.nomatchsubs"><code>Nomatchsub</code></a> -- Set
+        substitute file for searches on this file which result in no matches.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Nomatchsub=foo.html
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that the HTML file <code>foo.html</code> in the current
+          directory should be used for the output of all <a
+          href="search.html">searches</a> on this file which return no matches.
+          It can only be used in conjunction with the "<code><a
+          href="#fdir.searchwrapper">Searchwrapper=</a></code>" file directive.
+          See also "<code><a href="#ddir.nomatchsub">Nomatchsub=</a></code>"
+          for directories.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="fdir.redirect"><code>Redirect</code></a> -- Send an <a
+        href="http://www.w3c.org/Protocols/">HTTP/1.1</a> redirect to a new
+        URL.
+      </dt>
+      <dd>
+        <p>
+          The lines:
+        </p>
+
+        <blockquote>
+          <code>
+            File=foo
+            <br>
+            Redirect=http://host/path/bar
+          </code>
+        </blockquote>
+
+        <p>
+          cause a request for <code>foo</code> to be answered with an <a
+          href="http://www.w3c.org/Protocols/">HTTP/1.1</a> redirect response.
+          The client will then automatically request the new URL.  The file
+          <code>foo</code> need not exist.
+        </p>
+
+        <p>
+          The redirection always sends a <a
+          href="http://www.w3c.org/Protocols/">HTTP/1.1</a>
+          "<code>301&nbsp;Moved&nbsp;Permanently</code>" status header followed
+          by a "<code>Location:</code>" header whose value is
+          "<code>http://host/path/bar</code>".  This means that the value of a
+          "<code>Redirect=</code>" file directive should always be a complete
+          URL, starting with "<code>http://</code>" or "<code>ftp://</code>"
+          etc.  The one exception is that you may use
+          "<code>Redirect=&lt;null&gt;</code>".  This causes the server to send
+          a status <code>204</code> "no response" which tells the client to do
+          nothing and leave the display alone.  The page won't be reloaded and
+          won't change.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="fdir.refresh"><code>Refresh</code></a> -- Set a "Refresh"
+        header for use with "client-pull".
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Refresh=60
+          </code>
+        </blockquote>
+
+        <p>
+          adds an <a href="http://www.w3c.org/Protocols/">HTTP/1.1</a> header
+          at the beginning of the transmission of this document.  If the
+          client receiving this header supports "client-pull" (currently only
+          <a
+          href="http://www.netscape.com/download/prodinfonfs_1.html">Netscape
+          browsers</a> support this) then it will automatically reload the
+          document after 60 seconds.  This is useful for documents that are
+          updated very frequently, a stock ticker, for example.  If the
+          directive:
+        </p>
+
+        <blockquote>
+          <code>
+            Refresh=30;&nbsp;URL=http://host/path/foo
+          </code>
+        </blockquote>
+
+        <p>
+          is used then after 30 seconds the URL
+          <code>http://host/path/foo</code> is loaded.  This can be used to
+          create an automatic slide show.  The <code>Refresh</code> header is
+          not part of an <a href="http://www.w3c.org/Protocols/">HTTP/1.1</a>
+          standard and hence may evolve.  If it does this directive will be
+          subject to change!
+        </p>
+      </dd>
+
+      <dt>
+        <a name="fdir.searchwrapper"><code>Searchwrapper</code></a> -- Set
+        wrapper file for searches on this file.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Searchwrapper=swrap.html
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that the HTML file <code>swrap.html</code> in the current
+          directory should be used as a <a
+          href="search.html#searchwrapper">search wrapper</a> for the output
+          of all <a href="search.html">searches</a> on this file.
+        </p>
+
+        <p>
+          To specify a wrapper for all searches on a directory use the
+          directory directive "<code><a
+          href="#ddir.searchwrapper">Searchwrapper=</a></code>".
+        </p>
+      </dd>
+
+      <dt>
+        <a name="fdir.cookie"><code>Set-Cookie</code></a> -- Set a "Cookie"
+        header value.
+      </dt>
+      <dd>
+        <p>
+          The lines:
+        </p>
+
+        <blockquote>
+          <code>
+            Set-Cookie=name1=opaque1
+            <br>
+            Set-Cookie=name=xxx; Expires=Wed, 19 Jan 2000 08:49:37 GMT
+
+          </code>
+        </blockquote>
+
+        <p>
+          add an <a href="http://www.w3c.org/Protocols/">HTTP/1.1</a> header
+          at the beginning of the transmission of this document.  If the
+          client receiving this header supports cookie caching (currently only
+          <a
+          href="http://www.netscape.com/download/prodinfonfs_1.html">Netscape
+          browsers</a> browsers support this) then it will save the name=value
+          pairs and include them in the request headers when documents in the
+          same directory or sub-directories are accessed.  The server will put
+          the name=value pairs in the CGI environment variable <a
+          href="appendixD.html#HTTP_COOKIE"><code>HTTP_COOKIE</code></a> for
+          access by <a href="cgi.html">CGI programs</a>.  This is useful for
+          "shopping basket" type applications.
+        </p>
+
+        <p>
+	  If the value of this directive begins with an '!', as in
+        <blockquote>
+          <code>
+            Set-Cookie=!my_cookie_script
+          </code>
+        </blockquote>
+        </p>
+
+        <p>
+	  then it will be interpreted as the name of a program to be
+	  run to generate the value of the cookie.  The program should
+	  not generate the "Set-Cookie:" part of this header, just the
+	  value.  As elsewhere if the program name starts with '/' it
+	  will be taken relative to system root; if it begins with '~'
+	  it will be taken relative to the document root; and otherwise
+	  it will be assumed to be in the directory where this directive
+	  is found.  The standard CGI environment variables will be 
+	  available to the program.
+        </p>
+
+        <p>
+          Normally the client will discard the cookie at the end of a session.
+          However, if an <code>Expires</code> parameter like the one above is
+          provided the cookie will be saved between sessions and only
+          discarded when it expires.
+        </p>
+
+        <p>
+          More information about the <a
+          href="http://www.w3c.org/Protocols/">HTTP/1.1</a>
+          <code>Set-Cookie</code> header is available at <a
+          href="http://home.netscape.com/newsref/std/cookie_spec.html">http://home.netscape.com/newsref/std/cookie_spec.html</a>.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="fdir.title"><code>Title</code></a> -- Specify the title of a
+        document or file.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Title=This is the title
+          </code>
+        </blockquote>
+
+        <p>
+          specifies the text "<code>This is the title</code>" as the title of
+          the file.  If the file is an HTML document this is not necessary as
+          <a href="index_desc.html#wndex"><code>wndex</code></a> will attempt
+          to read the title from the document itself.  If this line is
+          supplied anyway it will override the title in the document.  If this
+          line is not supplied and the file is not an HTML document the
+          default title "<code>File&nbsp;&lt;filename&gt;</code>" is used.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="fdir.wrappers"><code>Wrappers</code></a> -- Specify the files
+        to be included in a text document.
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            Wrappers=file1
+          </code>
+        </blockquote>
+
+        <p>
+          causes "<code>file1</code>" to be parsed for lines like
+          "<code>&lt;!--&nbsp;#include&nbsp;--&gt;</code>".  When such a
+          marker is found the file whose record contains this line is inserted
+          and the combined document is sent to the client.  It is possible to
+          list multiple files in this directive.  The semantics of this are
+          explained in the section of the user guide on <a
+          href="parse.html">server-side includes and wrappers</a>.
+        </p>
+
+        <p>
+          If a listed file name begins with a '<code>/</code>' the name is
+          considered as a path relative to the system root directory.  If it
+          begins with '<code>~/</code>' as in "<code>~/dir/foo</code>" it is
+          assumed to be relative to the <em>WN</em> root directory.  Otherwise
+          it is assumed to be a path relative to the directory containing the
+          <a href="index_desc.html#index"><code>index.wn</code></a> file.  See
+          the section of the user guide on <a href="parse.html">includes and
+          wrappers</a> for more information.
+        </p>
+      </dd>
+    </dl>
+
+
+
+    <!-- #end -->
+    <hr size="4">
+
+    <address>
+      <em>WN</em> version 2.4.7
+      <br>
+      Copyright &copy; 1998-2005 <a href="mailto:john@math.northwestern.edu">John Franks
+      &lt;john@math.northwestern.edu&gt;</a>
+      <br>
+      licensed under the <a
+        href="http://www.gnu.org/copyleft/fdl.txt">GNU Free Documentation License</a>
+      <br>
+<!-- hhmts start -->
+Last modified: Sat June  18 2005
+<!-- hhmts end -->
+    </address>
+
+    <!-- pnuts --> <a href="appendixA2.html">[Previous]</a> <a href="appendixC.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+  </body>
+</html>

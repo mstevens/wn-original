@@ -1,0 +1,155 @@
+/*
+    WNDigest
+    Version 1.2
+    
+    Copyright (C) 1996-8  <by John Franks>
+
+    This program is free software; you can redistribute it and/or modify
+    it in any way you choose.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+*/
+
+WNdigest is an implementation of the proposed Digest authentication
+method for HTTP.   The specification is included in the file
+draft-ietf-http-authentication-01.txt.
+
+TO USE WNDIGEST WITH WN YOU WILL HAVE TO UNCOMMENT THE LINE
+
+/* #define DIGEST_AUTHENTICATION */
+
+IN THE CONFIG.H FILE.
+
+Some familiarity with this spec will be useful in understanding what
+follows.  WNdigest is an experimental implementation of Digest
+Authentication intended for use with the WN http server (see
+http://hopf.math.nwu.edu/).
+
+This implementation has a feature which is not
+part of the specification but are made possible by the flexibility of
+the proposed method.  
+
+     1. Timestamps:  The maintainer can set the time period for which
+     authentication granted the client is valid.  After this time period
+     the client will have to re-authenticate.   The time period can be
+     set to any number of seconds (or be unlimited) and is accurate to
+     within 1% of the specified value.  The timestamp is encoded in the
+     "nonce" header field (see the specification).  See below for how
+     they work.
+
+The wndigest program is designed as an authorization module for use
+with the WN http server, but it may be able to be modified for use
+with other servers.
+
+
+RUNNING WITH WN
+---------------
+
+TO USE WNDIGEST WITH WN YOU WILL HAVE TO UNCOMMENT THE LINE
+
+/* #define DIGEST_AUTHENTICATION */
+
+IN THE CONFIG.H FILE.
+
+Read the WN manual section on authentication.
+
+To compile the wndigest authentication module first do 
+
+	make md5
+
+to produce the md5 digest program.  Then test the perl script rand
+by executing it with "perl rand".  It should produce something like
+
+	#define RANDOMKEY "749ff050b4e0fcc8efa1f3c7d7342d67"
+
+This is not the key that will be used; it is only a test.  Next do a
+"make all" which will produce the wndigest module.
+
+If you put the digestauth directory in your data hierarchy and run wndex
+on it, it should work. Look at the example index file in this directory.
+It should contain: 
+
+	Authorization-realm=testrealm@yourhost.com
+	Authorization-module=wndigest -t 600 -d /digestauth -p wnpasswd
+	Authorization-type=Digest
+
+The first line specifies realm.  The module line gives the location of
+wndigest relative to the data root (you can use a complete path or
+start relative to the WN root directory using '~').  The arg -t 600
+means authenication is valid for 600 seconds or 10 mins. The domain is
+"/digestauth" and the password file is wnpasswd in the current
+directory.
+
+The password file has lines of the form 
+
+	username:Encrypted-realm-user-password
+
+You can produce an appropriate entry with the perl program wn_md5passwd
+which works like the wn_mkpasswd which comes with the WN distribution.
+This perl program calls the public domain program md5 to do the MD5
+hashing (and it assumes this program is in the current directory).
+The wndigest module for use with WN is self contained) though it uses
+the public domain code in the file md5c.c from RSA.
+
+
+HOW DO NONCE TIMESTAMPS WORK?
+-----------------------------
+
+Several people have asked about this.  Here is a brief explanation.
+The nonce sent to the client is really not an MD5 digest, but an MD5
+digest with two additional bytes tacked on.  The last two bytes
+indicate the fraction (in 256ths) of a time stamp period that has
+passed.  Let me give an example in decimal rather than hex (in fact
+originally I did this in decimal and then it really was "percent").
+Suppose the period of validity is 100 seconds and the Unix date in
+seconds was 12345.  Then we use only the 123 as the timestamp and
+calculate the nonce which is a hash of the timestamp plus other stuff
+-- say it is "abab".  Then we append the 45 to get "abab45" and this
+is what we will send to the client. (That's why there are 34 bytes,
+not 32 which MD5 produces).
+
+When we get the request from the client including our nonce we again
+check the time and we have to decide if 100 seconds has passed.  For
+example, it is fine if the time is 12377 or 12422, but 12455 is no
+good.  So we look at the last two digits of this current time and see
+how they compare to 45 which was the last two digits of the original
+issuing time.  If the new two-digit end is > 45 we know that if we are
+still in the 100 sec time frame the original timestamp had to be the
+same as the first n-2 digits of the current time.  And if the last two
+digits of the orig are < the last two digits of the current time then
+the orignial timestamp must have been one less than the first n-2
+digits of the current time.
+
+Thus if we get the request at 12377 we know the timestamp (if valid)
+was 123 and that is what we test.  Likewise if we get 12422, since 22
+< 45 the timestamp must have been 124-1 = 123.  If we get 12455 then we
+assume the timestamp was 124 (since 55 > 45) but testing that (by
+recalculating the nonce using this value as timestamp) will fail so we
+conclude the time has expired. (Or it could be that someone tampered with
+the nonce.)
+
+Of course, the time period doesn't have to be 100 seconds, we just
+calculate the percentage of the time period which has passed and use
+that (using 256 not 100).  The calculation from wndigest.c is
+
+		ts = ((unsigned long) curtime)/ tsvalid;
+		rem = ((unsigned long) curtime) % tsvalid;
+		percent = (int) (256 * rem)/tsvalid;
+
+where ts = timestamp (in units of tsvalid seconds), 
+      tsvalid = period of validity (in seconds)
+      rem = remainder of ts/tsvalid
+      percent = fraction of the current period which has passed (in 256ths).
+
+
+
+
+
+
+John Franks
+
+
+
+

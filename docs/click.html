@@ -1,0 +1,481 @@
+<!doctype html public "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+  <head>
+    <title>Clickable Images and Imagemap files on the WN Server</title>
+
+    <link rev="made" href="mailto:john@math.northwestern.edu">
+
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <meta http-equiv="last-modified" content="Sat June 18 2005">
+    <meta http-equiv="keywords" content="WN image maps">
+  </head>
+
+  <body bgcolor="#FFFFFF">
+    <p>
+      <a href="http://hopf.math.northwestern.edu/"><img
+        src="images/powered.jpg"
+        border="0"
+        width="190"
+        height="41"
+        align="right"
+        alt="WN home page"
+      ></a>
+    </p>
+
+    <strong>Version 2.4.7</strong>
+
+    <br>
+
+    <!-- pnuts --> <a href="module.html">[Previous]</a> <a href="cgi.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+
+
+
+    <br clear="right">
+
+    <hr size="4">
+    <!-- #start -->
+
+    <h2 align="center">Clickable Images and Imagemap files on the <em>WN</em>
+    Server</h2>
+    <hr size="4">
+
+    <p>
+      As of version 1.07 the <em>WN</em> server does not require the <a
+      href="http://hoohoo.ncsa.uiuc.edu/docs/tutorials/imagemap.txt">NCSA
+      C <code>imagemap.c</code> program</a> to support clickable images.  This
+      functionality is now built into the server. Try clicking on this image
+      for an example.
+    </p>
+
+    <center>
+      <a href="examples/shape.map"><img src="examples/shape.png" alt="imagemap"
+      width="245" height="164" ismap></a>
+    </center>
+
+    <p>
+      Clickable images like this make use of a "map file" telling the server
+      which coordinates in the image correspond to which document.  The format
+      of this file <a href="#map_format">(described below)</a> is the same as
+      that used with the <a
+      href="http://hoohoo.ncsa.uiuc.edu/docs/tutorials/imagemapping.html">NCSA
+      imagemap program</a> (with a few minor enhancements).
+    </p>
+
+
+    <h3>15.1 <a name="howto">The Steps in Setting up a Clickable Image</a></h3>
+
+
+    <h4>15.1.1 <a name="howto.create_image">Create an Image</a></h4>
+
+    <p>
+      There are a number of image creation and editing programs that can be
+      used.  One (which I have not tried) is <a
+      href="http://www.danbbs.dk/~torsten/xpaint/index.html">xpaint</a>.  The
+      image file must be in <code>png</code>, <code>jpeg</code> or
+      <code>xbm</code> format.
+    </p>
+
+
+    <h4>15.1.2 <a name="howto.create_map">Create a Map File</a></h4>
+
+    <p>
+      This is a file containing lines specifying regions in the image and the
+      URL to which the client should be directed after clicking in one of these
+      regions.  The format of this file is <a href="#map_format">described
+      below</a> in detail, but roughly a line contains the name of a shape
+      (like a rectangle) the URL to go to and the pixel coordinates necessary
+      to specify the rectangle.
+    </p>
+
+    <p>
+      There is a commercial program called <a
+      href="http://www.boutell.com/mapedit/">mapedit</a> and a free <a
+      href="http://www.tclconsortium.org/">tcl/tk</a> program <a
+      href="http://www.seqnet.dl.ac.uk/CBMT/mapmarker/HOME.html">mapmarker</a>
+      (neither of which I have used) that are designed to automate this task.
+    </p>
+
+
+    <h4>15.1.3 <a name="howto.install">Install the Image and Map File on Your
+    Server</a></h4>
+
+    <p>
+      In the index file for the directory containing the image (let's call it
+      <code>image.png</code>) put the lines:
+    </p>
+
+    <blockquote>
+      <code>
+        <a href="appendixB.html#fdir.file">File=</a>image.png
+        <br>
+        <br>
+        <a href="appendixB.html#fdir.file">File=</a>image.map
+        <br>
+        <a
+        href="appendixB.html#fdir.attributes.imagemap">Attributes=imagemap</a>
+      </code>
+    </blockquote>
+
+    <p>
+      If your imagemap file redirects the client to other documents on your
+      server make sure they are also installed.  Run <a
+      href="index_desc.html#wndex"><code>wndex</code></a> where necessary to
+      update your <code>index.cache</code>.
+    </p>
+
+    <blockquote>
+      <em>Note:</em> A file named <code>foo.map</code> (i.e. with suffix
+      "<code>.map</code>") will automatically be considered to have "<code><a
+      href="appendixB.html#fdir.attributes.imagemap">Attributes=imagemap</a></code>"
+      set when <a href="index_desc.html#wndex"><code>wndex</code></a> is run
+      unless a "<code><a
+      href="appendixB.html#fdir.content-type">Content-type=</a>something</code>"
+      line is supplied for it.
+    </blockquote>
+
+    <p>
+      This will also work if the "<code><a
+      href="appendixB.html#ddir.attributes.serveall">Attributes=serveall</a></code>"
+      directive is specified for this directory and there is no entry in the <a
+      href="index_desc.html#index"><code>index.wn</code></a> file for
+      <code>foo.map</code>.  But it is necessary to run <a
+      href="index_desc.html#wndex"><code>wndex</code></a> since the server will
+      not recognize <code>foo.map</code> as an <code>imagemap</code> file if <a
+      href="index_desc.html#wndex"><code>wndex</code></a> has not been run on
+      the directory containing it.
+    </p>
+
+
+    <h4>15.1.4 <a name="howto.link">Put a Link to Your Image Map in Your HTML
+    Document</a></h4>
+
+    <p>
+      In the HTML file which you want to contain the clickable image must put a
+      link to it which looks like:
+    </p>
+
+    <blockquote>
+      <code>
+        &lt;a href="image.map"&gt;
+        <br>
+        &lt;img&nbsp;src="image.png"&nbsp;ismap&gt;
+        <br>
+        &lt;/a&gt;
+        <br>
+      </code>
+    </blockquote>
+
+    <p>
+      assuming that "<code>image.map</code>", "<code>image.png</code>" and the
+      file containing this link are all in the same directory.
+    </p>
+
+
+    <h3>15.2 <a name="map_format">The Format of an Imagemap File</a></h3>
+
+    <p>
+      An imagemap file is a plain text file consisting of lines, each of which
+      tells the server what to do if a user clicks in a certain region.  You
+      will need to know the dimensions of your image and you will have to have
+      a way of reading the coordinates of points on your image when you click
+      on it.  I use the program <a href="http://www.trilon.com/xv/">xv</a> to
+      determine the coordinates.
+    </p>
+
+    <p>
+      A <a href="examples/ismap.html">complete functioning example</a> of
+      imagemap use, illustrating all the methods is included with the
+      <em>WN</em> distribution.
+    </p>
+
+    <p>
+      An imagemap can contain comments which are lines starting with the
+      character '<code>#</code>'.  These lines are ignored by the server, as
+      are lines which are blank.
+    </p>
+
+    <p>
+      All other lines must start with one of the imagemap "method" keywords:
+      <code>default</code>, <code>rect</code>, <code>circle</code>,
+      <code>poly</code>, <code>&#160;</code> or <code>point</code>.  Here is a
+      description of each type of method line.
+    </p>
+
+
+    <h4>15.2.1 <a name="map_format.default"><code>default</code>
+    keyword</a></h4>
+
+    <p>
+      This line contains only the keyword "<code>default</code>" followed by
+      white space and the URL to be referenced if none of the other other
+      regions is selected.  An example is:
+    </p>
+
+    <blockquote>
+      <code>
+        default&nbsp;http://webhost/dir/default.html
+      </code>
+    </blockquote>
+
+
+    <h4>15.2.2 <a name="map_format.rect"><code>rect</code> keyword</a></h4>
+
+    <p>
+      This line contains the keyword "<code>rect</code>" followed by white
+      space and the URL to be referenced and more white space followed by the
+      coordinates of the upper left and lower right corners of the rectangle.
+      When the coordinates of the clicked on point lie within the rectangle
+      specified by these coordinates the given URL will be referenced.  An
+      example is:
+    </p>
+
+    <blockquote>
+      <code>
+        rect&nbsp;http://webhost/dir/rect.html&nbsp;20,20&nbsp;70,100
+      </code>
+    </blockquote>
+
+    <p>
+      Note the coordinates of the rectangle corners consist of the X coordinate
+      (two numbers separated by a comma) followed by whitespace followed by the
+      Y coordinate (two more numbers separated by a comma). This URL will be
+      returned if the clicked on point lies in the rectangle with opposite
+      corners <code>(20,20)</code> and <code>(70,10)</code>.  In screen
+      coordinates (as opposed to the Cartesian plane) these are the upper left
+      and lower right corners respectively.
+    </p>
+
+
+    <h4>15.2.3 <a name="map_format.circle"><code>circle</code> keyword</a></h4>
+
+    <p>
+      This line contains the keyword "<code>circle</code>" followed by white
+      space and the URL to be referenced and more white space followed by the
+      coordinates of the center of the circle and the coordinates of a point on
+      the circle.  When the coordinates of the clicked on point lie within the
+      circle specified by these coordinates the given URL will be referenced.
+      An example is:
+    </p>
+
+    <blockquote>
+      <code>
+        circle&nbsp;http://webhost/dir/circle.html&nbsp;70,70&nbsp;70,100
+      </code>
+    </blockquote>
+
+    <p>
+      This URL will be returned if the clicked on point lies in the the circle
+      with center at <code>(70,70)</code> and radius <code>30</code> (i.e. the
+      circle with center <code>(70,70)</code> containing the point
+      <code>(70,100)</code>).
+    </p>
+
+
+    <h4>15.2.4 <a name="map_format.poly"><code>poly</code> keyword</a></h4>
+
+    <p>
+      This line contains the keyword "<code>poly</code>" followed by white
+      space and the URL to be referenced and more white space followed by the a
+      sequence of coordinates of the vertices of a polygon, in order.  The
+      polygon so determined is the one you would obtain by connecting each of
+      the vertices in order with a straight line and then connecting the last
+      vertex to the first.  The polygon need not be convex.
+    </p>
+
+    <blockquote>
+      <em>Technical note:</em> The curve formed in this way may cross itself --
+      a point will be considered inside if the winding number of the curve
+      around the point is non-zero.
+    </blockquote>
+
+    <p>
+      An example is:
+    </p>
+
+    <blockquote>
+      <code>
+        poly&nbsp;http://webhost/dir/triangle.html&nbsp;10,20&nbsp;70,100&nbsp;5,150
+      </code>
+    </blockquote>
+
+    <p>
+      This URL will be returned if the clicked on point lies in the triangle
+      with vertices <code>(10,20)</code>, <code>(70,100)</code> and
+      <code>(5,150)</code>.
+    </p>
+
+
+    <h4>15.2.5 <a name="map_format.point"><code>point</code> keyword</a></h4>
+
+    <p>
+      This line contains the keyword "<code>point</code>" followed by white
+      space and the URL to be referenced and more white space followed by the a
+      sequence of coordinates of one or more points in the the image.  This
+      method replaces the <code><a
+      href="#map_format.default">default</a></code>.  The default URL
+      referenced is the one associated with the point in a "point method" line
+      which is closest to the clicked location.  An example is:
+     </p>
+
+    <blockquote>
+      <code>
+        point&nbsp;http://webhost/dir/point1.html&nbsp;10,20&nbsp;70,100
+        <br>
+        point&nbsp;http://webhost/dir/point2.html&nbsp;100,110&nbsp;80,5
+      </code>
+    </blockquote>
+
+    <p>
+      If no other method has returned a URL then the returned URL will be to
+      <code>point1.html</code> or <code>point2.html</code> depending on whether
+      the clicked on location is closer to one of the points
+      <code>(10.20)</code> or <code>(70,100)</code> or to one of the points
+      <code>(100,110)</code> or <code>(80,5)</code>.
+    </p>
+
+    <blockquote>
+      <em>Note:</em> Allowing multiple points on a single point method line is
+      a <em>WN</em> enhancement and will not be portable to other imagemap
+      programs.
+    </blockquote>
+
+
+    <h4>15.2.6 <a name="map_format.point"><code>nocoords</code>
+    keyword</a></h4>
+
+    <p>
+      This line contains the keyword "<code>nocoords</code>" followed by white
+      space and the URL to be referenced when a user with a non-graphical
+      browser selects the the substitute text for the image.  More precisely,
+      if any browser makes a request for the document and does not include the
+      X and Y coordinates of the point clicked on in the image then this URL
+      will be referenced.  An example is:
+    </p>
+
+    <blockquote>
+      <code>
+        nocoords&nbsp;http://webhost/dir/message.txt
+      </code>
+    </blockquote>
+
+    <blockquote>
+      <em>Note:</em> The <code>nocoords</code> keyword and functionality is a
+      <em>WN</em> enhancement and will not be portable to other imagemap
+      programs.
+    </blockquote>
+
+
+    <h3>15.3 <a name="url">The URL Format in an Imagemap File</a></h3>
+
+    <p>
+      The <a href="http://linux-howto.com/rfc/rfc1500-1999/rfc1738.txt">URL</a>
+      in the lines listed above can be in one of the following three forms:
+    </p>
+
+    <blockquote>
+      <code>
+        http://remote_host/dir/rect.html
+        <br>
+        /dir/rect.html
+        <br>
+        rect.html
+      </code>
+    </blockquote>
+
+    <p>
+      Here are the differences.  The first,
+      "<code>http://remote_host/dir/rect.html</code>" is primarily used to link
+      to a document on a remote host.  On seeing this the server sends an <a
+      href="http://www.w3c.org/Protocols/">HTTP/1.1</a> redirect to the client
+      causing the client to automatically access this URL.
+    </p>
+
+    <p>
+      The use of "<code>/dir/rect.html</code>" is equivalent to
+      "<code>http://local_host/dir/rect.html</code>".  Any URL specified in a
+      method line which begins with a '<code>/</code>' is assumed to be on the
+      local local host and the path is assumed relative to the <em>WN</em> root
+      directory.  An <a href="http://www.w3c.org/Protocols/">HTTP/1.1</a>
+      redirect is sent because simply sending the file would confuse the client
+      (it would think that the document <code>rect.html</code> is in the same
+      directory as the imagemap file which might not be true in which case
+      relative URLs would fail to work).
+    </p>
+
+    <blockquote>
+      <em>Warning:</em> The <em>WN</em> root directory is changed by use of
+      <code>http://host/~user/</code> type URLs.
+    </blockquote>
+
+    <p>
+      The use of "<code>rect.html</code>" or anything which does not contain
+      '<code>:/</code>' (i.e. which does not start with <code>http://...</code>
+      or <code>ftp://...</code>) and does not start with '<code>/</code>'
+      causes the server to assume that the document is relative to the
+      directory containing the imagemap.  In this case the server will
+      immediately serve that document with no redirection.  This is the most
+      efficient way to set up an imagemap, but it requires that the response
+      files like "<code>rect.html</code>" be in the same directory as the
+      imagemap file.  There is one exception to this.  If the relative URL
+      contains a '<code>#</code>' the server prepends the appropriate path to
+      the URL and sends an <a href="http://www.w3c.org/Protocols/">HTTP/1.1</a>
+      redirect to the client.  This is necessary for the client to be able to
+      handle the "name" anchor indicated by the '<code>#</code>'.
+    </p>
+
+    <blockquote>
+      <em>Note:</em> Allowing relative URLs of this type is a <em>WN</em>
+      enhancement and will not be portable to imagemap programs run on other
+      servers.  Also note that using a relative URL like
+      "<code>dir/rect.html</code>" referring to a document in a subdirectory
+      can confuse a browser about the location of documents referred to in
+      "<code>rect.html</code>".  For this reason it should only be used when
+      the document is not an HTML document or contains a
+      <code>&lt;base&gt;</code> tag specifying its location.
+    </blockquote>
+
+    <p>
+      There is one special URL which may be used in map files, namely
+      <code>&lt;null&gt;</code>.  It has the effect of not sending a redirect
+      or a document to the client but instead sending a header with status 204.
+      This instructs the client to do nothing and in particular not to reload
+      or alter the document it is displaying.  For example, the line:
+    </p>
+
+    <blockquote>
+      <code>
+        default&nbsp;&lt;null&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      in a map file will have the effect of making clicks in the default area
+      behave as if the click had been somewhere outside the image, i.e.
+      nothing will happen.
+    </p>
+
+    <blockquote>
+      <em>Note:</em> the <code>&lt;null&gt;</code> URL is a <em>WN</em>
+      enhancement and will not be portable to imagemap programs run on other
+      servers.
+    </blockquote>
+
+
+    <!-- #end -->
+    <hr size="4">
+
+    <address>
+      <em>WN</em> version 2.4.7
+      <br>
+      Copyright &copy; 1998-2005 <a href="mailto:john@math.northwestern.edu">John Franks
+      &lt;john@math.northwestern.edu&gt;</a>
+      <br>
+      licensed under the <a
+        href="http://www.gnu.org/copyleft/fdl.txt">GNU Free Documentation License</a>
+      <br>
+Last modified: Sat June  18 2005
+    </address>
+
+    <!-- pnuts --> <a href="module.html">[Previous]</a> <a href="cgi.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+  </body>
+</html>

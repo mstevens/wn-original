@@ -1,0 +1,62 @@
+Wnssl support is now being integrated into the base distribution.  This is
+not yet documented.  You first need to install openssl version 0.9X or
+later.  Next you may want to issue YOUR certificate. Use the command
+
+   "openssl req -new -nodes -x509 -out yourFile.pem -keyout yourFile.pem"
+
+and this should produce a certificate.  When it asks for "YOUR name" I
+think it is the hostname you should give.  If you omit the "-nodes"
+argument, it will request a pass phrase from you and you will have to
+enter this pass phrase each time you start the server.
+
+Then create a new config.h (or use the old one) and name it
+"config_ssl.h" (put it in the same directory as "config.h").  Then from
+this same main source directory run "make wnssl" optionally followed by
+"make inst-wnssl".
+
+The standalone daemon is called wnsslsd and  should be run with the command 
+
+  "wnsslsd -l path/to/log -L path/to/errlog 
+               -z cert=path/to/yourFile.pem -z key=path/to/yourFile.pem". 
+
+Test with a browser or better with the command
+
+    openssl s_client -connect yourhost:443
+
+Then type 
+    
+    GET / HTTP/1.0
+
+followed by two returns.  You should get dianostic information plus
+your top level page.  
+
+-----------------------------------------------------------------
+
+Note on compilation:
+
+A common problem when running "make wnssl" is for the compiler to have
+difficulty finding the include files pem.h and ssl.h.  Here is an 
+excerpt from the INSTALL file of Openssl 0.9.4:
+
+    NOTE: The header files used to reside directly in the include
+    directory, but have now been moved to include/openssl so that
+    OpenSSL can co-exist with other libraries which use some of the
+    same filenames.  This means that applications that use OpenSSL
+    should now use C preprocessor directives of the form
+
+       #include <openssl/ssl.h>
+
+    instead of "#include <ssl.h>", which was used with library versions
+    up to OpenSSL 0.9.2b.
+
+I have followed this guideline.  That means those files (pem.h and ssl.h)
+are expected to be in /usr/include/openssl.  If you don't want them there
+you need to modify the #include lines for them in wn/wnssl.h and/or the
+SSLINCLUDES line in the Makefile in the wn subdirectory.  You may also
+need to alter the SSLLDFLAGS to reflect the location of libssl.a on your
+system.
+
+If you have compiled openssl without IDEA add -DNO_IDEA to SSLFLAGS in the 
+Makefile in the wn subdirectory.
+
+John Franks

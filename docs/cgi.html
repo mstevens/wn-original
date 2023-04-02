@@ -1,0 +1,390 @@
+<!doctype html public "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+  <head>
+    <title>Using CGI Programs on the WN Server</title>
+
+    <link rev="made" href="mailto:john@math.northwestern.edu">
+
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <meta http-equiv="last-modified" content="Sat June 18 2005">
+    <meta http-equiv="keywords" content="WN image maps">
+  </head>
+
+  <body bgcolor="#FFFFFF">
+    <p>
+      <a href="http://hopf.math.northwestern.edu/"><img
+        src="images/powered.jpg"
+        border="0"
+        width="190"
+        height="41"
+        align="right"
+        alt="WN home page"
+      ></a>
+    </p>
+
+    <strong>Version 2.4.7</strong>
+
+    <br>
+
+    <!-- pnuts --> <a href="click.html">[Previous]</a> <a href="defcache.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+
+
+
+    <br clear="right">
+
+    <hr size="4">
+    <!-- #start -->
+
+    <h2 align="center">Using CGI Programs on the <em>WN</em> Server</h2>
+    <hr size="4">
+
+    <p>
+      CGI stands for <a href="http://hoohoo.ncsa.uiuc.edu/cgi/">Common Gateway
+      Interface</a>.  It provides a standard for Web servers to interact with
+      programs which are not part of the server but may produce output which
+      you wish to serve.
+    </p>
+
+
+    <h3>16.1 <a name="need">Do You Need a CGI Program?</a></h3>
+
+    <p>
+      Many functions which are done by CGI programs on other servers are built
+      in features of <em>WN</em>.  If your needs can be met by these features
+      then not only will you save yourself considerable effort in creating,
+      setting up, and maintaining programs, but the built in
+      feature will perform much more efficiently and much more securely than a
+      CGI program.
+    </p>
+
+    <p>
+      These features include the ability to respond with different text or
+      entirely different documents based on the the client request, the
+      client's hostname, IP address, user-agent, or the "referer", the document
+      containing the link.  For information about this see the chapter "<a
+      href="parse.html#if">Parsed Text and Server Side Includes on the
+      <em>WN</em> Server</a>" in this guide.  Also support for "imagemaps" or
+      clickable images is built in so there is no need to use CGI for this.
+      See the chapter "<a href="click.html">Clickable Images and Imagemap files
+      on the <em>WN</em> Server</a>" in this guide.  Finally <em>WN</em>
+      supports a variety of methods of searching your data including by title,
+      keyword, or full text.  See the chapter "<a href="search.html">Setting Up
+      Searches on the <em>WN</em> Server</a>" in this guide.
+    </p>
+
+    <p>
+      If these features do not meet your needs and something like a CGI program
+      will, then you may wish to consider using a <a
+      href="filter.html#cgi"><em>WN</em> filter</a>. These have most of the
+      functionality of CGI programs, but are somewhat more secure and have one
+      advantage: the output of filters can be <a href="parse.html">parsed</a>
+      while CGI output cannot.
+    </p>
+
+
+    <h3>16.2 <a name="recognize">How Does the Server Recognize a CGI
+    Program?</a></h3>
+
+    <p>
+      It would be nice if one could simply indicate in the appropriate <a
+      href="index_desc.html#index"><code>index.wn</code></a> file that a
+      particular file is a CGI program which should be executed rather than
+      served.  Unfortunately, the CGI protocol makes it impossible to implement
+      this in an efficient way.
+    </p>
+
+    <p>
+      There are two mechanisms in fairly common use with other servers for
+      indicating that a file is a CGI program and <em>WN</em> supports them
+      both.  The first is to give the file name a special extension (by default
+      it is "<code>.cgi</code>") which indicates that it is a CGI program.
+      Thus any file you serve with the name "<code>something.cgi</code>" will
+      be treated as a CGI program.  The special extension "<code>.cgi</code>"
+      can be changed by redefining the macro "<a
+      href="configmacros.html#CGI_EXT"><code>#define&nbsp;CGI_EXT</code></a>" by
+      editing the file <a href="configmacros.html"><code>config.h</code></a>
+      and recompiling servers.
+    </p>
+
+    <p>
+      The second mechanism is to have specially named directories with the
+      property that any file in that directory will be assumed to be a CGI
+      program.  The default for this special name is "<code>cgi-bin</code>".
+      Thus, if you have a directory <code>/cgi-bin</code> in your hierarchy the
+      server will assume that any file served from that directory is a CGI
+      program.  Of course, as always, only files listed in that directory's <a
+      href="index_desc.html#index"><code>index.wn</code></a> file will be
+      servable.  No files in subdirectories of <code>/cgi-bin</code> can be
+      served.  This is because the server will alway interpret a request for
+      "<code>/cgi-bin/foo/bar</code>" as meaning run the program
+      "<code>/cgi-bin/foo</code>" with the <a
+      href="appendixD.html#cgi.PATH_INFO"><code>PATH_INFO</code></a> CGI
+      environment variable set to "<code>bar</code>".  Thus if
+      "<code>foo</code>" is actually a directory and "<code>bar</code>" a file
+      in it, the request will fail.
+    </p>
+
+    <p>
+      There is no need for <code>/cgi-bin</code> to be at the top of your
+      hierarchy.  It could be anywhere in the hierarchy.  And, in fact, you can
+      have as many directories named "<code>cgi-bin</code>" as you like.  They
+      will all be treated the same.  The special name "<code>cgi-bin</code>"
+      can be changed by redefining the macro "<a
+      href="configmacros.html#CGI_EXT"><code>#define&nbsp;CGI_BIN</code></a>"
+      by editing the file <a href="configmacros.html"><code>config.h</code></a>
+      and recompiling servers.
+    </p>
+
+
+    <h3>16.3 <a name="design">How Does a CGI Program Work?</a></h3>
+
+    <p>
+      It is beyond the scope of this document to provide an extensive tutorial
+      in writing CGI programs.  There is an online tutorial at <a
+      href="http://WDVL.internet.com/Tutorial/CGI/">WDVL.internet.com</a> and
+      another available from <a
+      href="http://hoohoo.ncsa.uiuc.edu/cgi/overview.html">NCSA</a>. A
+      collection of links to CGI information is available at <a
+      href="http://www.stars.com/Vlib/Providers/CGI.html">www.stars.com</a>.
+    </p>
+
+    <p>
+      We will provide only a simple example of a CGI program written in <a
+      href="http://www.perl.org/">perl</a>.  More examples can be found in the
+      <code>/docs/examples</code> directory of the <em>WN</em> distribution.
+    </p>
+
+    <blockquote>
+      <code>
+        #!/usr/local/bin/perl
+        <br>
+        # Simple example of CGI program.
+        <br>
+        <br>
+        print "Content-type: text/html\r\n";
+        <br>
+        # The first line must specify content type.  Other
+        <br>
+        # optional headers might go here.
+        <br>
+        <br>
+        print "\r\n";
+        <br>
+        # A blank line ends the headers.  All header lines should
+        <br>
+        # end with CRLF ("\r\n"), but other lines don't need to.
+        <br>
+        <br>
+        # From now on everything goes to the client
+        <br>
+        <br>
+        print "&lt;body&gt;\n";
+        <br>
+        print "&lt;h2&gt;A few CGI environment variables:&lt;/h2&gt;\n\n";
+        <br>
+        <br>
+        print "REMOTE_HOST = $ENV{REMOTE_HOST}&lt;br&gt;\n";
+        <br>
+        print "HTTP_REFERER = $ENV{HTTP_REFERER}&lt;br&gt;\n";
+        <br>
+        print "HTTP_USER_AGENT = $ENV{HTTP_USER_AGENT}&lt;br&gt;\n";
+        <br>
+        print "QUERY_STRING = $ENV{QUERY_STRING}&lt;br&gt;\n";
+        <br>
+        print "&lt;p&gt;\n";
+        <br>
+        <br>
+        print "&lt;/body&gt;\n";
+      </code>
+    </blockquote>
+
+    <p>
+      Notice that the first thing the program does is provide the <a
+      href="http://www.w3c.org/Protocols/">HTTP/1.1</a>
+      "<code>Content-type:</code>" header line.  It may be followed by other
+      optional headers you want the server to send.  The end of these headers
+      is indicated by a blank line.  Of course the server will add additional
+      headers.
+    </p>
+
+    <p>
+      By default the <em>WN</em> server assumes that the output of any CGI
+      program is "dynamic" or different each time the program is run and is
+      also "non-cachable".  Hence the server behaves as if the "<code><a
+      href="appendixB.html#fdir.attributes">Attributes=</a>dynamic,non-cachable</code>"
+      directive had been used.  The "<code><a
+      href="appendixB.html#fdir.attributes.dynamic">Attributes=dynamic</a></code>"
+      causes the server not to send a last modified date or a content length
+      since they might be constantly changing.  The "<code><a
+      href="appendixB.html#fdir.attributes.non-cachable">Attributes=non-cachable</a></code>"
+      attempts to dissuade clients and proxies from caching the output by
+      sending an appropriate HTTP header.
+    </p>
+
+    <p>
+      If, in fact, the output of your program is always the same, you can use
+      the "<code><a
+      href="appendixB.html#fdir.attributes.nondynamic">Attributes=nondynamic</a></code>"
+      directive.  Also if you wish it to be cached you must use the "<code><a
+      href="appendixB.html#fdir.attributes.cachable">Attributes=cachable</a></code>"
+      directive.  In particular, if you want the browser "back" button to
+      return users to a a CGI generated page after they have followed a link
+      you may need "<code><a
+      href="appendixB.html#fdir.attributes.cachable">Attributes=cachable</a></code>"
+      (especially with an HTML "<a
+      href="http://htmlhelp.com/reference/wilbur/block/form.html"><code>&lt;form&nbsp;action="post"&gt;</code></a>")
+      since otherwise the browser may not even cache the page in memory.
+    </p>
+
+    <p>
+      The program above is a good example of one which should not be cached as
+      it prints out the client's hostname, user agent and the URL of the
+      document which contains the link to this CGI program.  The CGI program
+      gets this information about the client from environmental variables set
+      by the server.  A complete list of the standard CGI environment variables
+      and a description of what they contain plus a description of some
+      additional non-standard ones supplied by the <em>WN</em> server can be
+      found in the appendix "<a href="appendixD.html">CGI and Other Environment
+      Variables on the <em>WN</em> server</a>" in this guide.
+    </p>
+
+    <p>
+      In addition to setting these environment variables appropriately the
+      server will change the current working directory of the CGI process to
+      the directory in which the CGI program is located.
+    </p>
+
+    <blockquote>
+      <em>Note:</em> In general a CGI program has complete control over its
+      output, so it is responsible for doing things which the server might do
+      for a static document.  This means that you cannot use many of the
+      <em>WN</em> features with CGI output.  In particular the server will not
+      use a filter or parse it for
+      "<code>&lt;!--&nbsp;#include&nbsp;--&gt;</code>", etc.  The CGI program
+      must do these things for itself.  Also the server will not provide ranges
+      specified in the "<code>Range:</code>" header.  Instead the contents of
+      this header is passed to the program in the environment variable <a
+      href="appendixD.html#cgi.HTTP_RANGE"><code>HTTP_RANGE</code></a>, so the
+      program can do the range processing.
+    </blockquote>
+
+    <p>
+      One thing you should be aware of in writing programs is that the
+      <em>WN</em> server does not send the UNIX <code>stderr(3)</code> stream
+      to the <a href="setup.html#logging">error log file</a>, but leaves its
+      default the terminal from which the server is invoked.  This allows the
+      maintainer to set it to a file of her choice or leave it directed to the
+      console window in which <code>wnsd</code> was invoked.  To redirect it to
+      a file called "<code>my.errs</code>" simply run <code>wnsd</code> with a
+      command like:
+    </p>
+
+    <blockquote>
+      <code>
+        wnsd&nbsp;&lt;options&gt;&nbsp;2&gt;my.errs
+      </code>
+    </blockquote>
+
+    <p>
+      if you are using a UNIX <a
+      href="/cgi-bin/man2html/usr/man/man1/sh.1.gz">sh(1)</a> Borne-like
+      shell.  This can be useful when debugging CGI programs because their
+      errors are typically sent to the UNIX <code>stderr(3)</code> stream so
+      you can easily view them with the UNIX <a
+      href="/cgi-bin/man2html/usr/man/man1/tail.1.gz"><code>tail(1)</code></a>
+      utility like:
+    </p>
+
+    <blockquote>
+      <code>
+        tail&nbsp;-f&nbsp;my.errs
+      </code>
+    </blockquote>
+
+    <p>
+      rather than have them buried in a log file.
+    </p>
+
+
+    <h3>16.4 <a name="handlers">CGI Handlers</a></h3>
+
+    <p>
+      Sometimes you may have a number of files which are to be processed by the
+      same CGI program or program.  In that case you might consider designating
+      a "handler" for these files instead of putting the the name of the CGI
+      program in the URL for each of them.
+    </p>
+
+    <p>
+      The file directive:
+    </p>
+
+    <blockquote>
+      <code>
+        <a href="appendixB.html#fdir.cgi-handler">CGI-Handler=</a>bar.cgi
+      </code>
+    </blockquote>
+
+    <p>
+      causes the program "<code>bar.cgi</code>" to be run and its output to be
+      served in place of the document requested.  This is a way to designate a
+      CGI program to handle a file somewhat like a filter.  The name of the
+      program need not be in the URL since it is in the <a
+      href="index_desc.html#index"><code>index.wn</code></a> file.  So when
+      <code>http://host/foo.html</code> is requested this will cause the
+      handler, <code>bar.cgi</code>, to be run with the CGI environment
+      variable <a
+      href="appendixD.html#cgi.PATH_INFO"><code>PATH_INFO</code></a> set to
+      <code>/path2/foo.html</code>.  In normal use the program
+      <code>bar.cgi</code> will do something to the file <code>foo.html</code>
+      and serve the output.  It is useful if you want a number of files in a
+      directory to be handled by the same CGI program.  Note the file
+      <code>foo.html</code> need not be used in any way by the program, but it
+      must exist or else the server will treat it as a non-existent file.
+    </p>
+
+    <p>
+      The directory directive "<code><a
+      href="appendixB.html#ddir.default-cgi-handler">Default-CGI-Handler=</a>handler.cgi</code>"
+      specifies that all files in the directory should be treated as if the
+      "<code><a href="appendixB.html#fdir.cgi-handler">CGI-Handler=</a></code>"
+      file directive had been set to <code>handler.cgi</code>.  To override
+      this setting and specify no CGI handler use the "<code><a
+      href="appendixB.html#fdir.cgi-handler">CGI-Handler=</a>&lt;none&gt;</code>"
+      directive.
+    </p>
+
+
+    <h3>16.5 <a name="safe">How Can CGI Programs be Made Safe?</a></h3>
+
+    <p>
+      This is an extremely important issue, but one which is beyond the scope
+      of this document.  I highly recommend the <a
+      href="http://www.go2net.com/people/paulp/cgi-security/safe-cgi.txt">Safe
+      CGI Programming</a> maintained by <a href="mailto:paulp@go2net.com">Paul
+      Phillips</a> and the <a
+      href="http://www-genome.wi.mit.edu/WWW/faqs/www-security-faq.html#CGI">WWW
+      Security FAQ</a> maintained by <a href="mailto:lstein@cshl.org">Lincoln
+      Stein</a>.
+    </p>
+
+
+
+    <!-- #end -->
+    <hr size="4">
+
+    <address>
+      <em>WN</em> version 2.4.7
+      <br>
+      Copyright &copy; 1998-2005 <a href="mailto:john@math.northwestern.edu">John Franks
+      &lt;john@math.northwestern.edu&gt;</a>
+      <br>
+      licensed under the <a
+        href="http://www.gnu.org/copyleft/fdl.txt">GNU Free Documentation License</a>
+      <br>
+Last modified: Sat June  18 2005
+    </address>
+
+    <!-- pnuts --> <a href="click.html">[Previous]</a> <a href="defcache.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+  </body>
+</html>

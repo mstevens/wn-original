@@ -1,0 +1,232 @@
+.\" source:
+.\"   $Source: /var/cvs/projects/debian/printop/debian/dpkg.src/printop.printop.1.in,v $
+.\"
+.\" revision:
+.\"   @(#) $Id: printop.printop.1.in,v 1.2 1998/04/23 04:31:28 jplejacq Exp $
+.\"
+.\" copyright:
+.\"   Copyright (C) 1998 Jean Pierre LeJacq <jplejacq@quoininc.com>
+.\"
+.\"   Distributed under the GNU GENERAL PUBLIC LICENSE.
+.\"
+.TH wnupdate-www 8 "Sat, 25 Apr 1998 00:34:33 -0400" "1.18.7-1" "Debian GNU/Linux manual"
+.SH NAME
+wnupdate-www \- enable access to standard directories through wn HTTP server
+.SH SYNOPSIS
+.B wnupdate-www
+.RB (\| \-d  \||\| \-c \||\| \-o
+.IR target_directory \|)
+.RB (\| \-i  \||\| \-m
+.IR src_directory
+.RB [\| \-a
+.IR name \|]\|)
+.SH DESCRIPTION
+.B wnupdate-www
+is a
+.BR sh (1)
+program that is part of the
+.BR wn (1)
+HTTP server package.
+.BR wn (1)
+will not serve files in a directory without an
+.I index.cache
+file.
+.B wnupdate-www
+provides two methods for supplying a simple default
+.I index.cache
+file that will enable access to all files in a directory hierarchy.
+
+You should only use this program when there are no restriction of any
+sort on who can access the files.  If there are restrictions, I
+strongly recommend that you supply your own
+.I index
+file and run
+.BR wndex (8)
+directly.
+
+The first method, which I recommended, mirrors a directory hierarchy
+but not its contents.
+.B wnupdate-www
+recursively examines each directory.  If a directory already contains
+both an
+.I index
+and
+.I index.cache
+file, it sets a symbolic link to that directory and doesn't recurse
+into any subdirectories.  Otherwise it creates both the
+.I index
+and
+.I index.cache
+files that allow access indirectly through
+.BR wn (1)
+using the
+.B File-Module
+directive (seed 
+.BR http://dochost/wn/module.html#db ).
+This is combined with
+.BR wncat (1)
+to provide transparent decompression of HTML files.  The original
+directory hierarchy is not modified by this method so it is
+appropriate for read-only hierarchies.  The downside is the disk space
+required which amount to 1.7 Mbytes for
+.I /usr/doc
+on my system.  Also, problematic is the effort required to keep the
+mirror consistent with the original directory hierarchy.  This has
+been automated with
+.I /etc/cron.daily/wn
+which is described in
+.BR wn (1)
+overview.
+
+The second approach is to recurse through a directory hierarchy
+and create both the
+.I index
+and
+.I index.cache
+files that allow access to all files in the directory directly.  This
+is simpler than the first approach and more efficient space wise.  The
+disadvantages is that it requires write-access to the "source"
+directory.
+.SH OPTIONS
+.TP
+.BI "\-a " name
+Define an alias
+.I name
+for the "target" directory when creating a mirror of "source"
+directory.  Can only be used when the option
+.B "\-m"
+is supplied.
+.TP
+.B \-c
+Use
+.I wn_www_root/cgi-bin
+as "target" directory where
+.I wn_www_root is defined in
+.I /etc/wn/wn.conf
+configuration file.  The directory must exist.  One and only one of
+the options
+.B "\-d \-c \-o"
+must be supplied.
+.TP
+.B \-d
+Use
+.I wn_www_root/doc
+as "target" directory where
+.I wn_www_root is defined in
+.I /etc/wn/wn.conf
+configuration file.  The directory must exist.  One and only one of
+the options
+.B "\-d \-c \-o"
+must be supplied.
+.TP
+.B \-i
+Recurses into "target" directory and insert a
+.BR wn (1)
+.I index
+and
+.I index.cache
+files in each subdirectory.  The
+.I index
+file simple grants access to any file in the directory.  Note that
+this modifies the "target" directory so it won't work on read-only
+directories.
+.TP
+.BI "\-m " src_directory
+Mirrors
+.I src_directory
+"source" directory
+into "target" directory
+with optionally the alias
+.I name
+defined by the
+.B \-a
+option and insert a
+.BR wn (1)
+.I index
+and
+.I index.cache
+file in each subdirectory.  The index file uses redirection to the
+original directory location and supports transparently compressed and
+uncompressed files.  Executable files are referred to by symbolic
+links.  Note that this doesn't modify
+.I src_directory
+and can be used for read-only directories.
+.TP
+.BI "\-o " directory
+ Use
+.I target_directory
+as "target" directory.  The directory must exist.  Note that if it is
+not in the wn www root directory, access will not be possible.
+Symbolic links can be used however.  One and only one of
+the options
+.B "\-d \-c \-o"
+must be supplied.
+.SH EXAMPLES
+To mirror the entire
+.I /usr/doc
+hierarchy in
+.I /var/www/doc
+with overwriting of all existing directories:
+.nf
+        update-www -o /var/www -m /usr/doc
+.fi
+
+To mirror the
+.I /opt/wn/doc
+hierarchy in
+.I /var/www/doc/wn
+without overwriting any other directories:
+.nf
+        update-www -d -m /opt/wn/doc -a wn
+.fi
+
+To insert
+.I index
+and
+.I index.cache
+files directly into
+.I /var/www/dwww
+use:
+.nf
+        update-www -o /var/www/dwww -i
+.fi
+.SH FILES
+.TP
+.I index
+Input file to
+.BR wndex (8)
+program.
+.TP
+.I index.cache
+Output file from
+.BR wndex (8)
+program which defines access control for directory.
+.TP
+.I /etc/wn/wn.conf
+Main configuration file for
+.BR wn (1)
+package.
+.TP
+.I /etc/cron.daily/wn
+.BR sh (1)
+program to re-index standard documentation directories.  It is run
+daily by the
+.BR cron (8)
+daemon.
+.SH SEE ALSO
+.BR wn (1),
+.BR wnconfig (8),
+.BR wndex (8),
+.BR wnpasswd (8),
+.BR wnuncache (8),
+.BR wnv2c (8)
+.br
+.B http://dochost/doc/wn/manual.html
+.br
+.B http://hopf.math.nwu.edu/index.html
+.SH AUTHOR
+.B wn
+is written by John Franks <john@math.nwu.edu>.  Modified by Jean
+Pierre LeJacq <jplejacq@quoininc.com> as part of packaging for the
+Debian GNU/Linux distribution. Manual page also added by Jean Pierre
+LeJacq.

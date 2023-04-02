@@ -1,0 +1,197 @@
+<!doctype html public "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+  <head>
+    <title>Ranges on the WN server</title>
+
+    <link rev="made" href="mailto:john@math.northwestern.edu">
+
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <meta http-equiv="last-modified" content="Sat June 18 2005">
+    <meta http-equiv="keywords" content="WN ranges">
+  </head>
+
+  <body bgcolor="#FFFFFF">
+    <p>
+      <a href="http://hopf.math.northwestern.edu/"><img
+        src="images/powered.jpg"
+        border="0"
+        width="190"
+        height="41"
+        align="right"
+        alt="WN home page"
+      ></a>
+    </p>
+
+    <strong>Version 2.4.7</strong>
+
+    <br>
+
+    <!-- pnuts --> <a href="field.html">[Previous]</a> <a href="access.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+
+
+
+    <br clear="right">
+
+    <hr size="4">
+    <!-- #start -->
+
+    <h2 align="center">Ranges on the <em>WN</em> Server</h2>
+    <hr size="4">
+
+    <h3>9.1 <a name="parameters">URL Range Parameters</a></h3>
+
+    <p>
+      If the server receives a request like:
+    </p>
+
+    <blockquote>
+      http://host/dir/foo;lines=20-30
+    </blockquote>
+
+    <p>
+      and <code>foo</code> is any document with content-type
+      <code>text/*</code> it will return a <code>text/plain</code> document
+      consisting of lines <code>20</code> through <code>30</code> of file
+      <code>foo</code>.  This is very useful for structured text files like
+      address lists or digests of mail and news.  A <em>WN</em> utility called
+      <code><a href="utility.html#wn_mkdigest">wn_mkdigest</a></code> will
+      produce an <a href="http://www.w3c.org/MarkUp/">HTML</a> file with a list
+      of links to separate sections (line ranges) of the structured file.  It
+      is described <a href="#wn_mkdigest">below</a>.
+    </p>
+
+    <p>
+      The option "<code>;lines=[first]-[last]</code>" can be appended to the
+      URL of any text file served by the <em>WN</em> server.  It has the effect
+      of causing the server to return line <code>[first]</code> through line
+      <code>[last]</code> of the document to which it is attached.  Line 1 is
+      the first line of a file.  This parameter is ignored and an error is
+      logged if it is used with a binary file.  When used with a text file the
+      content type of the returned document is set to <code>text/plain</code>
+      since, for example, a range of lines from an <a
+      href="http://www.w3c.org/MarkUp/">HTML</a> document is unlikely to be a
+      valid <a href="http://www.w3c.org/MarkUp/">HTML</a> document.
+    </p>
+
+    <p>
+      For any file, including binaries, but not <a
+      href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a> output or parsed or
+      filtered documents, the server will honor a byte range.  A request for:
+    </p>
+
+    <blockquote>
+      <code>
+        http://host/dir/foo;bytes=256-1024
+      </code>
+    </blockquote>
+
+    <p>
+      will cause the server to return bytes <code>256</code> to
+      <code>1024</code> inclusive.  The first byte is numbered 0 so a range of
+      0-100 represents the first 101 bytes.  Note that while file lines are
+      numbered starting with 1, bytes are numbered starting with 0.  The
+      content type of the returned document will be <code>text/plain</code> if
+      the document <code>foo</code> is a text document and
+      <code>application/octet-stream</code> otherwise.
+    </p>
+
+    <p>
+      A request for:
+    </p>
+
+    <blockquote>
+      <code>
+        http://host/dir/foo;bytes=256-
+      </code>
+    </blockquote>
+
+    <p>
+      will cause the server to return bytes <code>256</code> through the end of
+      the file, while:
+    </p>
+
+    <blockquote>
+      <code>
+        http://host/dir/foo;bytes=-1024
+      </code>
+    </blockquote>
+
+    <p>
+      requests the last <code>1024</code> bytes of the file.
+    </p>
+
+
+
+    <h3>9.2 <a name="header">The "<code>Range:</code>" Header</a></h3>
+
+    <p>
+      Requests for a specific range can also be made with the proposed <a
+      href="http://www.w3c.org/Protocols/">HTTP/1.1</a> header
+      "<code>Range:</code>".  For example, if the server receives a request
+      with the header:
+    </p>
+
+    <blockquote>
+      <code>
+        Range: bytes=100-200
+      </code>
+    </blockquote>
+
+    <p>
+      it will send the 101 bytes starting with the 100th and ending with the
+      200th.  The header "<code>Range:&nbsp;bytes=300-</code>" requests all
+      bytes starting with number 300 and continuing until the end of the file.
+      And "<code>Range:&nbsp;bytes=-300</code>" requests the last 300 bytes of
+      the file.  This is normally done automatically by the client in
+      appropriate circumstances and is not under the control of the server
+      administrator.
+    </p>
+
+
+
+    <h3>9.3 <a name="wn_mkdigest">The <code>wn_mkdigest</code> Utility</a></h3>
+
+    <p>
+      The <a href="utility.html#wn_mkdigest"><code>wn_mkdigest</code></a>
+      utility is executed with two regular expressions: one to match the
+      section separator and the other to match the section title.  For example,
+      for a mail digest named <code>foo</code>, the command:
+    </p>
+
+    <blockquote>
+      <code>
+        wn_mkdigest foo "^From" "^Subject:" foo
+      </code>
+    </blockquote>
+
+    <p>
+      will produce an <a href="http://www.w3c.org/MarkUp/">HTML</a> file called
+      <code>foo.index.html</code> which contains an unordered list of anchors.
+      Each has as a title the content of the Subject line of a mail message in
+      <code>foo</code> and <code>href</code> the range of lines in
+      <code>foo</code> containing that particular message. More detailed
+      information is available in the section "<a
+      href="utility.html#wn_mkdigest"><code>wn_mkdigest</code></a>" in this
+      guide.
+    </p>
+
+
+
+    <!-- #end -->
+    <hr size="4">
+
+    <address>
+      <em>WN</em> version 2.4.7
+      <br>
+      Copyright &copy; 1998-2005 <a href="mailto:john@math.northwestern.edu">John Franks
+      &lt;john@math.northwestern.edu&gt;</a>
+      <br>
+      licensed under the <a
+        href="http://www.gnu.org/copyleft/fdl.txt">GNU Free Documentation License</a>
+      <br>
+Last modified: Sat June  18 2005
+    </address>
+
+    <!-- pnuts --> <a href="field.html">[Previous]</a> <a href="access.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+  </body>
+</html>

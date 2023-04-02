@@ -1,0 +1,25 @@
+This directory contains source for suexec and instructions on how to
+use it with WN (2.3.9 and later).  This program is normally used as a
+setuid root program and that involves a number of security issues.
+Any setuid root program is dangerous.
+
+There are special considerations for using this program with WN.  The
+program "suexec" should *only* be executable by the user under which
+your server runs (say www) and *only* when called by the WN binary.
+Some do's and don'ts:
+
+1) DO make the suexec executable ONLY by user www (and root).
+
+2) DON'T allow a version of WN compiled without suexec support to be run as user www
+if you have an available suexec.
+
+3) Compile suexec restricting the users it can change to as much as possible.
+
+Earlier I wrote, "The problem is if any user can run this suexec
+he/she can change his/her identity for running subsequent programs.
+If 2) above is not adhered to then WN can run suexec in a cgi script
+and do bad things as any user."  This problem should no longer be as
+serious (version 2.3.10 and later) as the current suexec will only 
+run when given a hashed secret by the WN server.
+
+John Franks

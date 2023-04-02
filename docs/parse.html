@@ -1,0 +1,932 @@
+<!doctype html public "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+  <head>
+    <title>Parsed Text and Server Side Includes on the WN server</title>
+
+    <link rev="made" href="mailto:john@math.northwestern.edu">
+
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <meta http-equiv="last-modified" content="Sat June 18 2005">
+    <meta http-equiv="keywords" content="WN parsing">
+  </head>
+
+  <body bgcolor="#FFFFFF">
+    <p>
+      <a href="http://hopf.math.northwestern.edu/"><img
+        src="images/powered.jpg"
+        border="0"
+        width="190"
+        height="41"
+        align="right"
+        alt="WN home page"
+      ></a>
+    </p>
+
+    <strong>Version 2.4.7</strong>
+
+    <br>
+
+    <!-- pnuts --> <a href="search.html">[Previous]</a> <a href="field.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+
+
+    <br clear="right">
+
+    <hr size="4">
+    <!-- #start -->
+
+    <h2 align="center">Parsed Text and Server Side Includes on the <em>WN</em>
+    Server</h2>
+    <hr size="4">
+
+    <p>
+      The <em>WN</em> server has powerful capabilities for modifying an HTML
+      file as it is served.  One such feature, called "server-side includes",
+      is the ability to automatically insert one file in another.  But the
+      usefulness of this capability is greatly enhanced by another feature, <a
+      href="#if">conditional text</a>.  A simple "<code>if - else -
+      endif</code>" construct allows sections of a document to be served only
+      to certain hosts, or to clients providing an appropriate
+      <code>Accept</code> header or a desired <code>Referer</code> or
+      <code>User-Agent</code> header.  Using the "<code>else</code>" construct
+      allows alternate text segments for clients not meeting the desired
+      criteria.  For these features to work it is necessary for the server to
+      parse the file looking for the location of includes or for conditionally
+      served text.  The fact that a file should be parsed in this way is
+      indicated in its entry in its <code><a
+      href="index_desc.html#index">index.wn</a></code> file.  This is done with
+      an entry "<code><a
+      href="appendixB.html#fdir.attributes.parse">Attributes=parse</a></code>"
+      in the file record.  This line is not necessary if the file record lists
+      <a href="#wrapping">wrappers</a> or <a href="#including">includes</a>
+      since it is assumed in that case. Only documents with MIME type
+      <code>text/html</code> can be parsed in this way.
+    </p>
+
+
+
+    <h3>6.1 <a name="wrappers">Wrappers, Includes, and List-Includes</a></h3>
+
+    <p>
+      The simplest and most common use of parsed text is including additional
+      files in one which is being served or "wrapping" a served file with a
+      second file, i.e. inserting the requested file inside the second at a
+      desired location.  The latter is useful, for example, if you wish to
+      place a standard message at the beginning or end (or both) of a large
+      collection of files.  All files included or used as wrappers must be
+      listed in the <code>index.cache</code> file.  They are not listed in the
+      file in which they are to be included; only the location of the insertion
+      is marked.
+    </p>
+
+    <p>
+      To ensure security various options are available including the the
+      requirement that a served file and all its includes and wrappers have the
+      same owner as the <code>index.cache</code> file listing them.  This is
+      done with the <a href="appendixA1.html#u_opt"><code>-u</code></a> option.
+    </p>
+
+    <p>
+      Another important application of wrappers is to customize the <a
+      href="http://www.w3c.org/MarkUp/">HTML</a> documents returned listing the
+      successful search matches.  If, for example, a directory is assigned a
+      wrapper the server assumes that it contains all text describing the
+      search and it merely supplies an unordered list of links to the matching
+      items.
+    </p>
+
+
+
+    <h3>6.2 <a name="including">Simple Including</a></h3>
+
+    <p>
+      Suppose your server offers the file <code>foo.html</code> and you wish to
+      have the file <code>bar.html</code> automatically inserted at some point
+      into <code>foo.html</code>.  You achieve this by use of the "<code><a
+      href="appendixB.html#fdir.includes">Includes=</a></code>" directive in
+      the <a href="index_desc.html#index"><code>index.wn</code></a> file in the
+      directory containing <code>foo.html</code>.  That <code><a
+      href="index_desc.html#index">index.wn</a></code> file should have an entry
+      like:
+    </p>
+
+    <blockquote>
+      <code>
+        <a href="appendixB.html#fdir.file">File=</a>foo.html
+        <br>
+        <a href="appendixB.html#fdir.includes">Includes=</a>bar.html
+      </code>
+    </blockquote>
+
+    <p>
+      and the file <code>foo.html</code> should contain either of the lines:
+    </p>
+
+    <blockquote>
+      <code>
+        &lt;!--&nbsp;#include&nbsp;--&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      or:
+    </p>
+
+    <blockquote>
+      <code>
+        &lt;?WN&nbsp;#include&nbsp;&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      These two forms are equivalent as far as the server is concerned.  The
+      second form is considered more <a
+      href="http://www.sil.org/sgml/sgml.html">SGML</a> friendly by many as
+      <code>&lt;?WN&nbsp;something&gt;</code> indicates a processing
+      instruction specific to <em>WN</em> rather than a comment.  For
+      historical reasons this manual describes the other form, but either may
+      be used.  With the first form the '<code>#</code>' is required but with
+      the other you may use either:
+    </p>
+
+    <blockquote>
+      <code>
+        &lt;?WN #include&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      or:
+    </p>
+
+    <blockquote>
+      <code>
+        &lt;?WN include&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      Any of the "<code>&lt;!--&nbsp;#something&nbsp;--&gt;</code>" lines
+      described in this section may be replaced using the
+      "<code>&lt;?WN&nbsp;something&gt;</code>" syntax.  Also with this syntax
+      the case of the <em>WN</em> is not significant.
+    </p>
+
+    <p>
+      The marker "<code>&lt;!--&nbsp;#include&nbsp;--&gt;</code>" should be the
+      only thing on its line but may have white space before it.  This is
+      controlled by the "<code><a
+      href="appendixB.html#fdir.includes">Includes=</a></code>" line in the
+      <code><a href="index_desc.html#index">index.wn</a></code> file.  All
+      including of files by <em>WN</em> is done only for text files and only in
+      units of lines.
+    </p>
+
+    <p>
+      If the include marker is never found in <code>foo.html</code>, then this
+      file is served and the file <code>bar.html</code>, is appended at the
+      end.  Thus the "<code><a
+      href="appendixB.html#fdir.includes">Includes=</a></code>" directive can
+      be used to append a file without the need of any marker in the main file.
+    </p>
+
+    <p>
+      If you wanted to include two files in <code>foo.html</code>, say
+      <code>bar.html</code> and <code>bah.html</code> you would place the
+      marker "<code>&lt;!--&nbsp;#include&nbsp;--&gt;</code>" at two places in
+      <code>foo.html</code> and have an entry in your <code><a
+      href="index_desc.html#index">index.wn</a></code> file like:
+    </p>
+
+    <blockquote>
+      <code>
+        <a href="appendixB.html#fdir.file">File=</a>foo.html
+        <br>
+        <a href="appendixB.html#fdir.includes">Includes=</a>bar.html,bah.html
+      </code>
+    </blockquote>
+
+    <p>
+      The two files will then be included at the marked spots in the order that
+      they are listed in the "<code><a
+      href="appendixB.html#fdir.includes">Includes=</a></code>" directive,
+      i.e. <code>bar.html</code> will be inserted at the first marker and
+      bah.html at the second.  You can have as many included files as you wish.
+      They should all be listed on the "<code><a
+      href="appendixB.html#fdir.includes">Includes=</a></code>" line separated
+      by commas.
+    </p>
+
+    <p>
+      Sometimes it is easier to specify the order in which multiple files are
+      to be inserted by adding the file name in the <a
+      href="http://www.w3c.org/MarkUp/">HTML</a> document.  This is also
+      possible with <em>WN</em>.  However, since good security requires that
+      only files listed in the <code><a
+      href="index_desc.html#index">index.wn</a></code> file may be served, it is
+      still necessary to list files you want to include there.
+    </p>
+
+    <p>
+      So, another way to include two files in <code>foo.html</code>, say,
+      <code>bar</code> and <code>bah</code>, is to place the markers
+      '<code>&lt;!--&nbsp;#include&nbsp;"bar"&nbsp;--&gt;</code>' and
+      '<code>&lt;!--&nbsp;#include&nbsp;"bah"&nbsp;--&gt;</code>' at the
+      appropriate places in <code>foo.html</code> and have an entry in your
+      <code><a href="index_desc.html#index">index.wn</a></code> file like:
+    </p>
+
+    <blockquote>
+      <code>
+        <a href="appendixB.html#fdir.file">File=</a>foo.html
+        <br>
+        <a href="appendixB.html#fdir.list-includes">List-Includes=</a>bar,bah
+      </code>
+    </blockquote>
+
+    <p>
+      The order of the files listed in the directive is not significant.  The
+      example above grants permission for the inclusion of the three files
+      listed.  It does not require their insertion.  Note the difference
+      between the two mechanisms: with the "<code><a
+      href="appendixB.html#fdir.includes">Includes=</a></code>" directive only
+      "<code>&lt;!--&nbsp;#include&nbsp;--&gt;</code>" is needed in the <a
+      href="http://www.w3c.org/MarkUp/">HTML</a> and the file inserted is taken
+      (in order) from the list in the directive, while with the "<code><a
+      href="appendixB.html#fdir.list-includes">List-Includes=</a></code>"
+      directive the <a href="http://www.w3c.org/MarkUp/">HTML</a> must contain
+      '<code>&lt;!--&nbsp;#include&nbsp;"bah"&nbsp;--&gt;</code>' so the server
+      knows to insert file "<code>bah</code>" and the file list in the
+      directive is checked to see that permission to serve this file has been
+      granted.  If you use the "<code><a
+      href="appendixB.html#fdir.list-includes">List-Includes=</a></code>"
+      directive you cannot also use either the "<code><a
+      href="appendixB.html#fdir.includes">Includes=</a></code>" or "<code><a
+      href="appendixB.html#fdir.wrappers">Wrappers=</a></code>" directives --
+      the "<code><a
+      href="appendixB.html#fdir.list-includes">List-Includes=</a></code>" and
+      "<code><a
+      href="appendixB.html#fdir.includes">Includes=</a></code>"/"<code><a
+      href="appendixB.html#wrappers">Wrappers=</a></code>" mechanisms are
+      mutually exclusive.  It is fine to use the line
+      '<code>&lt;!--&nbsp;#include&nbsp;"bar.html"&nbsp;--&gt;</code>' to
+      insert a file with the "<code><a
+      href="appendixB.html#fdir.includes">Includes=</a></code>" directive, but
+      with that directive the "<code>bar.html</code>" is only a comment and has
+      no effect on which file is actually inserted.
+    </p>
+
+    <p>
+      There is a "<code><a
+      href="appendixB.html#ddir.default-list-includes">Default-List-Includes=</a></code>"
+      directory directive which can be used to grant permission for any <a
+      href="http://www.w3c.org/MarkUp/">HTML</a> file in the directory to
+      include one or more of the listed files.  This also causes all <a
+      href="http://www.w3c.org/MarkUp/">HTML</a> files in the directory to
+      acquire the "<code><a
+      href="appendixB.html#fdir.attributes.parse">Attributes=parse</a></code>".
+    </p>
+
+    <p>
+      If a file has a <a href="filter.html">filter</a> only that file will be
+      filtered, not any <a href="#wrapping">wrappers</a> or includes.
+    </p>
+
+    <p>
+      Instead of a file it is possible to include the output of a program.  To
+      do this the program is listed in the "<code><a
+      href="appendixB.html#fdir.includes">Includes=</a></code>" directive but
+      its name is preceded with the '<code>!</code>' character. For example:
+    </p>
+
+    <blockquote>
+      <code>
+        <a href="appendixB.html#fdir.file">File=</a>foo.html
+        <br>
+        <a href="appendixB.html#fdir.includes">Includes=</a>!/usr/bin/date,bar.html
+      </code>
+    </blockquote>
+
+    <p>
+      will insert the time and date at the first
+      "<code>&lt;!--&nbsp;#include&nbsp;--&gt;</code>" and the contents of
+      <code>bar.html</code> at the second.  "<code><a
+      href="appendixB.html#fdir.includes">Includes=</a></code>" and "<code><a
+      href="appendixB.html#fdir.list-includes">List-includes=</a></code>"
+      should not list arguments to programs.  Thus if you wished to use the
+      output of the UNIX <code><a
+      href="/cgi-bin/man2html/usr/man/man1/date.1.gz">date</a></code>
+      utility to get UTC instead of local time you should create a program
+      named "<code>mydate</code>" containing, for example:
+    </p>
+
+    <blockquote>
+      <code>
+        #!/bin/sh
+        <br>
+        exec /usr/bin/date -u
+      </code>
+    </blockquote>
+
+    <p>
+      and use the directive "<code><a
+      href="appendixB.html#fdir.includes">Includes=</a>!mydate</code>".
+    </p>
+
+    <p>
+      This ability to serve the output of programs can be restricted in several
+      ways.  If <em>WN</em> is invoked with the <a
+      href="appendixA1.html#e_opt"><code>-e</code></a> option then no includes,
+      <a href="filter.html">filters</a>, or <a href="cgi.html">CGI
+      programs</a> will be executed.
+    </p>
+
+    <p>
+      The <a href="appendixA1.html#E_opt"><code>-E</code></a> option in
+      conjunction with the <a href="appendixA1.html#t_opt"><code>-t</code></a>
+      or <a href="appendixA1.html#T_opt"><code>-T</code></a> options restricts
+      the execution of programs to those listed in <code>index.cache</code>
+      files owned by trusted users or groups.  The <a
+      href="appendixA1.html#u_opt"><code>-u</code></a> option allows the
+      execution of programs or inclusion of files owned by the owner of the
+      <code>index.cache</code> file which lists them.  If the <a
+      href="appendixA1.html#E_opt"><code>-E</code></a> and <a
+      href="appendixA1.html#u_opt"><code>-u</code></a> options are used
+      together the <a href="appendixA1.html#E_opt"><code>-E</code></a> option
+      takes precedence.
+    </p>
+
+    <p>
+      If you wish to have all the standard <a
+      href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a> environment variables
+      made available to the executed include program you can do so by adding
+      the line:
+    </p>
+
+    <blockquote>
+      <code>
+        <a href="appendixB.html#fdir.attributes.cgi">Attributes=cgi</a>
+      </code>
+    </blockquote>
+
+    <p>
+      to the file record.  A list of these environment variables can be found
+      in the appendix "<a href="appendixD.html">CGI and other Environment
+      Variables for the <em>WN</em> Server</a>" in this guide.  Also see the <a
+      href="examples/sample.cgi">sample CGI program</a> which is located in the
+      file /docs/examples/sample.cgi which accompanies the <em>WN</em>
+      distribution.
+    </p>
+
+
+
+    <h3>6.3 <a name="if">Conditional Text: If, Else, and Endif</a></h3>
+
+    <p>
+      Often a server maintainer may wish to serve different versions of a
+      document to different clients.  Here is a simple example of how this can
+      be handled with <em>WN</em>.
+    </p>
+
+    <blockquote>
+      <code>
+        &lt;!--&nbsp;#if accept =~ "image/jpeg" --&gt;
+        <br>
+        <br>
+        &lt;a href="picture.jpg"&gt;
+        <br>
+        Here is the jpeg version of the picture:
+        <br>
+        &lt;/a&gt;
+        <br>
+        <br>
+        &lt;!-- #else --&gt;
+        <br>
+        <br>
+        &lt;a href="picture.png"&gt;
+        <br>
+        Here is the png version of the picture:
+        <br>
+        &lt;/a&gt;
+        <br>
+        <br>
+        &lt;!-- #endif --&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      This tells the server to look at the Accept: headers provided by the
+      client and if "<code>image/jpeg</code>" is among them then use the
+      <code>jpeg</code> image and otherwise use the <code>png</code> image.
+      More precisely, the "<code>image/jpeg</code>" part of the
+      "<code>if</code>" line is a UNIX <code><a
+      href="/cgi-bin/man2html/usr/man/man1/grep.1.gz">grep(1)</a></code>
+      utility like regular expression and if there is any match for it among
+      the <code>Accept</code> headers the <code>jpeg</code> image will be used.
+      Of course these "<code>if - else - endif</code>" constructs can be
+      nested.  A similar construct allows you to make the text served depend on
+      matching a regular expression with the contents of the
+      <code>User-Agent</code> header, the <code>Referer</code> header, the
+      <code>Cookie</code> header, the client hostname, or the client IP
+      address.  A complete list of possible test clauses for the
+      <code>#if</code> statement is contained in appendix "<a
+      href="appendixC.html">Parsed Document Syntax for the <em>WN</em>
+      Server</a>" in this guide.
+    </p>
+
+    <blockquote>
+      <em>Note:</em> For this to work the file containing the conditional text
+      needs to be parsed by the server.  The server only knows to do this if
+      the file record in the <code><a
+      href="index_desc.html#index">index.wn</a></code> file contains a line
+      "<code><a
+      href="appendixB.html#fdir.attributes.parse">Attributes=parse</a></code>".
+    </blockquote>
+
+    <p>
+      If, in an "if clause", instead of the equal-tilde string
+      '<code>=~</code>' (to indicate a regular expression match) the character
+      string '<code>!~</code>' is used then the truth value of the match is
+      reversed.  For example the lines:
+    </p>
+
+    <blockquote>
+      <code>
+        &lt;!-- #if referer !~ "my.host.edu" --&gt;
+        <br>
+        Here is some text for newcomers to my site.
+        <br>
+        &lt;!-- #endif --&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      would display the "<code>Here is some text ...</code>" to those clients
+      accessing this document via any link which is not on the host
+      <code>my.host.edu</code>.
+    </p>
+
+    <p>
+      There is also a <a href="appendixC.html#redirect">redirect command</a>
+      which can conditionally cause the server to send an <a
+      href="http://www.w3c.org/Protocols/">HTTP/1.1</a> redirect to a new URL.
+      For example if the text:
+    </p>
+
+    <blockquote>
+      <code>
+        &lt;!-- #if hostname =~ "\.uk$" --&gt;
+        <br>
+        &lt;!-- #redirect = "UK_mirror_url" --&gt;
+        <br>
+        &lt;!-- #endif --&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      is included at the beginning of an <a
+      href="http://www.w3c.org/MarkUp/">HTML</a> document then any request from
+      a UK host will automatically be redirected to the specified URL, the
+      <code>UK_mirror_url</code> in this case.  This mechanism could also be
+      used to redirect text only browsers to a text only alternative page, etc.
+      There must be no text sent before the
+      '<code>&lt;!--&nbsp;#redirect&nbsp;=&nbsp;"url"&nbsp;--&gt;</code>' is
+      encountered (not even blank lines) since the server cannot send an <a
+      href="http://www.w3c.org/Protocols/">HTTP/1.1</a> redirect while in the
+      middle of transmitting a document.
+    </p>
+
+    <p>
+      Normally the URL in the
+      '<code>&lt;!--&nbsp;#redirect&nbsp;=&nbsp;"URL"&nbsp;--&gt;</code>' line
+      is fully qualified, like "<code>http://host/path/foo</code>".  However,
+      it can also be simply "<code>foo</code>" referring to a file in the same
+      directory as the file being parsed.  In this case an <a
+      href="http://www.w3c.org/Protocols/">HTTP/1.1</a> redirection is not
+      sent, and instead the file "<code>foo</code>" is returned immediately to
+      the client.
+    </p>
+
+    <p>
+      Often a single regular expression is not adequate to distinguish whether
+      or not to serve some text.  For that reason <em>WN</em> allows you to use
+      a file containing any number of regular expressions and serve a document
+      based on whether any of these expressions match accept headers, referer
+      header, user-agent, hostname, etc.  For example, if the file
+      "<code>acceptfile</code>" contains the lines:
+    </p>
+
+    <blockquote>
+      <code>
+        image/png
+        <br>
+        image/jpeg
+        <br>
+        image/x-xbitmap
+      </code>
+    </blockquote>
+
+    <p>
+      then the following conditional text might be appropriate:
+    </p>
+
+    <blockquote>
+      <code>
+        &lt;!-- #if accept file = "acceptfile" --&gt;
+        <br>
+        <br>
+        I see you aren't using a text only browser...
+        <br>
+        &lt;!-- #endif --&gt;<br>
+      </code>
+    </blockquote>
+
+    <p>
+      The format of the file "<code>acceptfile</code>" is one UNIX <code><a
+      href="/cgi-bin/man2html/usr/man/man1/grep.1.gz">grep(1)</a></code>
+      utility like regular expression per line.  Lines beginning with
+      '<code>#</code>' are taken to be comments.  If a regular expression is
+      preceded by the character '<code>!</code>' then that character is skipped
+      but the truth value of the match is reversed.  More information about
+      files of regular expressions for conditional text can be found in
+      appendix "<a href="appendixC.html">Parsed Document Syntax for the
+      <em>WN</em> Server</a>" in this guide.
+    </p>
+
+
+    <h3>6.4 <a name="conditional">Conditional Text and Access Control
+    Files</a></h3>
+
+    <p>
+      Another method of using conditional text is with a normal <em>WN</em>
+      access control file.  For example:
+    </p>
+
+    <blockquote>
+      <code>
+        &lt;!-- #if accessfile="secret/access" --&gt;
+        <br>
+        <br>
+        Here is a link to a restricted directory.
+        <br>
+        <br>
+        &lt;a href="/secret/stuff.html"&gt;Restricted Local Stuff&lt;/a&gt;
+        <br>
+        <br>
+        Hosts not listed in the file "secret/access" can't look at it, so why
+        show them a link to it?
+        <br>
+        <br>
+        &lt;!-- #endif --&gt;<br>
+      </code>
+    </blockquote>
+
+    <p>
+      will display the included text and the link to
+      "<code>Restricted&nbsp;Local&nbsp;Stuff</code>" only to clients on hosts
+      permitted by the <a href="access.html">access control file</a>
+      "<code>secret/access</code>".
+    </p>
+
+
+
+    <h3>6.5 <a name="logic">Logical Operations in If Conditions</a></h3>
+
+    <p>
+      The condition in the "<code>if</code>" or "<code>elif</code>" tags can be
+      made more complex than those described above by combining simple
+      conditions using the logical operations '<code>&amp;&amp;</code>' for
+      'and', '<code>||</code>' for 'or' and '<code>!</code>' for 'not'.
+      Parentheses may be used for grouping.  For example:
+    </p>
+
+
+    <blockquote>
+      <code>
+        &lt;!--&nbsp;#if&nbsp;hostname&nbsp;=~&nbsp;"\.uk$"&nbsp;&amp;&amp;&nbsp;accessfile="secret/access"&nbsp;--&gt;
+        <br>
+        <br>
+        Something for those sites in accessfile but not in the UK.
+        <br>
+        <br>
+        &lt;!-- #endif --&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      This is described in greater detail in the section "<a
+      href="appendixC.html#match">Matching Regular Expressions:
+      <code>#if</code> and <code>#elif</code></a>" in this guide.
+    </p>
+
+
+    <h3>6.6 <a name="section">More on Including: the <code>section</code>
+    Marker</a></h3>
+
+    <p>
+      Often you may want to include <a
+      href="http://www.w3c.org/MarkUp/">HTML</a> files in a larger document.
+      For example, a single logical <a
+      href="http://www.w3c.org/MarkUp/">HTML</a> document often consists of a
+      number of separate files.  This can make it very difficult for a client
+      to download and print the entire document.  To alleviate this problem you
+      could form a single document concatenating all the pieces, but that can
+      be problematic when the document is altered or updated as it is necessary
+      to change both the piece and the concatenation.
+    </p>
+
+    <p>
+      <em>WN</em> offers a solution to this by allowing you to write a small
+      skeleton document which includes all the pieces, forming a "virtual"
+      document which is the concatenation.  But if we just used the mechanism
+      above the concatenation document would include the
+      <code>&lt;head&gt;</code> elements of all the pieces.  To remedy this you
+      use the marker:
+    </p>
+
+    <blockquote>
+      <code>
+        &lt;!-- #section --&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      instead of "<code>&lt;!--&nbsp;#include&nbsp;--&gt;</code>" and the
+      server will include only the portion of the <a
+      href="http://www.w3c.org/MarkUp/">HTML</a> document between the special
+      comments "<code>&lt;!--&nbsp;#start&nbsp;--&gt;</code>" and
+      "<code>&lt;!--&nbsp;#end&nbsp;--&gt;</code>" inserted in that document.
+      This requires that these starting and ending comments occur in the <a
+      href="http://www.w3c.org/MarkUp/">HTML</a> document on lines by
+      themselves.
+    </p>
+
+
+
+    <h3>6.7 <a name="wrapping">Wrapping Files</a></h3>
+
+    <p>
+      Suppose you have a large number of files and want a standard header or
+      footer placed on all of them (perhaps a standard disclaimer).  You could,
+      of course, make many copies of the standard header with a different
+      "<code><a href="appendixB.html#fdir.includes">Includes=</a></code>"
+      directive for each, but this is cumbersome.  It has other drawbacks as
+      well, such as the fact that <a href="search.html#grep">grep</a> and <a
+      href="search.html#context">context</a> searches do not search associated
+      include files, only the main file.
+    </p>
+
+    <p>
+      To deal with this case <em>WN</em> uses <em>wrappers</em>.  Wrapping a
+      file is the inverse of including it.  If you have an <code><a
+      href="index_desc.html#index">index.wn</a></code> file entry like:
+    </p>
+
+    <blockquote>
+      <code>
+        <a href="appendixB.html#fdir.file">File=</a>foo.html
+        <br>
+        <a href="appendixB.html#fdir.wrappers">Wrappers=</a>bar.html
+      </code>
+    </blockquote>
+
+    <p>
+      then the server will send the file <code>bar.html</code> looking for the
+      marker "<code>&lt;!--&nbsp;#include&nbsp;--&gt;</code>" and inserting
+      <code>foo.html</code> at the line where it is found.  So this is just
+      like the "<code><a
+      href="appendixB.html#fdir.includes">Includes=</a></code>" directive
+      except the role of which file is included in the other is reversed.  If
+      the include marker is never found the entire wrapper,
+      <code>bar.html</code>, is sent first and the main file,
+      <code>foo.html</code>, is appended at the end.  Thus the "<code><a
+      href="appendixB.html#fdir.wrappers">Wrappers=</a></code>" directive can
+      be used to prepend a file without the need of any marker in the main
+      file.
+    </p>
+
+
+
+    <h3>6.8 <a name="searchwrapper">Search Wrappers</a></h3>
+
+    <p>
+      A search wrapper is a special kind of wrapper.  Its function is to allow
+      you to customize the results of user searches.  It is normally associated
+      with an entire directory in which case it applies to all <a
+      href="search.html#title">title</a>, <a
+      href="search.html#keyword">keyword</a>, <a
+      href="search.html#fielded">field</a>, <a href="search.html#grep">grep</a>
+      and <a href="search.html#context">context</a> searches of that directory.
+      See the chapter "<a href="search.html">Setting Up Searches on the
+      <em>WN</em> Server</a>" in this guide.
+    </p>
+
+    <p>
+      A line like:
+    </p>
+
+    <blockquote>
+      <code>
+        <a href="appendixB.html#ddir.searchwrapper">SearchWrapper=</a>foo.html
+      </code>
+    </blockquote>
+
+    <p>
+      in the directory record of an <code><a
+      href="index_desc.html#index">index.wn</a></code> file will cause any search
+      of that directory to return an unordered list of matches wrapped with the
+      file <code>foo.html</code>.  The list of matches will be inserted into
+      <code>foo.html</code> at a point where the marker
+      "<code>&lt;!--&nbsp;#include&nbsp;--&gt;</code>" is found.  You can also
+      insert the user supplied search term by using the marker
+      "<code>&lt;!--&nbsp;#query&nbsp;--&gt;</code>".  Both of these markers
+      must occur on a line by themselves.
+    </p>
+
+
+
+    <h3>6.9 <a name="nested">Nested Including and Wrapping</a></h3>
+
+    <p>
+      Wrapping and including can be arbitrarily nested (though this is not true
+      of <a href="#searchwrapper">search wrappers</a>).  It can be a little
+      complicated to get the effect you want.
+    </p>
+
+    <p>
+      Here is how to do it.  Think of all your files, wrappers, includes and
+      the main file arranged as you wish them to be combined for the final
+      served document.  Now imagine inserting an opening (or left) parenthesis
+      at the beginning of each file and insert a closing (or right) parenthesis
+      at the end of each file.  You should have a legally nested and balanced
+      collection of parentheses.  To each of the opening parentheses attach the
+      name of the file which begins at that point.  Then write down the list of
+      all the file names in the order their corresponding opening parentheses
+      occur.  All the files which come before the main file should be wrappers
+      and should be listed in the "<code><a
+      href="appendixB.html#fdir.wrappers">Wrappers=</a></code>" line in the
+      order in which they occur in this list.  All the files after the main
+      file should be in the "<code><a
+      href="appendixB.html#fdir.includes">Includes=</a></code>" line and should
+      occur in the order they occur in this list.
+    </p>
+
+    <p>
+      Here's a simple example.  Suppose we have a main file <code>M</code> and
+      other files <code>A</code>, <code>B</code>, <code>C</code>, and
+      <code>D</code> which we want to have nested like:
+    </p>
+
+    <blockquote>
+      <code>
+        (D...(B...B)...(M...(A...(C...C)...A)...M)...D)
+      </code>
+    </blockquote>
+
+    <p>
+      Then the entry in the <code><a
+      href="index_desc.html#index">index.wn</a></code> file should look like:
+    </p>
+
+    <blockquote>
+      <code>
+        <a href="appendixB.html#fdir.file">File=</a>M
+        <br>
+        <a href="appendixB.html#fdir.wrappers">Wrappers=</a>D,B
+        <br>
+        <a href="appendixB.html#fdir.includes">Includes=</a>A,C
+      </code>
+    </blockquote>
+
+
+
+    <h3>6.10 <a name="title">Including Title, Query, Fields and Environment
+    Variables</a></h3>
+
+    <p>
+      Often it is useful to insert items like the main document's title into a
+      wrapper, or the search item provided by the client into a searchwrapper
+      for the responses.  This is possible with <em>WN</em> parsed documents
+      using the lines:
+    </p>
+
+    <blockquote>
+      <code>
+        &lt;!-- #title --&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      or:
+    </p>
+
+    <blockquote>
+      <code>
+        &lt;!-- #query --&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      in the file at the point where the title or search term should be
+      inserted. Both of these markers must occur on a line by themselves.
+    </p>
+
+    <p>
+      In addition to the title and query <a href="field.html">user supplied
+      fields</a> can be inserted in documents.  This is done by including a
+      marker such as:
+    </p>
+
+    <blockquote>
+      <code>
+        &lt;!--&nbsp;#field3&nbsp;--&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      in the file at the point where the value should be inserted.
+    </p>
+
+    <p>
+      You can also insert the value of any environment variable into your text
+      with a line like:
+    </p>
+
+    <blockquote>
+      <code>
+        &lt;!--&nbsp;#environ = "HTTP_REFERER" --&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      which will be replaced by the contents of the environment variable
+      <code>HTTP_REFERER</code>.
+    </p>
+
+    <blockquote>
+      <em>Note:</em> If there is no "<code><a
+      href="appendixB.html#fdir.wrappers">Wrappers=</a></code>" or "<code><a
+      href="appendixB.html#fdir.includes">Includes=</a></code>" line in the
+      <code><a href="index_desc.html#index">index.wn</a></code> file for this
+      entry then there must be a line like:
+    </blockquote>
+
+    <blockquote>
+      <code>
+        <a href="appendixB.html#fdir.attributes.parse">Attributes=parse</a>
+      </code>
+    </blockquote>
+
+    <p>
+      so the server knows it is to parse the file to look for the marker.  See
+      the section "<a href="appendixB.html#fdir.attributes">Set File
+      Attributes</a>" in this guide for more details.  Also if you wish to
+      insert the value of a <a
+      href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a> environment variable
+      (as in the example above) you must have an "<code><a
+      href="appendixB.html#fdir.attributes.parse">Attributes=parse</a></code>"
+      line.
+    </p>
+
+
+    <h3>6.11 <a name="metainfo">Meta Information</a></h3>
+
+    <p>
+      Strictly speaking this feature has nothing to do with parsed
+      documents, but it fits here as well as anywhere.  If a URL has
+      the parameter <code>meta</code> appended (with a semi-colon
+      separator), as in
+    </p>
+
+    <blockquote>
+      <code>
+        http://host/path/foo;meta
+      </code>
+    </blockquote>
+
+    <p>
+      for example, then it will return meta data about the resource
+      rather than the resource itself.  
+      <a href="parse.html;meta">Here is the meta data</a> returned
+      by this document when the <code>meta</code> parameter is used.
+    </p>
+
+    <!-- #end -->
+    <hr size="4">
+
+    <address>
+      <em>WN</em> version 2.4.7
+      <br>
+      Copyright &copy; 1998-2005 <a href="mailto:john@math.northwestern.edu">John Franks
+      &lt;john@math.northwestern.edu&gt;</a>
+      <br>
+      licensed under the <a
+        href="http://www.gnu.org/copyleft/fdl.txt">GNU Free Documentation License</a>
+      <br>
+<!-- hhmts start -->
+Last modified: Sat June  18 2005
+<!-- hhmts end -->
+    </address>
+
+    <!-- pnuts --> <a href="search.html">[Previous]</a> <a href="field.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+  </body>
+</html>

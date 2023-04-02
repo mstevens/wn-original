@@ -1,0 +1,25 @@
+NOTES:
+
+1. Starting with release 2.0.0 there have been some name changes to
+be consistent.  The former "swn" is now called "wnsd" and the former
+"wn" is now "wnd".  Hopefully this won't be too incovenient.  If it
+is you can change the name back after compiling without ill effect.
+
+2. If you are upgrading WN from a version earlier than 1.17.6 you cannot
+use your old mime.types file.  The format of this file has changed
+to one which is more standard.  A fairly comprehensive mime.types file
+(derived from the Debian Linux file) is included in /lib/mime.types.
+I recommend you use it or modify it if you desire.  The correct format
+is described in this file.
+
+3. Before you run the configure perl script, you may want to place a
+copy of your previous config.h file and Makefile in the top level
+directory.  The configure script will then take as its default values
+the ones you used in the earlier release.  It is still important to
+run the configure script as the newer version of config.h it creates
+may differ from the old one.
+
+4. After upgrading it is a good idea to rerun wndex on your hierarchy
+using the new version of wndex.  The comman "wndex -r -s index"
+executed at the top of your data hierarchy will recursively run
+wndex in all subdirectories which contain an "index" file.

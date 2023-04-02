@@ -1,0 +1,97 @@
+#!/usr/bin/perl
+
+##################################################################
+#wnindexmaker version 0.3  part of the WN server package
+#Usage: wnindexmaker [-t title] [-d directory] [-o outfile] wordfile
+##################################################################
+
+
+$VERSION = "0.2";
+
+	require "getopts.pl";
+	$title="Index";
+
+	$outfile = "docindex.html";
+
+	&Getopts('d:o:t:');
+	$words = shift;
+	$outfile = $opt_o if $opt_o ne "";
+	$dir = $opt_d if $opt_d ne "";
+	$title = $opt_t if $opt_t ne "";
+
+	if ( $dir ne "") {
+		$x = substr( $dir, -1);
+		$dir = $dir."/" if $x ne "/";
+	}
+	open( WORDS, "<$words") || die "Can't open file: $!";
+	open( OUT, ">$outfile") || die "Can't open file: $!";
+
+	printf( OUT "<html>\n<head>\n<title>%s</title>\n</head>\n", $title);
+	printf( OUT "<body>\n<!-- pnuts -->\n<h2 align=\"center\">%s</h2>\n",
+				$title);
+
+	&alphabet;
+	$firstlet = "A";
+	while ( $curword = <WORDS> ) {
+		chop( $curword);
+		$curword =~ s/^[^a-zA-Z]*//;
+		$curword =~ s/[<>]//g;
+		$query = $curword;
+		$query =~ s/\s/\+/g;
+		$firstlet = $curword;
+		$firstlet = substr( $firstlet, 0, 1);
+		$firstlet =~ y/a-z/A-Z/;
+		if ( $firstlet ne $prevlet) {
+			$firstlet =~ /^A$/ || printf( OUT "</ul>\n");
+			printf( OUT "<ul><b>-- <a name=\"%s\">%s</a> --</b>",
+				$firstlet, $firstlet);
+			printf( OUT "<p>\n");
+			$prevlet = $firstlet;
+		}
+		printf( OUT "<li> <a href=\"%ssearch=context?%s\">",
+				$dir, $query);
+		printf( OUT "%s</a>\n", $curword);
+	}
+	printf( OUT "</ul><p>\n<!-- pnuts -->\n</body>\n</html>\n");
+	close( WORDS);
+	close( OUT);
+	exit();
+
+
+sub alphabet {
+
+print OUT <<EOF
+
+<p align="center">
+<b>
+<a href="#A">A</a>
+<a href="#B">B</a>
+<a href="#C">C</a>
+<a href="#D">D</a>
+<a href="#E">E</a>
+<a href="#F">F</a>
+<a href="#G">G</a>
+<a href="#H">H</a>
+<a href="#I">I</a>
+<a href="#J">J</a>
+<a href="#K">K</a>
+<a href="#L">L</a>
+<a href="#M">M</a>
+<a href="#N">N</a>
+<a href="#O">O</a>
+<a href="#P">P</a>
+<a href="#Q">Q</a>
+<a href="#R">R</a>
+<a href="#S">S</a>
+<a href="#T">T</a>
+<a href="#U">U</a>
+<a href="#V">V</a>
+<a href="#W">W</a>
+<a href="#X">X</a>
+<a href="#Y">Y</a>
+<a href="#Z">Z</a>
+</b>
+</p>
+EOF
+;
+}

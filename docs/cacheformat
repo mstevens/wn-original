@@ -1,0 +1,137 @@
+WN version 2.0.6
+
+This file documents the format of an index.cache file for WN.
+
+Parameters in a record of an index file like
+
+	File=foo.html
+	Title=This is foo
+	Keywords=bar, baz
+
+get translated to a line in the index.cache file like
+
+	file=foo.html&title=This is foo&keywords=bar, baz
+
+i.e. a sequence of token=value pairs separated by ampersands.  Any
+ampersands in a value must be escaped with a '\' which will be removed
+when the server reads the index.cache file.  All lines in an index.cache
+file are terminated with a single '\n' (newline) character. (This is
+UNIX after all).
+
+The first line of an index.cache file is the directory record line,
+the second line should be blank.  If there is no directory record
+line the first line should be blank and file information can start
+with the second line.
+
+Here is a list of the elements of an index file and the corresponding
+tokens used in the index.cache file.
+
+Directory Record	Cache token
+----------------	-----------
+Accessfile 		accessfile
+Searchwrapper		dwrapper
+Nomatchsub		nomatchsub
+Subdirs			subdirs
+Owner			owner
+Cache-module		cachemod	/* Cache data base module */
+File-module		filemod		/* File data base  module */
+Search-module		indexmod	/* Index search module  module */
+Authorization-type	authtype	/* Type of authorization */
+Authorization-realm	authrealm	/* Realm for authorization */
+Authorization-module	authmod		/* module to do authorization */
+Auth-denied-file        authdenied_file 
+Default-Content		default_content <see note 1>
+Default-Document	default_document
+Default-Max-Age		default_maxage  <see note 4>
+Attributes		<see note 3>
+Default-Attributes	defattributes	<see note 3>
+No-such-file-URL	nofile_url
+Access-denied-URL	noaccess_url
+<none>			cntlfname	<see note 5>
+
+File Record		Cache Token
+-----------		-----------
+File			file
+IndexFile		file
+Title			title
+URL			url
+Header			header		/* HTTP header line added for item */
+Parse			parse		/* boolean */
+Redirect		redirect
+Keywords		keywords
+Content-Type		content
+Content-Encoding	encoding
+Field#			field#			/* e.g. field7 */
+Includes		includes
+Wrappers		wrappers
+Searchwrapper		swrapper
+Nomatchsub		nomatchsub
+Filter			filter
+Expires			expires
+Attributes		<see note 2>
+Logtype			<see note  >
+Set-Cookie		setcookie
+Refresh			refresh
+Max-Age			maxage  <see note 4>
+
+<Note 1> The Default-content line is used to specify the content-type of
+files for which no Content-type record is present.  By default this has
+the value "text/plain".
+
+<Note 2> "Attributes=" lines in a file record (or in their absence
+"Default-Attributes=" lines in the directory record) get translated
+into a numeric value which is the sum of the numbers corresponding
+to the items below marked with an (*).  An ASCII representation of
+this number prceded by "attributes=" is the item in the index.cache
+file.  For example the entry "Attributes=nondynamic, parse, cgi" in
+an index file is converted to the entry "attributes=642" (since
+642=2+128+512) and "Default-attributes=nondynamic, parse, cgi"  is 
+converted to  "defattributes=642".
+
+Items not marked with an (*) should not have their numeric values
+added as this is done by the server when it reads e.g. the include
+or wrapper line.
+
+dynamic*	(1)
+nondynamic*	(2)
+include		(4)
+wrapped		(8)
+swrapped	(16)
+filtered	(32)
+nosearch*	(64)
+parse*		(128)
+noparse*	(256)
+cgi*		(512)
+ismap*		(1024)
+nocache		(1<<11)
+unbuffered	(1<<12)
+cacheable	(1<<13)
+nokeepalive	(1<<14)
+
+<Note 3> In the directory record Attributes=nosearch is translated to
+nosearch=true and Attributes=serveall is translates to serveall=true.
+
+
+<Note 4> The maxage and default_maxage lines have the format
+"maxage=12345" to indicate 12345 seconds after the document is
+served or "maxage=L12345" to indicate 12345 seconds after the 
+last modification date of the document.  All times must be converted
+to seconds before being put in the index.cache file.
+
+<Note 5> This field is used by wndex to find the name of the "index"
+file used in place of the default "index.wn".  It is ignored by the
+server.
+
+<Note 6> This field is an Ascii representation of an unsigned integer
+whose bits determine the log type according to the following table
+
+	/* Bits in the request logtype */
+	WN_NO_LOG		(1<<0)
+	WN_COMMON_LOG		(1<<1)
+	WN_VERBOSE_LOG		(1<<2)
+	WN_NCSA_LOG		(1<<3)
+	WN_LOG_SYSLOG		(1<<4)
+	WN_VERBOSE_SYSLOG	(1<<5)
+	NO_DNS_LOG		(1<<11)
+	REV_DNS_LOG		(1<<12)
+

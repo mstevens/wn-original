@@ -1,0 +1,729 @@
+<!doctype html public "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+  <head>
+    <title>Security on the WN Server</title>
+
+    <link rev="made" href="mailto:john@math.northwestern.edu">
+
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <meta http-equiv="last-modified" content="Sat June 18 2005">
+    <meta http-equiv="keywords" content="WN security">
+  </head>
+
+  <body bgcolor="#FFFFFF">
+    <p>
+      <a href="http://hopf.math.northwestern.edu/"><img
+        src="images/powered.jpg"
+        border="0"
+        width="190"
+        height="41"
+        align="right"
+        alt="WN home page"
+      ></a>
+    </p>
+
+    <strong>Version 2.4.7</strong>
+
+    <br>
+
+    <!-- pnuts --> <a href="index_desc.html">[Previous]</a> <a href="search.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+
+    <br clear="right">
+
+    <hr size="4">
+    <!-- #start -->
+
+    <h2 align="center">Security on the <em>WN</em> Server</h2>
+    <hr size="4">
+
+    <p>
+      A great deal of effort has gone into attempting to make <em>WN</em> as
+      secure as possible.  Security has received the highest priority in all
+      design decisions.  This is not grounds for <em>WN</em> maintainers to
+      feel they can lessen their vigilance, however.  The first thing you
+      should be aware of is that there is a trade-off between security and
+      functionality.  You can have high security and restricted functionality
+      or lower security with greater functionality, or something in between.
+      <em>WN</em> is designed to let the maintainer choose the point on this
+      continuum he or she is comfortable with.  This document tries to discuss
+      the various options you as a maintainer will have and what the
+      implications of your choices are.
+    </p>
+
+    <p>
+      First, it is important to understand possible threats to the integrity of
+      a system running the <em>WN</em> server.  There are two types of threat
+      which this document addresses separately: (1) external, from a client or
+      purported client on a remote host, and (2) local, from a user with an
+      account on the server host.
+    </p>
+
+    <p>
+      After reading this section you may wish to look at the section "<a
+      href="index_desc.html#file_owner">File Ownership and Permissions</a>" in
+      this guide.
+    </p>
+
+
+
+    <h3>4.1 <a name="threats_external">External Threats</a></h3>
+
+    <p>
+      The maintainer's objective is to prevent any unauthorized access to (or
+      alteration of) files on the host system.  Programs run on the server with
+      the <a href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a> protocols
+      cause special problems and are discussed separately below.  If you do not
+      need to use any executable programs you should run the server with the <a
+      href="appendixA1.html#e_opt"><code>-e</code></a> option.  This option
+      disallows any attempt to execute a command on your server and does not
+      allow any data sent by a client even to be written to a temporary disk
+      file.  In this situation the key to <em>WN</em> security is twofold: no
+      document is served without explicit permission from the maintainer; and
+      nothing is written to disk on the server except the log file.
+    </p>
+
+    <p>
+      The basic philosophy of <em>WN</em> security is that by default no client
+      requests are granted.  Permission to serve a document must be explicitly
+      granted by the maintainer.  The <em>WN</em> server keeps a small database
+      in each directory of its data hierarchy which contains information about
+      files to be served from that directory.  In particular no document can be
+      served unless explicit permission to serve it is given in such a
+      database.
+    </p>
+
+    <p>
+      <em>Note:</em> For more information on these database files the chapter
+      "<a href="overview.html">An Overview of the <em>WN</em> Server</a>" in
+      this guide is a good place to start.  These files are very easy to create
+      and maintain.  See the chapter "<a href="index_desc.html">Creating Your
+      <em>WN</em> Data Directory</a>" in this guide.
+    </p>
+
+    <p>
+      Despite this strong security foundation several additional steps are
+      prudent.  The most important is that the maintainer must assure that no
+      untrusted person has write access to any part of the <em>WN</em>
+      hierarchy.  For example an incoming anonymous ftp directory should
+      <strong>never</strong> be part of a <em>WN</em> hierarchy (better yet
+      don't have one at all), because an attacker might be able to put a
+      database there granting illicit access to some documents on the server
+      system for which the user id running the server has read permission.
+      There are several defenses against such a counterfeit database and we
+      discuss them next.
+    </p>
+
+
+    <h4>4.1.1 <a name="threats_external.protect_index">Protecting Your
+    <code>index.cache</code> Files</a></h4>
+
+    <p>
+      All security control for the <em>WN</em> server resides in the per
+      directory database files (these files have the default name
+      <code>index.cache</code>).  Consequently it is extremely important to
+      guarantee their integrity.  There are several command line options for
+      the server which help protect against counterfeit
+      <code>index.cache</code> files.
+    </p>
+
+    <p>
+      The <a href="appendixA1.html#t_opt"><code>-t</code></a> or <a
+      href="appendixA1.html#T_opt"><code>-T</code></a> option to
+      <code>wnd</code> and <code>wnsd</code> allow you to specify a trusted
+      owner or group owner (not both) for <code>index.cache</code> files.  When
+      invoked with only the <a href="appendixA1.html#t_opt"><code>-t</code></a>
+      argument (or the <a href="appendixA1.html#t_opt"><code>-T</code></a>
+      argument) <code>wnd</code> or <code>wnsd</code> will not serve a document
+      unless the <code>index.cache</code> file listing it has the prescribed
+      uid or gid.  This uid or gid should be that of the maintainer
+      <strong>not</strong> the user id under which <code>wnd</code> or
+      <code>wnsd</code> runs.  Indeed, for security reasons if the server has
+      been started as <code>root</code> and changed to another uid it will
+      refuse to use an <code>index.cache</code> file whose owner is the uid
+      under which it is running.  If on your server all
+      <code>index.cache</code> files are created by a single user or a single
+      group I strongly recommend using the <a
+      href="appendixA1.html#t_opt"><code>-t</code></a> or <a
+      href="appendixA1.html#T_opt"><code>-T</code></a> option.
+    </p>
+
+    <p>
+      This added security is weakened somewhat if you use the <a
+      href="appendixA1.html#u_opt"><code>-u</code></a> option which allows
+      <code>index.cache</code> files owned by untrusted users, but only permits
+      them to grant access to files owned by the same user as the
+      <code>index.cache</code> file.  This option might be appropriate if you
+      permit users to have their own home page on your server.  It would allow
+      users to serve documents which they own but no others.  If both the <a
+      href="appendixA1.html#u_opt"><code>-u</code></a> and the <a
+      href="appendixA1.html#t_opt"><code>-t</code></a> argument are used the <a
+      href="appendixA1.html#u_opt"><code>-u</code></a> takes effect except the
+      trusted user specified with the <a
+      href="appendixA1.html#t_opt"><code>-t</code></a> option is exempt from
+      its restrictions.  <em>Notice that if neither the <a
+      href="appendixA1.html#t_opt"><code>-t</code></a> or <a
+      href="appendixA1.html#u_opt"><code>-u</code></a> argument is used then a
+      user with his own home page can make a symbolic link to any file readable
+      by the server and that document will be served!  This is true even if the
+      linked to document is in a directory with <a href="access.html">limited
+      access</a> or is outside the server data hierarchy.</em>
+    </p>
+
+    <p>
+      When the server is run it must assume the permissions of some user on the
+      host.  Which user is determined when you run the <a
+      href="setup.html#installing.configure"><code>configure</code></a> program
+      or by defining "<code><a
+      href="configmacros.html#USERID">#define&nbsp;USER_ID</a></code>" in <a
+      href="configmacros.html"><code>config.h</code></a>.  It is important that
+      <code>USER_ID</code> have as few permissions as possible. On many systems
+      there is a user called <code>nobody</code> with minimal permissions.  The
+      numeric user_id of <code>nobody</code> is a good choice and is the
+      default choice of the <em>WN</em> configure program. Of course the server
+      must have read permission on all the files served but it should not have
+      write permission for any directory or file other than its log files.  If
+      the UNIX <a href="setup.html#logging"><code>syslogd(8)</code></a> system
+      utility for logging is enabled there is not even any need for write
+      permission on a log file.  A good practice is to have all the files in
+      your hierarchy which you intend to serve be owned by the maintainer or
+      their creator.  They should be world readable (assuming they are for
+      general consumption) but with restricted write permission.  The files in
+      your hierarchy should <em>not</em> be owned by the user id under which
+      <em>WN</em> will run.
+    </p>
+
+    <p>
+      <em>WN</em> does not by default use the UNIX <code><a
+      href="/cgi-bin/man2html/usr/man/man8/chroot.8.gz">chroot(8)</a></code>
+      system utility to further restrict the files which the server can access.
+      Doing so would enhance security at the expense of extra work for the
+      maintainer.  The effect of this is to prevent the server from even
+      internally accessing any file which is not in your data directory.  If
+      you are especially concerned about security you may wish to run one of
+      the public domain TCP wrappers, such as <a
+      href="mailto:wietse@wzv.win.tue.nl">Wietse Venema</a>'s <a
+      href="ftp://ftp.win.tue.nl/pub/security/tcp_wrappers_7.6.BLURB"><code>tcp_wrappers</code></a>
+      (source code available at <a
+      href="ftp://ftp.win.tue.nl/pub/security/tcp_wrappers_7.6.tar.gz"><code>ftp://ftp.win.tue.nl/pub/security/tcp_wrappers_7.6.tar.gz</code></a>),
+      in conjunction with <em>WN</em> which will allow you to use the UNIX
+      <code>chroot(8)</code> system utility.  This can simultaneously enhance
+      security for other TCP services like the UNIX <code><a
+      href="/cgi-bin/man2html/usr/man/man8/ftpd.8.gz">ftpd(8)</a></code>
+      system utility.
+    </p>
+
+
+    <h4>4.1.2 <a name="threats_external.cgi">CGI Programs</a></h4>
+
+    <p>
+      Enabling the use of programs run on the server greatly enhances its
+      functionality but also increases the potential risk of an attack.  Many
+      things which on other servers can only be done with <a
+      href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a> programs are built-in
+      features of <em>WN</em> and hence entail much less risk than they would
+      as <a href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a> programs.
+      These include <a href="click.html">imagemaps</a>, a variety of <a
+      href="search.html">document searches</a>, and serving <a
+      href="parse.html#if">conditional text</a> based on information in the
+      client supplied headers.  If your needs can be met with these features
+      then you can disable <a
+      href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a> with the <a
+      href="appendixA1.html#e_opt"><code>-e</code></a> option and greatly
+      improve your security.
+    </p>
+
+    <p>
+      However, there are many needs which can only be met by programs.  The
+      greatest danger in their use is that even though the program is under the
+      control of the maintainer, the arguments passed to it can be set by a
+      potential attacker.  <em>WN</em> supports the <a
+      href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a> or "Common Gateway
+      Interface" protocol (see the chapter "<a href="cgi.html">Using CGI
+      Programs on the <em>WN</em> Server</a>" in this guide) for executing
+      programs.  Under this protocol there are three ways by which arguments
+      are passed to programs.  The first of these is used when processing <a
+      href="http://www.w3c.org/MarkUp/">HTML</a> forms which use the
+      <code>GET</code> method.  Under this method all arguments are put in
+      environment variables and the program must extract them from the
+      environment.  Moreover, they have been placed in a <a
+      href="http://linux-howto.com/rfc/rfc1500-1999/rfc1738.txt">URL</a>
+      encoded format by the browser and must be decoded by the program.  Thus
+      if the request is of type <code>GET</code>, the arguments are examined to
+      see if they contain an '<code>=</code>'.  If they do, it is assumed that
+      this is a <a href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a> form
+      response (something like
+      "<code>name=John&amp;toppings=pepperoni</code>").  In this case the
+      program is executed with no arguments and the argument string is placed
+      in an environment variable where the program can read it.  This is fairly
+      safe from the server point of view but the program writer must exercise
+      great care.
+    </p>
+
+    <p>
+      The second method is for <a href="http://www.w3c.org/MarkUp/">HTML</a>
+      forms using the <code>POST</code> method.  In this case everything posted
+      by the client (in <a
+      href="http://linux-howto.com/rfc/rfc1500-1999/rfc1738.txt">URL</a>-encoded
+      form) must be sent to the UNIX <code><a
+      href="/cgi-bin/man2html/usr/man/man3/stdio.3.gz">stdin(3)</a></code>
+      stream of the <a href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a>
+      program.  Thus if the request is of type <code>POST</code>, information
+      is read from the client and put in a temporary file on disk.  Then the
+      program is executed with no arguments and its <code>stdin(3)</code> comes
+      from this file.  Security is the responsibility of the program writer. It
+      is not so dangerous to have arguments come from <code>stdin(3)</code> but
+      the program writer must still exercise care.
+    </p>
+
+    <p>
+      Finally if the <code>GET</code> request has arguments but no
+      '<code>=</code>' it is assumed to be an <code>ISINDEX</code> type request
+      and the program should be executed with the given arguments.  While the
+      <a href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a> specification does
+      not permit the altering of arguments, it does say that if the arguments
+      pose any security problems it is permissible to put the string in an
+      environment variable and execute the program with no arguments, just as
+      in the <a href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a> forms case
+      described above.  <em>WN</em> takes a very strict view on this subject
+      and considers any characters other than space and alphanumeric characters
+      as a security problem.  Accordingly, if it finds any other character in
+      an argument it will put all arguments in the appropriate environmental
+      variable and run the program with no command line arguments.
+    </p>
+
+    <p>
+      Again let me say <strong>the program writer must exercise great
+      care</strong>. I can't emphasize this too strongly.  When you run a <a
+      href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a> program the server
+      almost completely absolves itself of security responsibility and dumps
+      that responsibility on the program writer.  Most authors of freely
+      distributed <a href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a>
+      programs are not fully cognizant of potential security holes they may
+      open up.  Running insecure programs created locally or obtained from
+      Usenet postings is almost certainly the single greatest risk to a
+      <em>WN</em> server site.  To find out more about writing secure <a
+      href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a> programs I strongly
+      recommend that you read the relevant sections of the "<a
+      href="http://www-genome.wi.mit.edu/WWW/faqs/www-security-faq.html#CGI">WWW
+      Security FAQ</a>" maintained by <a href="mailto:lstein@cshl.org">Lincoln
+      Stein</a> and the "<a
+      href="http://www.go2net.com/people/paulp/cgi-security/safe-cgi.txt">Safe
+      CGI Programming</a>" maintained by <a href="mailto:paulp@go2net.com">Paul
+      Phillips</a>.
+    </p>
+
+
+    <h3>4.2 <a name="threats_internal">Internal Threats</a></h3>
+
+    <p>
+      Whenever untrusted users have accounts on a system there is risk
+      involved.  The objective of <em>WN</em> is to insure that running the
+      server does not increase this risk.  If the server is wisely managed, I
+      believe this goal can be achieved.  Here are some guidelines.
+    </p>
+
+    <p>
+      If it is possible make sure that no untrusted user has write access to
+      any part of your <em>WN</em> hierarchy.  As mentioned above an attacker
+      with write access to your hierarchy can create an
+      <code>index.cache</code> file which will give access to anything on your
+      server which is readable by the user id under which <em>WN</em> runs.
+      Even worse, she can create a shell program and a <code>index.cache</code>
+      file permitting it to be executed, so it can be executed with all the
+      permissions of that user id.  A good rule of thumb is:
+    </p>
+
+
+    <blockquote>
+      <em>Note:</em> Always assume that everyone with write access to any part
+      of your data hierarchy has all the permissions of the user id under which
+      your server runs!
+    </blockquote>
+
+    <p>
+      This should not be true if you are using some of the command line options
+      described above, but it is good practice to behave as if it were true.
+    </p>
+
+    <p>
+      Sometimes it is not possible or desirable to deny write access to your
+      <em>WN</em> hierarchy.  For example, you may need to allow all users to
+      have a home page in their home directory or in some other designated
+      place.  There are two important things to do in this case.
+    </p>
+
+    <p>
+      The first of these is run the server with the <a
+      href="appendixA1.html#u_opt"><code>-u</code></a> option.  This has the
+      effect of requiring that every file served (including <a
+      href="parse.html#wrapping">wrappers</a> and <a
+      href="parse.html#including">includes</a>) have the same owner as the
+      <code>index.cache</code> file which grants it permission to be served.
+      This means that untrusted users can only serve files which they own.
+      This will prevent a user from serving the UNIX <a
+      href="/cgi-bin/man2html/usr/man/man5/passwd.5.gz"><code>passwd(5)</code></a>
+      configuration file typically in <code>/etc</code>, but will not prevent
+      him from making his own copy of <code>passwd(5)</code> and serving that.
+    </p>
+
+    <p>
+      If the <a href="appendixA1.html#t_opt"><code>-t</code></a> or <a
+      href="appendixA1.html#T_opt"><code>-T</code></a> option is also used then
+      <code>index.cache</code> files owned by the trusted user or trusted group
+      are exempt from this requirement and they may grant permission to serve
+      any file the server can read.  For security reasons the server will
+      refuse to use an <code>index.cache</code> file which is a symbolic link
+      to another file.
+    </p>
+
+    <p>
+      The <a href="appendixA1.html#e_opt"><code>-e</code></a> or <a
+      href="appendixA1.html#E_opt"><code>-E</code></a> option <a
+      href="#threats_external.cgi">mentioned above</a> are also a good idea in
+      this case, to prevent any execution of programs or at least restrict
+      their execution to trusted <code>index.cache</code> files.
+    </p>
+
+    <p>
+      You should note that when run in its default configuration there is no
+      way to use <a href="access.html#ip">access files</a> or <a
+      href="access.html#authenticate">password authentication</a> to prevent
+      users on your system, who can create <code>index.cache</code> files, from
+      gaining access to files you are serving.  They can simply make a symbolic
+      link in their part of the hierarchy to the file you want to restrict and
+      a <code>index.cache</code> file permitting it to be served.  Since the
+      server has access to the restricted file it will serve it if it is listed
+      in a <code>index.cache</code> file. This simple threat can be avoided by
+      using the <a href="appendixA1.html#u_opt"><code>-u</code></a> option
+      described above, but the number of potential threats is quite large.  For
+      example, if the <a href="appendixA1.html#e_opt"><code>-e</code></a> or <a
+      href="appendixA1.html#E_opt"><code>-E</code></a> option is not used a
+      hostile user could write a <a
+      href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a> program which reads
+      the sensitive files and mails them to himself.  In general I would
+      strongly advise against trying to have sensitive documents (protected by
+      password or <a href="access.html#ip"><code>.access</code></a> files) and
+      potentially hostile users on the same server.  I would also strongly
+      advise against allowing potentially hostile <a
+      href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a> programs, executed
+      includes or external modules.  They can be disallowed through the use of
+      the <a href="appendixA1.html#e_opt"><code>-e</code></a> or <a
+      href="appendixA1.html#E_opt"><code>-E</code></a> options.  If they are
+      not disallowed a <a href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a>
+      program can alter or destroy log files.  A hostile authorization module
+      could collect user passwords.
+    </p>
+
+    <p>
+      The <a href="appendixA1.html#u_opt"><code>-u</code></a> and <a
+      href="appendixA1.html#E_opt"><code>-E</code></a> options greatly enhance
+      security, but it is important to keep the following principle in mind.
+      <em>You should assume that any permissions you grant to the user id under
+      which <em>WN</em> runs are also granted to every user who can create an
+      <code>index.cache</code> file in your data hierarchy.</em>
+    </p>
+
+
+
+    <h3>4.3 <a name="authenticate">Password Authentication and Restriction by
+    IP Address</a></h3>
+
+    <p>
+      <em>WN</em> offers two methods of limiting access to your hierarchy or
+      parts of it.  See the chapter "<a href="access.html">Limiting Access to
+      Your <em>WN</em> Hierarchy</a>" in this guide for information on how to
+      use these features.
+    </p>
+
+    <p>
+      These are useful for many purposes but I would not advise using them to
+      protect extremely sensitive information.  The first of these methods is
+      restriction by hostname or IP address.  It is not impossible to spoof a
+      server with a fake IP address, but I think it is fairly difficult.  It is
+      easier to use a counterfeit hostname.  For this reason I would suggest
+      using IP addresses rather than host names in <a
+      href="access.html#ip">access control files</a>.
+    </p>
+
+    <p>
+      The other method of limiting access is by password with the <a
+      href="http://www.w3c.org/Protocols/">HTTP/1.1</a> Basic Authentication
+      scheme.  This is about as secure as using passwords with the UNIX <a
+      href="/cgi-bin/man2html/usr/man/man8/ftpd.8.gz"><code>ftpd(8)</code></a>
+      system utility to protect information.  This scheme is flawed in that it
+      involves the transmission of essentially unencoded passwords over the
+      network.  It is relatively easy for unscrupulous people to obtain
+      "sniffer" software which allows eavesdropping on all local network
+      traffic.  This means, in particular, that it is possible to intercept
+      passwords of other users.
+    </p>
+
+    <p>
+      For security reasons when you use <a
+      href="module.html#authorization"><code>wnauth</code></a> or any "<a
+      href="appendixB.html#ddir.authorization-module"><code>Authorization-Module=</code></a>"
+      <strong>you are required to use either the <a
+      href="appendixA1.html#t_opt"><code>-t</code></a> or <a
+      href="appendixA1.html#T_opt"><code>-T</code></a> option or the <a
+      href="appendixA1.html#a_opt"><code>-a</code></a> or <a
+      href="appendixA1.html#a_opt"><code>-A</code></a> option</strong> when the
+      server is run and to have the <code>index.cache</code> file in the
+      protected directory owned by the trusted user or group. This is to guard
+      against counterfeit authentication modules.
+    </p>
+
+    <p>
+      This particular problem is remedied by the "Digest" authentication
+      scheme.  Digest authentication is <a
+      href="http://hopf.math.northwestern.edu/digestauth/index.html">supported
+      experimentally</a> by <em>WN</em> but has the rather severe drawback that
+      no publicly available clients currently support it.  It is experimental,
+      because I have no client to test it and hence it has barely been tested.
+      I believe it will be a standard part of <a
+      href="http://www.w3c.org/Protocols/">HTTP/1.1</a> and at that time will
+      significantly improve security of password protected directories.
+    </p>
+
+    <p>
+      The directive "<code><a
+      href="appendixB.html#ddir.authorization-realm">Authorization-Realm=</a></code>",
+      used whenever an authentication module is used, is to notify the client
+      that for any document on this server with the same realm as this one, the
+      same password/username combination will be valid, so the client need not
+      ask the user for a username and password, but can reuse the one supplied
+      for the first document with this realm.  For security reasons you should
+      always put your host and domain name in the realm.  This may at least
+      discourage attempts at other sites to forge your realm in order to
+      collect user passwords.  Your users should also be warned never to enter
+      their password if the realm displayed when they are prompted for a
+      password contains a different hostname than the one in the URL they are
+      trying to access.
+    </p>
+
+    <p>
+      Both Basic authentication and access control by IP address become much
+      more vulnerable if the potential attack comes from users who can create
+      <code>index.cache</code> files for another part of your server's data
+      hierarchy.  I would recommend against trying to use either to protect
+      information from users with home pages on your server.
+    </p>
+
+    <p>
+      If no potentially hostile users can create documents which can be served
+      on your system the mechanisms described above provide protection adequate
+      for many purposes.  If I were an information provider selling access to a
+      collection of information on my server, I would be comfortable using the
+      numeric IP address to limit access to my paying customers.  On the other
+      hand I would not want any of these mechanisms used to protect my bank
+      records.
+    </p>
+
+
+
+    <h3>4.4 <a name="recommend">Some Recommended Security
+    Configurations</a></h3>
+
+    <p>
+      This a list of possible ways you might configure your server by setting
+      values in <a href="configmacros.html"><code>config.h</code></a> and using
+      command line arguments.  It assumes that you are running either
+      <code>wnsd</code> or <code>wnd</code> on the privileged port 80 and that
+      the default value of "<code><a
+      href="configmacros.html#USERID">#define&nbsp;USERID</a></code>" and
+      "<code><a
+      href="configmacros.html#GROUPID">#define&nbsp;GROUPID</a></code>" defined
+      in <a href="configmacros.html"><code>config.h</code></a> have not been
+      changed.  This will mean that <code>wnsd</code> will be started as
+      <code>root</code>, but will almost immediately switch its privileges to
+      those of the unprivileged user <code>nobody</code>.  Likewise if
+      <code>wnd</code> is running under the UNIX <a
+      href="/cgi-bin/man2html/usr/man/man8/inetd.8.gz"><code>inetd(8)</code></a>
+      system utility we assume that it is set to run with the privileges of
+      <code>nobody</code>.
+    </p>
+
+
+    <p>
+      The following list of configurations is in decreasing order of security.
+    </p>
+
+    <dl>
+      <dt>
+        4.4.1 <a name="recommend.no_cgi">Forbid CGI and Only Maintainer
+        Trusted</a>
+      </dt>
+       <dd>
+        <p>
+          This strongest level of security is achieved by running either
+          <code>wnsd</code> (or <code>wnd</code> under the UNIX <a
+          href="/cgi-bin/man2html/usr/man/man8/inetd.8.gz"><code>inetd(8)</code></a>
+          system utility) with the <a
+          href="appendixA1.html#t_opt"><code>-t</code></a> or <a
+          href="appendixA1.html#T_opt"><code>-T</code></a> option and with the
+          <a href="appendixA1.html#e_opt"><code>-e</code></a> option and with
+          no other options.  For the really paranoid uncommenting the "<code><a
+          href="configmacros.html#FORBID_CGI">#define&nbsp;FORBID_CGI</a></code>"
+          line in the file <a
+          href="configmacros.html"><code>config.h</code></a> and recompiling
+          removes the <a href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a>
+          code from the binary.
+        </p>
+
+        <p>
+          With these options no <a
+          href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a> programs or
+          filters or program output includes are permitted.  Also the
+          <code>POST</code> method is not accepted (an error is returned for a
+          <code>POST</code> request).  Furthermore only
+          <code>index.cache</code> files owned by the user specified in the <a
+          href="appendixA1.html#t_opt"><code>-t</code></a> option are used.
+          The server should be run as <code>nobody</code> (the default) and the
+          numeric user id specified with <a
+          href="appendixA1.html#t_opt"><code>-t</code></a> option should be the
+          maintainer's.
+        </p>
+      </dd>
+
+      <dt>
+        4.4.2 <a name="recommend.only_maintainer">Only Maintainer or Maintainer
+        Group Trusted</a>
+      </dt>
+       <dd>
+        <p>
+          This is the the strongest level of security if you need the
+          functionality of <a
+          href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a> programs or
+          filters or program output as server includes.  This security
+          configuration does not allow any user home pages (unless the
+          maintainer produces the <code>index.cache</code> file for them).  To
+          use this level run <code>wnsd</code> (or <code>wnd</code> under
+          <code>inetd(8)</code>) with the <a
+          href="appendixA1.html#t_opt"><code>-t</code></a> or <a
+          href="appendixA1.html#T_opt"><code>-T</code></a> option and no other
+          options.  This places all control in the hands of a single maintainer
+          or a "maintainer group".  No document or program output may be served
+          unless the maintainer has authorized it by explicit mention in one of
+          the <code>index.cache</code> database files.  The server will not
+          recognize any <code>index.cache</code> file unless it is owned by the
+          maintainer specified with the <a
+          href="appendixA1.html#t_opt"><code>-t</code></a> option or the group
+          specified with the <a
+          href="appendixA1.html#T_opt"><code>-T</code></a> option.  Only one of
+          <a href="appendixA1.html#t_opt"><code>-t</code></a> or <a
+          href="appendixA1.html#T_opt"><code>-T</code></a> options can be used.
+        </p>
+      </dd>
+
+       <dt>
+        4.4.3 <a name="recommend.only_restricted">Restricted User Serving
+        Privileges</a>
+      </dt>
+      <dd>
+        <p>
+          This permits users on the server host to have and control their own
+          home pages and documents, but with a number of limitations.  They
+          will not be permitted to run <a
+          href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a> programs, filters
+          or include programs.  Also the server will require that every file
+          served (including <a href="parse.html#wrapping">wrappers</a> and <a
+          href="parse.html#including">includes</a>) have the same owner as the
+          <code>index.cache</code> file which grants it permission to be
+          served. This means that users can only serve files which they own.
+        </p>
+
+        <p>
+          This is configuration is obtained by running with the <a
+          href="appendixA1.html#E_opt"><code>-E</code></a> option and the <a
+          href="appendixA1.html#u_opt"><code>-u</code></a> option.  The <a
+          href="appendixA1.html#E_opt"><code>-E</code></a> option is similar to
+          the <a href="appendixA1.html#e_opt"><code>-e</code></a> option except
+          that <code>index.cache</code> files owned by a trusted user id or
+          trusted group id (set with the <a
+          href="appendixA1.html#t_opt"><code>-t</code></a> or <a
+          href="appendixA1.html#T_opt"><code>-T</code></a> option) are exempt
+          from the restrictions.  The <a
+          href="appendixA1.html#u_opt"><code>-u</code></a> option requires that
+          in order to be served a file must be owned by the owner of the
+          <code>index.cache</code> file which lists it.  Trusted users as
+          specified with <a href="appendixA1.html#t_opt"><code>-t</code></a> or
+          <a href="appendixA1.html#T_opt"><code>-T</code></a> options are
+          exempt from this restriction also.
+        </p>
+      </dd>
+    </dl>
+
+
+
+    <h3>4.5 <a name="other">Other <em>WN</em> Security Measures</a></h3>
+
+    <p>
+      One of the security problems encountered with another HTTP server
+      involved an attack by overflowing an internal buffer with data provided
+      by the the client in such a way that the (attacking) client could supply
+      code that the server executed.  I have, to the best of my ability,
+      defended against this in <em>WN</em> code.  All copying of data supplied
+      by the client and most copying of data read from the
+      <code>index.cache</code> file is done by a function which I wrote and
+      which was designed precisely to deal with this threat.  Excess data which
+      would overflow is discarded so buffers may contain truncated data, but
+      will not be overwritten.
+    </p>
+
+    <p>
+      Probably the most controversial security "feature" of <em>WN</em> is that
+      it greatly restricts the set of characters which can be used in file or
+      path names.  Instead of trying to decide which characters are dangerous
+      and disallow them, <em>WN</em> has a list of characters presumed safe and
+      only allows them.  The currently allowed characters are alphanumeric
+      characters and '<code>_</code>', '<code>-</code>', '<code>.</code>',
+      '<code>+</code>', '<code>/</code>' and '<code>%</code>'.  The same
+      restrictions are applied to the <a
+      href="appendixD.html#cgi.PATH_INFO"><code>PATH_INFO</code></a> part of <a
+      href="http://linux-howto.com/rfc/rfc1500-1999/rfc1738.txt">URLs</a> for
+      <a href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a> programs, except
+      that the character '<code>=</code>' is also allowed.  These restrictions
+      sometimes cause problems with <a
+      href="http://hoohoo.ncsa.uiuc.edu/cgi/">CGI/1.1</a> programs that like to
+      include unusual characters in file names or <a
+      href="appendixD.html#cgi.PATH_INFO"><code>PATH_INFO</code></a>.
+    </p>
+
+    <p>
+      Also the server will attempt to resolve all "<code>../</code>" references
+      while staying in the server data hierarchy.  If these references would
+      result in a request for a document outside the server data hierarchy the
+      request is treated like a request containing illegal path characters.  In
+      particular with <a href="setup.html#logging">verbose logging</a> turned
+      on, a message like "<code>SECURITY Found bad character (%X hex) in
+      path</code>" is logged.
+    </p>
+
+    <p>
+      To defend against a "denial of service" attack the server will refuse a
+      <code>POST</code> request with post data in excess of 10 megabytes.  This
+      does not defend against multiple requests with large <code>POST</code>
+      data.  The maximum allowed size of <code>POST</code> data can be altered
+      by changing the value of <code>MAX_POST_LEN</code> in the file
+      <code>config.h</code>
+    </p>
+
+
+
+    <!-- #end -->
+    <hr size="4">
+
+    <address>
+      <em>WN</em> version 2.4.7
+      <br>
+      Copyright &copy; 1998-2005 <a href="mailto:john@math.northwestern.edu">John Franks
+      &lt;john@math.northwestern.edu&gt;</a>
+      <br>
+      licensed under the <a
+        href="http://www.gnu.org/copyleft/fdl.txt">GNU Free Documentation License</a>
+      <br>
+Last modified: Sat June  18 2005
+    </address>
+
+    <!-- pnuts --> <a href="index_desc.html">[Previous]</a> <a href="search.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+  </body>
+</html>

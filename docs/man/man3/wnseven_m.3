@@ -1,0 +1,82 @@
+.\" source:
+.\"   $Source: /var/cvs/projects/debian/printop/debian/dpkg.src/printop.printop.1.in,v $
+.\"
+.\" revision:
+.\"   @(#) $Id: printop.printop.1.in,v 1.2 1998/04/23 04:31:28 jplejacq Exp $
+.\"
+.\" copyright:
+.\"   Copyright (C) 1998 Jean Pierre LeJacq <jplejacq@quoininc.com>
+.\"
+.\"   Distributed under the GNU GENERAL PUBLIC LICENSE.
+.\"
+.TH wnseven_m 3 "Sat, 25 Apr 1998 00:34:33 -0400" "1.18.7-1" "Debian GNU/Linux manual"
+.SH NAME
+wnseven_m \- CGI program for searching files for sections for wn HTTP server
+.SH SYNOPSIS
+.B wnseven_m
+.I separator_pattern
+.I section_pattern
+.I file
+.RI [\| file \|] \ .\|.\|.
+.SH DESCRIPTION
+.B wnseven_m
+is a
+.BR perl (1)
+CGI program that is part of the
+.BR wn (1)
+HTTP server package.
+.B wnseven_m
+searches
+.I file
+and produces
+a
+.B <ul>
+HTML list of anchors to sections of the
+.I file
+containing a
+match for the regular expression in the environment variable
+.BR QUERY_STRING .
+A new section is determined to begin when a line matching
+.I separator_pattern
+is found.  The text of the anchor is taken from the first line of a 
+section matching
+.IR section_pattern .
+
+.B wnseven_m
+is intended as an Index Search Module of
+.BR wn (1)
+(see
+.BR http://dochost/doc/wn/module.html#isearch ).
+This requires that the
+.B Search-Module
+directive be set in the appropriate
+.I index
+file (see
+.BR http://dochost/doc/wn/appendixB.html ).
+For example, for a mail format file
+.I foo in directory
+.IR dir :
+.nf
+  Search-Module=/usr/lib/cgi-bin/wn/wnseven_m "^From " "^Subject:" foo
+.fi
+.SH SEE ALSO
+.BR wn (1),
+.BR wnauth (3),
+.BR wncat (3),
+.BR wnredir (3),
+.BR wnsectsearch (3)
+.br
+.B http://dochost/doc/wn/manual.html
+.br
+.B http://dochost/doc/wn/module.html#isearch
+.br
+.B http://dochost/doc/wn/appendixB.html
+.br
+.B http://dochost/doc/wn/appendixD.html
+.B http://hopf.math.nwu.edu/index.html
+.SH AUTHOR
+.B wn
+is written by John Franks <john@math.nwu.edu>.  Modified by Jean
+Pierre LeJacq <jplejacq@quoininc.com> as part of packaging for the
+Debian GNU/Linux distribution. Manual page also added by Jean Pierre
+LeJacq.

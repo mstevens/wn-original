@@ -1,0 +1,92 @@
+.\" source:
+.\"   $Source: /var/cvs/projects/debian/printop/debian/dpkg.src/printop.printop.1.in,v $
+.\"
+.\" revision:
+.\"   @(#) $Id: printop.printop.1.in,v 1.2 1998/04/23 04:31:28 jplejacq Exp $
+.\"
+.\" copyright:
+.\"   Copyright (C) 1998 Jean Pierre LeJacq <jplejacq@quoininc.com>
+.\"
+.\"   Distributed under the GNU GENERAL PUBLIC LICENSE.
+.\"
+.TH wn_uncache 8 "Sat, 25 Apr 1998 00:34:33 -0400" "1.18.7-1" "Debian GNU/Linux manual"
+.SH NAME
+wn_uncache \- decompile access control file for wn HTTP server
+.SH SYNOPSIS
+.B wn_uncache
+.SH DESCRIPTION
+.B wn_uncache
+is a
+.BR perl (1)
+program that is part of the
+.BR wn (1)
+HTTP server package.
+.B wn_uncache
+reverses the action of the
+.BR wndex (8)
+program. It will convert an
+.I index.cache
+file to
+an
+.I index
+file. It read from its standard input and writes to its standard
+output.
+
+When invoked with:
+.nf
+        wn_uncache <index.cache >index 
+.fi
+it will create a file named
+.I index
+(overwriting any other file of that name). This file may not be
+identical to the original
+.I index
+file
+used to create
+.I index.cache
+but when
+wndex (8)
+is run on this new
+.I index
+it
+should produce an
+.I index.cache
+identical to the one used as input for the
+.B wn_uncache
+program.
+.SH FILES
+.TP
+.I index
+Input file to
+.BR wndex (8)
+and output from the
+.B wn_uncache
+program.
+.TP
+.I index.cache
+Output file from
+.BR wndex (8)
+and input to the
+.B wn_uncache
+program which defines access control for directory.
+.SH SEE ALSO
+.BR wn (1),
+.BR wnconfig (8),
+.BR wndex (8),
+.BR wnpasswd (8),
+.BR wnupdate-www (8),
+.BR wnv2c (8)
+.br
+.B http://dochost/doc/wn/manual.html
+.br
+.B http://dochost/doc/wn/utility.html#wn_uncache
+.br
+.B http://dochost/doc/wn/appendixB.html
+.br
+.B http://hopf.math.nwu.edu/index.html
+.SH AUTHOR
+.B wn
+is written by John Franks <john@math.nwu.edu>.  Modified by Jean
+Pierre LeJacq <jplejacq@quoininc.com> as part of packaging for the
+Debian GNU/Linux distribution. Manual page also added by Jean Pierre
+LeJacq.

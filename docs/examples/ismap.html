@@ -1,0 +1,202 @@
+<!doctype html public "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+  <head>
+    <title>WN Clickable Image Examples</title>
+
+    <link rev="made" href="mailto:john@math.nwu.edu">
+
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <meta http-equiv="last-modified" content="Sun, 10 May 1998 18:07:18 GMT">
+    <meta http-equiv="keywords" content="WN clickable image example">
+  </head>
+
+  <body bgcolor="#FFFFFF">
+    <p>
+      <a href="http://hopf.math.nwu.edu/"><img
+        src="../images/powered.jpg"
+        border="0"
+        width="190"
+        height="41"
+        align="right"
+        alt="WN home page"
+      ></a>
+    </p>
+
+    <strong>Version 2.4.2</strong>
+
+    <br>
+
+    <!-- pnuts --> <a href="index.html">[Up]</a> <a href="../index.html">[Top]</a>
+
+    <br clear="right">
+
+    <hr size="4">
+
+    <h2 align="center"><em>WN</em> Clickable Image Examples</h2>
+    <hr size="4">
+
+    <p>
+      The <em>WN</em> server has built in support for
+      clickable images.  You no longer need to compile and use the <a
+      href="http://hoohoo.ncsa.uiuc.edu/docs/tutorials/imagemap.txt">NCSA C
+      <code>imagemap.c</code> program</a>.  This page illustrates the new
+      <em>WN</em> functionality with two examples.  If you want to set up your
+      own imagemaps you should read the chapter "<a
+      href="../click.html">Clickable Images and Imagemap files on the
+      <em>WN</em> Server</a>" from the "<a href="../manual.html">User's Guide
+      for the <em>WN</em> Server</a>".
+    </p>
+
+
+    <h3>1 <a name="shape">A Simple Example Using the Shape Method</a></h3>
+
+    <center>
+      <a href="shape.map"><img src="shape.png" alt="Imagemap Shape Example"
+      width="245" height="164" ismap></a>
+    </center>
+
+    <p>
+      Here is a very simple sample of the <em>WN</em> clickable image
+      capability.  Click in the box with the picture above and the server will
+      produce a response indicating in which area you clicked.
+    </p>
+
+    <p>
+      In order to create such a clickable image you must create a file called a
+      "<a href="../click.html#format">map file</a>" telling the server which
+      coordinates in the image correspond to which document.  The format of
+      this file is the same as that used with the <a
+      href="http://hoohoo.ncsa.uiuc.edu/docs/tutorials/imagemap.txt">NCSA C
+      <code>imagemap.c</code> program</a> (with a few minor enhancements).
+    </p>
+
+
+    <h4>1.1 <a name="shape.map">The Map File <code>shape.map</code></a></h4>
+
+    <p>
+      The map file for this example contains the following:
+    </p>
+
+    <blockquote>
+      <pre>
+<!-- #include -->
+      </pre>
+    </blockquote>
+
+    <p>
+      In this example all the URL's refer to the file <code>shape.html</code>
+      with a different "query" (the stuff after the ?).  Then <em>WN</em>'s
+      conditional text gives a different response for each request.  In real
+      life each of the URL's would probably refer to a different document.
+    </p>
+
+    <p>
+      In general these can be arbitrary URLs in one of three formats: Either
+      full, as in <code>http://webhost/docs/shape.html</code>&nbsp; or local as
+      in <code>/docs/shape.html</code>&nbsp; or relative as in
+      <code>shape.html</code>&nbsp; This last form is not supported by other
+      imagemap handlers, so should not be used if you plan to move your work to
+      a non-<em>WN</em> system.  It refers to a document in the same directory
+      as the map file.
+    </p>
+
+
+    <h4>1.2 <a name="shape.index">The <code>index.wn</code> File Entries</a></h4>
+
+    <p>
+      The <code>index</code> file entries for this example are:
+    </p>
+
+    <blockquote>
+      <code>
+        <a href="../appendixB.html#fdir.file">File=</a>shape.png
+        <br>
+        <br>
+        <a href="../appendixB.html#fdir.file">File=</a>shape.html
+        <br>
+        <a href="../appendixB.html#fdir.attributes">Attributes=</a>parse
+        <br>
+        <br>
+        <a href="../appendixB.html#fdir.file">File=</a>shape.map
+        <br>
+        <a href="../appendixB.html#fdir.attributes">Attributes=</a>imagemap
+      </code>
+    </blockquote>
+
+
+    <h3>2 <a name="point">A Simple Example Using the Point Method</a></h3>
+
+    <center>
+      <a href="points.map"><img src="points.png" alt="Imagemap Point Example"
+      width="229" height="148" ismap></a>
+    </center>
+
+    <p>
+      Click in the box with the dots above and a response will tell you the
+      color of the dot closest to the point where you clicked.
+    </p>
+
+
+    <h4>2.1 <a name="point.map">The Map File <code>points.map</code></a></h4>
+
+    <p>
+      The map file for this example contains:
+    </p>
+
+    <blockquote>
+      <pre>
+<!-- #include -->
+      </pre>
+    </blockquote>
+
+
+    <h4>2.2 <a name="point.index">The <code>index</code> File Entries</a></h4>
+
+    <p>
+      The index file entries for this example are:
+    </p>
+
+    <blockquote>
+      <code>
+        <a href="../appendixB.html#fdir.file">File=</a>points.png
+        <br>
+        <br>
+        <a href="../appendixB.html#fdir.file">File=</a>points.html
+        <br>
+        <a href="../appendixB.html#fdir.attributes">Attributes=</a>parse
+        <br>
+        <br>
+        <a href="../appendixB.html#fdir.file">File=</a>points.map
+        <br>
+        <a href="../appendixB.html#fdir.attributes">Attributes=</a>imagemap
+        <br>
+      </code>
+    </blockquote>
+
+    <p>
+      Of course you can use the point method and the shape methods in the same
+      map file.  When you do this the point method acts like a default.  That
+      is, if any of the methods "rect", "circle", or "poly" succeed the URL
+      corresponding to the first to do so will be returned.  Otherwise the URL
+      corresponding to the closest point to the click location will be
+      returned.
+    </p>
+
+
+    <hr size="4">
+
+    <address>
+      <em>WN</em> version 2.4.2
+      <br>
+      Copyright &copy; 1998 <a href="mailto:john@math.nwu.edu">John Franks
+      &lt;john@math.nwu.edu&gt;</a>
+      <br>
+      licensed under the <a href="http://www.gnu.org/copyleft/gpl.html">GNU
+      General Public License</a>
+      <br>
+      last-modified: Thu Sep 27 15:58:30 UTC 2001
+    </address>
+
+    <!-- pnuts --><a href="index.html">[Up]</a> <a href="../index.html">[Top]</a>
+  </body>
+</html>

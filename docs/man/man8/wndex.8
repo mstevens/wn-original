@@ -1,0 +1,222 @@
+.\" source:
+.\"   $Source: /var/cvs/projects/debian/printop/debian/dpkg.src/printop.printop.1.in,v $
+.\"
+.\" revision:
+.\"   @(#) $Id: printop.printop.1.in,v 1.2 1998/04/23 04:31:28 jplejacq Exp $
+.\"
+.\" copyright:
+.\"   Copyright (C) 1998 Jean Pierre LeJacq <jplejacq@quoininc.com>
+.\"
+.\"   Distributed under the GNU GENERAL PUBLIC LICENSE.
+.\"
+.TH wndex 8 "Sat, 25 Apr 1998 00:34:33 -0400" "1.18.7-1" "Debian GNU/Linux manual"
+.SH NAME
+wndex \- create access control file for wn HTTP server
+.SH SYNOPSIS
+.B wndex
+.RB [\| \-a \|]
+.RB [\| \-q \|]
+.RB [\| \-r \|]
+.RB [\| \-v \|]
+.RB [\| \-V \|]
+.RB [\| \-x \|]
+.RB [\| \-c
+.IR file \|]
+.RB [\| \-d
+.IR directory \|]
+.RB [\| \-i
+.IR file \|]
+.RB [\| "\-s all" \||\| "index" \|]
+.SH DESCRIPTION
+.B wndex
+is a
+.B C
+program that is part of the
+.BR wn (1)
+HTTP server package.
+.BR wn (1)
+will not serve files in a directory without an
+.I index.cache
+file.
+.B wndex
+is used to produce the
+.I index.cache
+files from
+.I index
+files.
+
+Executing
+.B wndex
+with no arguments in a directory containing an
+.I index
+file will produce the
+.I index.cache
+file for that directory. This file contains all the information in the
+.I index
+file plus additional information gathered automatically about the
+files to be served. In particular the
+.I index.cache
+file will list the names of the files given in the "File=" directives
+(see
+.BR http://dochost/doc/wn/appendixB.html#file )
+of the
+.I index
+file.  Any file on the server whose name is not listed in an
+.I index.cache
+file will not be served.  This is the basis of
+.BR wn (1)
+security.  For security reasons the server will refuse to use any
+.I index.cache
+file which is in reality a symbolic link to another file.
+.SH OPTIONS
+.TP
+.B \-a
+Using the
+.B \-a
+option is equivalent to putting the directive
+"Attributes=serveall" (see
+.BR http://dochost/doc/wn/appendixB.html#serveall )
+at the beginning of the
+.I index
+file (or files) being processed, with one important exception.  If
+.B wndex
+is used with this option in a directory which contains no
+.I index
+file, it will behave as if there were an
+.I index
+file containing only the line "Attributes=serveall".  This allows the
+creation of an
+.I index.cache
+file permitting access to all files in a directory without first
+creating an
+.I index
+file.  This can be used with
+.B \-r
+option to grant access to a directory hierarchy without the need to
+create an
+.I index
+file in each directory.
+.TP
+.BI "\-c " file
+Use
+.I file
+for name of database file instead of
+.I index.cache
+default.
+.TP
+.BI "\-d " directory
+Process the directory
+.I directory
+rather than the current directory.  It will use the
+.I index
+file in
+.I directory
+and write the file
+.I directory/index.cache
+for the database file.
+.TP
+.BI "\-i " file
+Read input from
+.I file
+rather than the default
+.I index
+file.
+.TP
+.B \-q
+Suppress any warning messages (except fatal errors) sent to
+.B stderr
+as well as other informational messages.
+.TP
+.B \-r
+Recursively descend through some subdirectories and process them as
+well.  By default it processes only those subdirectories listed in the
+"Subdirs=" directive (see
+.BR http://dochost/doc/wn/appendixB.html#subdirs ).
+However, this can be changed to be either all subdirectories or all
+subdirectories containing an
+.I index
+file by use of
+the
+.B \-s
+option described below.  If the
+.B \-r
+and
+.B \-a
+are used together then the default is to use all subdirectories.
+.PP
+.BR "\-s all" \||\c
+.B index
+.RS
+Using the
+.B "\-s index"
+option with an
+.I index
+file containing no "Subdirs=" directive (see
+.BR http://dochost/doc/wn/appendixB.html#subdirs )
+is equivalent to having such a directive whose value is a list of all
+subdirectories which contain an
+.I index
+file.  Using the 
+.B "\-s all"
+option with an
+.I index
+file containing no "Subdirs=" directive is equivalent to having such a
+directive whose value is a list of all subdirectories of the directory
+being processed.  If the
+.B \-r
+and
+.B \-a
+are used together then
+.B "\-s all"
+is automatically assumed.  This can be overridden by using a real
+"Subdirs=" directive or using the
+.B "\-s index"
+option.
+.RE
+.TP
+.B \-v
+Be verbose while processing.
+.TP
+.B \-V
+Print version and exit.
+.TP
+.B \-x
+Read from standard input
+instead of the file
+.I index
+and write to standard output rather
+than the file
+.I index.cache
+database.
+.SH FILES
+.TP
+.I index
+Input file to
+.B wndex
+program.
+.TP
+.I index.cache
+Output file from
+.B wndex
+program which defines access control for directory.
+.SH SEE ALSO
+.BR wn (1),
+.BR wnconfig (8),
+.BR wnpasswd (8),
+.BR wnuncache (8),
+.BR wnupdate-www (8),
+.BR wnv2c (8)
+.br
+.B http://dochost/doc/wn/manual.html
+.br
+.B http://dochost/doc/wn/appendixA2.html
+.br
+.B http://dochost/doc/wn/appendixB.html
+.br
+.B http://hopf.math.nwu.edu/index.html
+.SH AUTHOR
+.B wn
+is written by John Franks <john@math.nwu.edu>.  Modified by Jean
+Pierre LeJacq <jplejacq@quoininc.com> as part of packaging for the
+Debian GNU/Linux distribution. Manual page also added by Jean Pierre
+LeJacq.

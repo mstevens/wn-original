@@ -1,0 +1,117 @@
+.\" source:
+.\"   $Source: /var/cvs/projects/debian/printop/debian/dpkg.src/printop.printop.1.in,v $
+.\"
+.\" revision:
+.\"   @(#) $Id: printop.printop.1.in,v 1.2 1998/04/23 04:31:28 jplejacq Exp $
+.\"
+.\" copyright:
+.\"   Copyright (C) 1998 Jean Pierre LeJacq <jplejacq@quoininc.com>
+.\"
+.\"   Distributed under the GNU GENERAL PUBLIC LICENSE.
+.\"
+.TH wnindexmaker 1 "Sat, 25 Apr 1998 00:34:33 -0400" "1.18.7-1" "Debian GNU/Linux manual"
+.SH NAME
+wnpnuts \- produce navigation links to a set of HTML files for wn HTTP server
+.SH SYNOPSIS
+.B wnpnuts
+.RB [\| \-s
+.IR search_url \|]
+.RB [\| \-i
+.IR index_url \|]
+.IR hierarchy_file
+.SH DESCRIPTION
+.B wnpnuts
+is a
+.BR perl (1)
+program that is part of the
+.BR wn (1)
+HTTP server package.
+
+PNUTS (pronounced "peanuts") is an acronym for previous, next, up, top,
+search.  The argument
+.IR hierarchy_file
+is the name of a file describing the hierarchical structure of a group
+of HTML files constituting a single virtual document. The pnuts
+program then searches these files for lines which begin with the
+string
+
+.nf
+        <!-- pnuts -->
+.fi
+
+which it replaces with this string followed by a sequence of anchors
+like
+
+.nf
+        [previous] [next] [ up] [ top] [ search] [ index]
+.fi
+
+with links to the relevant files in the virtual document. Actually it
+replaces this line with a single line starting with <!-- pnuts -->,
+followed by the anchors. That way the next time it is run, say after
+inserting a new chapter in your document, the "pnuts" line will be
+replaced by a new one with the appropriate links.
+
+The file
+.IR hierarchy_file
+contains the information by which
+.B wnpnuts
+knows which files to process and what the order of those files should
+be. It consists of a list of files relative to the current directory,
+one per line, in the order which should be reflected in the [next]
+[previous] links. If a file is hierarchically one level lower than the
+previous file this should be indicated by preceding its name with one
+more <tab> character than the preceding file. Here is an example:
+
+.nf
+        top.html
+        second.html
+        <tab>firstsub.html
+        <tab><tab>subsub.html
+        <tab>secondsub.html
+        third.html
+.fi
+
+If this list is supplied to
+.B wnpnuts
+it will insert anchors into all these files wherever <!-- pnuts -->
+occurs.  All those named [top] will point to the file top.html. In
+firstsub.html and secondsub.html the [up] link will point to
+second.html. The [previous] and [next] links will reflect the order
+top.html, second.html, firstsub.html, subsub.html, secondsub.html,
+third.html.
+.SH OPTIONS
+.TP
+.BI "\-s " search_url
+The URL for the "[search]" anchor.  Optional with the default being no
+search item in the list of items in the list of items inserted by
+.B wnpnuts.
+.TP
+.BI "\-i " index_url
+The URL for the "[index]" anchor.  Optional with the default being no
+search item in the list of items in the list of items inserted by
+.B wnpnuts.
+This URL typically points to an an HTML document created with
+.BR wnindexmaker (1).
+.SH FILES
+.TP
+.I hierarchy_file
+Text file showing hiearchy of HTML files that make up a "virtual"
+document.
+.SH SEE ALSO
+.BR wn (1),
+.BR wndigest (1),
+.BR wnhtmlify (1),
+.BR wnindexmaker (1)
+.br
+.B http://dochost/doc/wn/index.html
+.br
+.B http://dochost/doc/wn/utility.html#pnuts
+.br
+.B http://hopf.math.nwu.edu/index.html
+.SH AUTHOR
+.B wn
+is written by John Franks <john@math.nwu.edu>.  Modified by Jean
+Pierre LeJacq <jplejacq@quoininc.com> as part of packaging for the
+Debian GNU/Linux distribution. Manual page also added by Jean Pierre
+LeJacq.

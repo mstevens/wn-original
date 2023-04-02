@@ -1,0 +1,207 @@
+.\" source:
+.\"   $Source: /var/cvs/projects/debian/printop/debian/dpkg.src/printop.printop.1.in,v $
+.\"
+.\" revision:
+.\"   @(#) $Id: printop.printop.1.in,v 1.2 1998/04/23 04:31:28 jplejacq Exp $
+.\"
+.\" copyright:
+.\"   Copyright (C) 1998 Jean Pierre LeJacq <jplejacq@quoininc.com>
+.\"
+.\"   Distributed under the GNU GENERAL PUBLIC LICENSE.
+.\"
+.TH wndigest 1 "Sat, 25 Apr 1998 00:34:33 -0400" "1.18.7-1" "Debian GNU/Linux manual"
+.SH NAME
+wndigest \- produce HTML links to document sections for wn HTTP server
+.SH SYNOPSIS
+.B wndigest
+.RB [\| \-b \|]
+.IR separator
+.IR section_title
+.IR file
+.RI [\| file \|] \ .\|.\|.
+.SH DESCRIPTION
+.B wndigest
+is a
+.BR perl (1)
+program that is part of the
+.BR wn (1)
+HTTP server package.  This program is designed to work with the range
+feature of the
+.BR wn (1)
+server and with list searches. It produces a list of anchors or links
+to sections of a structured plain text document like an address list
+or a mail file.
+
+.B wndigest
+is executed with three (or more) arguments. The first two arguments
+are regular expressions. The first regular expression should match the
+section separator of the structured file and the second should match
+the beginning of the line to be used as the section title. (More about
+this below).  The next argument is the name of a structured file, like
+a mail file, news digest or address list. Instead of a single
+structured file several files can be listed and
+.B wndigest
+will process their concatenation.
+
+Now more about the regular expressions: Suppose our structured file is
+a mail file in its usual format with a number of messages. The first
+regular expression should match just the lines which are the beginning
+of each section (in this case each message). For a mail file a good
+choice would be '^From ' which matches the word "From" followed by a
+space at the beginning of a line.
+
+The second regular expression matches start of the line which you
+would like to be the title of the section. It is convenient to have
+the link text be everything after the occurrence of the matching
+pattern for this regular expression. So for the mail file we would
+choose '^Subject:' for this regular expression. Then the program will
+produce a list of links one for each message with the text in the
+anchor the contents of the message Subject line (minus the word
+"Subject:"). Each link when accessed will produce a plain text
+document containing just that mail message.
+
+So if our mail file is named
+.I file
+we should execute the command:
+.nf
+        wndigest "^From " "^Subject:" file
+.fi
+
+Note the quotation marks which are needed to get the space after
+From. It produces a file named
+.I file.index.html
+which consists primarily of an unordered list. Each item in the list
+is an anchor referring to a line range in
+.I foo
+-- the ranges being delimited by lines which match the first regular
+expression argument. In this case that means each range will start
+with a line beginning with "From " which is the marker in a mail file
+designating the start of a new message. The anchor label for each
+range is taken from the first line in the range which contains a match
+for the second regular expression and, in fact, as mentioned above, it
+will consist of everything on that line after the matched regular
+expression.
+
+The first line of each range or section is a line which matches the
+first regular expression and the next matching line will begin the
+next section. Normally the search for the match for the anchor title
+regular expression begins with this first line. However, it is
+sometimes useful to skip this first line in the search for a title
+match. This can be done by starting the second regular expression with
+the character '$'. For example the command:
+.nf
+        wndigest ^$ $^ file
+.fi
+
+is a common one. It says to divide
+.I file
+into sections (line ranges) which are separated by blank lines (the
+regular expression ^$ matches a blank line). To obtain an anchor title
+for each section the blank line is skipped (since the second regular
+expression starts with $) and then everything on the next line is
+taken as the title (since ^ matches the beginning of the next
+line). The regular expressions of this example would be useful, for
+example, for an address list
+.I file
+which consisted of multi-line records separated by blank lines with an
+individual's name on the first line of each record. The
+.B wndigest
+utility would then produce a
+.I file.index.html
+file with an unordered list of anchors, one for each individual in the
+list. Selecting an anchor would present the record for that
+individual. Using a list search for this file would allow a form user
+to enter a name or regular expression and obtain a list of anchors for
+matching items.
+
+The
+.B wndigest
+command can have any number of files listed after the regular
+expressions and it will produce a single file whose name is the name
+of the first file with
+.I index.html
+appended. This file will contain a list of links to all the sections
+of all the files given on the command line.
+
+When
+.B wndigest
+writes the index file (e.g.,
+.I file.index.html\c
+), it adds two HTML
+comments to mark the start and end of the lines containing links to
+the records in your structured document. The markers look like this,
+where VERSION is the current version of
+.B wndigest
+used:
+.nf
+  <!-- Range list generated by digest/VERSION -->
+  <!-- End of range list generated by digest/VERSION -->
+.fi
+
+The first time
+.B wndigest
+writes an index file, it writes a default leader and trailer before
+and after the link lines. If
+.B wndigest
+finds an existing index file when it runs, it uses the information
+preceding the first marker and following the second marker as the
+leader and trailer for the new index file. This means you can run
+.B wndigest
+to create the initial index file, then edit the beginning and/or end
+of the file to modify the leader and trailer. Subsequent invocations
+of
+.B wndigest
+will retain your modifications each time the index file is recreated.
+
+If you add the -b argument when you use
+.B wndigest
+(i.e. run the command:
+.nf
+        wndigest -b regexp1 regexp1 file
+.fi
+then it will produce a file
+.I file.index.html
+which uses byte ranges rather than the default line ranges. This
+functions the same except the server will log the number of bytes
+actually sent when a request is served (the server won't bother to
+count the bytes in a line range request).
+
+There are fancier tools than
+.B wndigest
+for displaying mail archives, but this utility has great flexibility
+for dealing with a wide variety of structured files.
+.SH OPTIONS
+.TP
+.B \-b
+Produce a file which uses byte ranges rather than the default line
+ranges.
+.SH FILES
+.TP
+.I file
+Input to
+.B wndigest
+containing some structure such as sections.
+.TP
+.I file.index.html
+Output of
+.B wndigest
+with links to sections in
+.I file
+input.
+.SH SEE ALSO
+.BR wn (1),
+.BR wnhtmlify (1),
+.BR wnindexmaker (1),
+.BR wnpnuts (1)
+.br
+.B http://dochost/doc/wn/index.html
+.br
+.B http://dochost/doc/wn/utility.html#digest
+.br
+http://hopf.math.nwu.edu/index.html
+.SH AUTHOR
+.B wn
+is written by John Franks <john@math.nwu.edu>.  Modified by Jean
+Pierre LeJacq <jplejacq@quoininc.com> as part of packaging for the
+Debian GNU/Linux distribution. Manual page also added by Jean Pierre
+LeJacq.

@@ -1,0 +1,1221 @@
+<!doctype html public "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+  <head>
+    <title>Parsed Document Syntax for the WN Server</title>
+
+    <link rev="made" href="mailto:john@math.northwestern.edu">
+
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <meta http-equiv="last-modified" content="Sat June 18 2005">
+    <meta http-equiv="keywords" content="WN parsing syntax">
+  </head>
+
+  <body bgcolor="#FFFFFF">
+    <p>
+      <a href="http://hopf.math.northwestern.edu/"><img
+        src="images/powered.jpg"
+        border="0"
+        width="190"
+        height="41"
+        align="right"
+        alt="WN home page"
+      ></a>
+    </p>
+
+    <strong>Version 2.4.7</strong>
+
+    <br>
+
+    <!-- pnuts --> <a href="appendixB.html">[Previous]</a> <a href="appendixD.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+
+
+
+    <br clear="right">
+
+    <hr size="4">
+    <!-- #start -->
+
+    <h2 align="center">Parsed Document Syntax for the <em>WN</em> Server</h2>
+    <hr size="4">
+
+    <p>
+      This is a list of all parsing instructions recognized by <em>WN</em>
+      while parsing an HTML document. Note that only documents with MIME type
+      <code>text/html</code> can be parsed for the purposes described here.
+      All parsing instructions use one of the two equivalent forms:
+    </p>
+
+     <blockquote>
+      <code>
+        &lt;!--&nbsp;#something&nbsp;--&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      or:
+    </p>
+
+    <blockquote>
+      <code>
+        &lt;?WN&nbsp;something&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      There is a maximum allowed size of 2K bytes for the entire
+      "<code>&lt;!--&nbsp;#something&nbsp;--&gt;</code>" expression.  Current
+      versions of <em>WN</em> no longer require this expression to be on a line
+      by itself.
+    </p>
+
+    <p>
+      The second form is considered more <a
+      href="http://www.sil.org/sgml/">SGML/XML</a> friendly by many as
+      "<code>&lt;?WN&nbsp;something&nbsp;&gt;</code>" indicates a processing
+      instruction specific to <em>WN</em> rather than a comment.  For
+      historical reasons this manual describes the other form, but either may
+      be used.  With the first form the '<code>#</code>' is required but with
+      the other you may use either:
+    </p>
+
+     <blockquote>
+      <code>
+        &lt;?WN&nbsp;#something&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      or:
+    </p>
+
+     <blockquote>
+      <code>
+        &lt;?WN&nbsp;something&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      Also "<code>&lt;?wn&nbsp;#something&gt;</code>" is fine.  The case of the
+      <code>WN</code> is not significant.
+    </p>
+
+
+    <h3>C.1 <a name="match">Matching Regular Expressions: <code>#if</code> and
+    <code>#elif</code></a></h3>
+
+    <p>
+      This section describes the use of conditionally included text of the
+      form:
+    </p>
+
+    <blockquote>
+      <code>
+        &lt;!--&nbsp;#if&nbsp;some_condition&nbsp;--&gt;
+        <br>
+        &nbsp;&nbsp;Some conditional text goes here.
+        <br>
+        &lt;!--&nbsp;#elif&nbsp;another_condition&nbsp;--&gt;
+        <br>
+        &nbsp;&nbsp;Some other conditional text goes here.
+        <br>
+        &lt;!--&nbsp;#else&nbsp;--&gt;
+        <br>
+        &nbsp;&nbsp;Alternate text.
+        <br>
+        &lt;!--&nbsp;#endif&nbsp;--&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      Which will insert the first conditional text only if
+      <code>some_condition</code> is satisfied.  The
+      "<code>&lt;!--&nbsp;#elif&nbsp;another_condition&nbsp;--&gt;</code>" and
+      "<code>&lt;!--&nbsp;#else&nbsp;&gt;</code>" are optional.  There may be
+      multiple "<code>#elif</code>" lines.
+    </p>
+
+    <p>
+      In all the examples below the use of the equal-tilde string
+      '<code>=~</code>' to indicate a matching regular expression can be
+      replaced with the two characters '<code>!~</code>' in which case the if
+      clause will be true when the regular expression fails to match.
+    </p>
+
+    <p>
+      Also in the examples of the form
+      "<code>&lt;--&nbsp;#if&nbsp;accept&nbsp;file="foo"&nbsp;--&gt;</code>"
+      the file <code>foo</code> is assumed to be relative to the current
+      directory unless it begins with a '<code>/</code>' in which case it is
+      taken relative to the <em>WN</em> data hierarchy root.  The format of
+      these files is a list of <code>grep(1)</code> like regular expressions,
+      one per line with any white space being taken as part of the expression.
+      Lines beginning with '<code>#</code>' are taken to be comments.  If a
+      regular expression is preceded with the character '<code>!</code>' then
+      that character is skipped but the truth value of any matches with the
+      expression is reversed.
+    </p>
+
+    <p>
+      The regular expressions recognized by the <em>WN</em> server are the same
+      as those of the UNIX <code><a
+      href="/cgi-bin/man2html/usr/man/man1/grep.1.gz">grep(1)</a></code>
+      utility (though this utility is not used as the server has its own
+      regular expression functions).  The more general regular expressions used
+      for example in the UNIX <code><a
+      href="/cgi-bin/man2html/usr/man/man1/egrep.1.gz">egrep(1)</a></code>
+      utility are not supported by <em>WN</em>.
+    </p>
+
+    <p>
+      The condition in the "<code>#if</code>" or "<code>#elif</code>" tags can
+      be made more complex than those described above by combining simple
+      conditions using the logical operations '<code>&amp;&amp;</code>' for
+      '<code>and</code>', '<code>||</code>' for '<code>or</code>' and
+      '<code>!</code>' for '<code>not</code>'.  Parentheses may be used for
+      grouping.  For example:
+    </p>
+
+    <blockquote>
+      <code>
+        &lt;!--&nbsp;#if&nbsp;cond_1&nbsp;&amp;&amp;&nbsp;cond_2&nbsp;--&gt;
+        <br>
+        &nbsp;&nbsp;Text to show if cond_1 and cond_2 are satisfied.
+        <br>
+        &lt;!--&nbsp;#endif&nbsp;--&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      Other examples are:
+    </p>
+
+    <blockquote>
+      <code>
+        &lt;!--&nbsp;#if&nbsp;cond_1&nbsp;||&nbsp;cond_2&nbsp;--&gt;
+        <br>
+        &lt;!--&nbsp;#if&nbsp;!cond_1&nbsp;--&gt;
+        <br>
+        &lt;!--&nbsp;#if&nbsp;(cond_1&nbsp;||&nbsp;cond_2)&nbsp;&amp;&amp;&nbsp;!cond_3&nbsp;--&gt;
+      </code>
+    </blockquote>
+
+    <p>
+      The '<code>&amp;&amp;</code>' and '<code>||</code>' operations have equal
+      precedence and associate from right to left.
+    </p>
+
+
+    <h4>C.1.1 <a name="match.conditions"><code>#if</code> and
+    <code>#elif</code> Conditions</a></h4>
+
+    <dl>
+      <dt>
+        <a name="match.conditions.accept"><code>#if accept</code></a> -- Match
+        client's <code>Accept</code> headers
+      </dt>
+      <dd>
+        <p>
+          The lines:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;accept&nbsp;=~&nbsp;"regexp"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          or:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;accept&nbsp;file&nbsp;=&nbsp;"foo"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          specify that this text segment should be served if (in the first
+          case) the UNIX <code><a
+          href="/cgi-bin/man2html/usr/man/man1/grep.1.gz">grep(1)</a></code>
+          utility like regular expression "<code>regexp</code>" matches any of
+          the <code>Accept</code> headers supplied by the client.  Or for the
+          second line if the file "<code>foo</code>" contains a regular
+          expression matching any of the <code>Accept</code> headers.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="match.conditions.accept_charset"><code>#if accept_charset</code></a> -- Match
+        client's <code>Accept-Charset</code> headers
+      </dt>
+      <dd>
+        <p>
+          The lines:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;accept_charset&nbsp;=~&nbsp;"regexp"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          or:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;accept_charset&nbsp;file&nbsp;=&nbsp;"foo"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          specify that this text segment should be served if (in the first
+          case) the UNIX <code><a
+          href="/cgi-bin/man2html/usr/man/man1/grep.1.gz">grep(1)</a></code>
+          utility like regular expression "<code>regexp</code>" matches any of
+          the <code>Accept-Charset</code> headers supplied by the client.  Or for the
+          second line if the file "<code>foo</code>" contains a regular
+          expression matching any of the <code>Accept-Charset</code> headers.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="match.conditions.accept_encoding"><code>#if accept_encoding</code></a> -- Match
+        client's <code>Accept-Encoding</code> headers
+      </dt>
+      <dd>
+        <p>
+          The lines:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;accept_encoding&nbsp;=~&nbsp;"regexp"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          or:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;accept_encoding&nbsp;file&nbsp;=&nbsp;"foo"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          specify that this text segment should be served if (in the first
+          case) the UNIX <code><a
+          href="/cgi-bin/man2html/usr/man/man1/grep.1.gz">grep(1)</a></code>
+          utility like regular expression "<code>regexp</code>" matches any of
+          the <code>Accept-Encoding</code> headers supplied by the client.  Or for the
+          second line if the file "<code>foo</code>" contains a regular
+          expression matching any of the <code>Accept-Encoding</code> headers.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="match.conditions.accept_language"><code>#if&nbsp;accept_language</code></a>
+        -- Match client's <code>Accept-Language</code> headers
+      </dt>
+      <dd>
+        <p>
+          The lines:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;accept_language&nbsp;=~&nbsp;"regexp"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          or:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;accept_language&nbsp;file&nbsp;=&nbsp;"foo"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          specify that this text segment should be served if (in the first
+          case) the UNIX <code><a
+          href="/cgi-bin/man2html/usr/man/man1/grep.1.gz">grep(1)</a></code>
+          utility like regular expression "<code>regexp</code>" matches any of
+          the <code>Accept-Language</code> headers supplied by the client.  Or
+          for the second line if the file "<code>foo</code>" contains a regular
+          expression matching any of the <code>Accept-Language</code> headers.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="match.conditions.after"><code>#if&nbsp;after</code> and
+        <code>#if&nbsp;before</code></a> -- Select text based on date
+      </dt>
+      <dd>
+        <p>
+          The lines:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;after&nbsp;"date"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          or:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;before&nbsp;"date"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          specify that this text segment should be served if the current time
+          is after (or before) the specified date.  That is, the line:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;after&nbsp;"22&nbsp;Oct&nbsp;1996&nbsp;17:41:26"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          will cause the text segment to be served only after
+          "<code>22&nbsp;Oct&nbsp;1996&nbsp;17:41:26</code>" local time.  The
+          date format is rather rigid.  It must be in precisely the format
+          shown above (specified by <a
+          href="http://linux-howto.com/rfc/rfc1000-1499/rfc1123.txt">RFC
+          1123</a>) and with a single space between each field.  Only local
+          time of the server is supported.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="match.conditions.cookie"><code>#if&nbsp;cookie</code></a> --
+        Match client's <code>Cookie</code> headers
+      </dt>
+      <dd>
+        <p>
+          The lines:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;cookie&nbsp;=~&nbsp;"regexp"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          or:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;cookie&nbsp;file=&nbsp;"foo"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that this text segment should be served if the UNIX
+          <code><a
+          href="/cgi-bin/man2html/usr/man/man1/grep.1.gz">grep(1)</a></code>
+          utility like regular expression <code>regexp</code> matches any of
+          the <code>Cookie</code> headers supplied by the client.
+        </p>
+
+        <p>
+          More information about the proposed HTTP <code>Set-Cookie</code>
+          header is available at <a
+          href="http://home.netscape.com/newsref/std/cookie_spec.html">http://home.netscape.com/newsref/std/cookie_spec.html</a>.
+        </p>
+      </dd>
+
+
+      <dt>
+        <a name="match.conditions.environ"><code>#if&nbsp;environ VAR</code></a> --
+        Match client's environment variable <code>VAR</code>
+      </dt>
+      <dd>
+        <p>
+          The lines:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;environ&nbsp;VAR&nbsp;=~&nbsp;"regexp"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          or:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;environ&nbsp;VAR;&nbsp;file=&nbsp;"foo"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that this text segment should be served if the UNIX
+          <code><a
+          href="/cgi-bin/man2html/usr/man/man1/grep.1.gz">grep(1)</a></code>
+          utility like regular expression <code>regexp</code> matches any of
+          the the contents of the server's environment variable <code>VAR</code>.
+        </p>
+
+
+      <dt>
+        <a name="match.conditions.field"><code>#if&nbsp;field</code></a> --
+        Match document's user defined field
+      </dt>
+      <dd>
+        <p>
+          The lines:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;field3&nbsp;=~&nbsp;"regexp"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          or:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;field3&nbsp;file=&nbsp;"foo"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          specify that this text segment should be served if the UNIX <code><a
+          href="/cgi-bin/man2html/usr/man/man1/grep.1.gz">grep(1)</a></code>
+          utility like regular expression "<code>regexp</code>" matches the
+          contents of the <a href="field.html">user defined field</a> number 3
+          (in the first case) or if the file "<code>foo</code>" contains a
+          matching regular expression (in the second) case.  Any valid field
+          number may be used in place of 3.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="match.conditions.hostname"><code>#if&nbsp;hostname</code></a>
+        -- Match client's hostname
+      </dt>
+      <dd>
+        <p>
+          The lines:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;hostname&nbsp;=~&nbsp;"regexp"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          or:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;hostname&nbsp;file=&nbsp;"foo"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          specify that this text segment should be served if the UNIX <code><a
+          href="/cgi-bin/man2html/usr/man/man1/grep.1.gz">grep(1)</a></code>
+          utility like regular expression "<code>regexp</code>" matches the
+          hostname of the client (in the first case) or if the file
+          "<code>foo</code>" contains a matching regular expression (in the
+          second) case.  For an alternate method of doing this see the "<a
+          href="#match.control"><code>#if&nbsp;accessfile</code></a>" syntax
+          described below.
+        </p>
+
+        <p>
+          Be aware that the character '<code>.</code>' (dot) has a special
+          meaning in regular expressions and must be escaped with a
+          '<code>\</code>' to have its usual meaning.
+        </p>
+      </dd>
+
+      <dt>
+        <a
+        name="match.conditions.host_header"><code>#if&nbsp;host_header</code></a>
+        -- Match server's virtual hostname from client's HTTP Host header
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;host_header&nbsp;=~&nbsp;"regexp"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          specify that this text segment should be served if the UNIX <code><a
+          href="/cgi-bin/man2html/usr/man/man1/grep.1.gz">grep(1)</a></code>
+          utility like regular expression "<code>regexp</code>" matches the
+          contents of the HTTP "<code>Host:</code>" header supplied by the
+          client in its request.
+        </p>
+
+        <p>
+          Be aware that the character '<code>.</code>' (dot) has a special
+          meaning in regular expressions and must be escaped with a
+          '<code>\</code>' to have its usual meaning.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="match.conditions.ip"><code>#if&nbsp;IP</code></a> -- Match
+        client's IP address
+      </dt>
+      <dd>
+        <p>
+          The lines:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;IP&nbsp;=~&nbsp;"regexp"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          or:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;IP&nbsp;file=&nbsp;"foo"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          specify that this text segment should be served if the UNIX <code><a
+          href="/cgi-bin/man2html/usr/man/man1/grep.1.gz">grep(1)</a></code>
+          utility like regular expression "<code>regexp</code>" matches the IP
+          address of the client (in the first case) or if the file
+          "<code>foo</code>" contains a matching regular expression (in the
+          second case).  For an alternate method of doing this see the "<a
+          href="#match.control"><code>#if&nbsp;accessfile</code></a>" syntax
+          described below.
+        </p>
+
+        <p>
+          Be aware that the character '<code>.</code>' (dot) has a special
+          meaning in regular expressions and must be escaped with a
+          '<code>\</code>' to have its usual meaning.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="match.conditions.language"><code>#if&nbsp;language</code></a>
+        -- Match client's <code>Accept-Language</code> headers
+      </dt>
+      <dd>
+        <p>
+          The lines:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;language&nbsp;=~&nbsp;"regexp"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          or:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;language&nbsp;file&nbsp;=&nbsp;"foo"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          specify that this text segment should be served if (in the first
+          case) the UNIX <code><a
+          href="/cgi-bin/man2html/usr/man/man1/grep.1.gz">grep(1)</a></code>
+          utility like regular expression "<code>regexp</code>" matches any of
+          the <code>Accept-Language</code> headers supplied by the client.  Or
+          for the second line if the file "<code>foo</code>" contains a regular
+          expression matching any of the <code>Accept-Language</code> headers.
+	  These forms are deprecated.  The preferred form is to use
+	  <code>#if&nbsp;accept_language</code> in place of <code>#if&nbsp;language.</code>
+        </p>
+      </dd>
+
+      <dt>
+        <a name="match.conditions.query"><code>#if&nbsp;query</code></a> --
+        Match query string supplied in request URL
+      </dt>
+      <dd>
+        <p>
+          The lines:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;query&nbsp;=~&nbsp;"regexp"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          or:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;query&nbsp;file&nbsp;=&nbsp;"foo"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that this text segment should be served if the UNIX
+          <code><a
+          href="/cgi-bin/man2html/usr/man/man1/grep.1.gz">grep(1)</a></code>
+          utility like regular expression "<code>regexp</code>" matches the
+          query string supplied by the client in the URL (in the first case) or
+          if the file "<code>foo</code>" contains a matching regular expression
+          (in the second case).
+        </p>
+      </dd>
+
+      <dt>
+        <a name="match.conditions.referer"><code>#if&nbsp;referer</code></a> --
+        Match client supplied <code>Referer:</code> header
+      </dt>
+      <dd>
+        <p>
+          The lines:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;referer&nbsp;=~&nbsp;"regexp"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          or:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;referer&nbsp;file&nbsp;=&nbsp;"foo"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          specify that this text segment should be served if the UNIX <code><a
+          href="/cgi-bin/man2html/usr/man/man1/grep.1.gz">grep(1)</a></code>
+          utility like regular expression "<code>regexp</code>" matches the
+          contents of the <code>Referer:</code> header supplied by the client
+          or if the file "<code>foo</code>" contains a matching regular
+          expression (in the second case).  The <code>Referer:</code> header
+          contains the URL of the document containing the link accessed to
+          obtain the current document.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="match.conditions.request"><code>#if&nbsp;request</code></a> --
+        Match client's request
+      </dt>
+      <dd>
+        <p>
+          The lines:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;request&nbsp;=~&nbsp;"regexp"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          or:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;request&nbsp;file&nbsp;=&nbsp;"foo"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          specify that this text segment should be served if the UNIX <code><a
+          href="/cgi-bin/man2html/usr/man/man1/grep.1.gz">grep(1)</a></code>
+          utility like regular expression "<code>regexp</code>" matches the
+          contents of the full text of the request supplied by the client (in
+          the first case) or if the file "<code>foo</code>" contains a matching
+          regular expression (in the second case).  The full request contains
+          the "method" (<code>GET</code> or <code>POST</code>) followed by the
+          URL requested with the "<code>http://host</code>" part having been
+          removed (by the client).
+        </p>
+      </dd>
+
+      <dt>
+        <a name="match.conditions.TE"><code>#if TE</code></a> -- Match
+        client's <code>TE</code> header
+      </dt>
+      <dd>
+        <p>
+          The lines:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;TE&nbsp;=~&nbsp;"regexp"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          or:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;TE&nbsp;file&nbsp;=&nbsp;"foo"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          specify that this text segment should be served if (in the first
+          case) the UNIX <code><a
+          href="/cgi-bin/man2html/usr/man/man1/grep.1.gz">grep(1)</a></code>
+          utility like regular expression "<code>regexp</code>" matches
+          the <code>TE</code> header supplied by the client.  Or for the
+          second line if the file "<code>foo</code>" contains a regular
+          expression matching the <code>TE</code> header.  The TE
+	  header specifies the <code>transfer encoding</code>.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="match.conditions.true"><code>#if&nbsp;true</code> and
+        <code>#if&nbsp;false</code></a> -- Include or exclude text segment
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;false&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that the corresponding text segment should not be served.
+          It may be useful for "commenting out" a part of a document which is
+          under construction.  The "<code>#if&nbsp;true</code>" construct is
+          present for logical completeness.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="match.conditions.ua"><code>#if&nbsp;UA</code></a> -- Match
+        client's <code>User-Agent:</code> header
+      </dt>
+      <dd>
+        <p>
+          The lines:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;UA&nbsp;=~&nbsp;"regexp"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          or:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;UA&nbsp;file&nbsp;=&nbsp;"foo"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that this text segment should be served if the UNIX
+          <code><a
+          href="/cgi-bin/man2html/usr/man/man1/grep.1.gz">grep(1)</a></code>
+          utility like regular expression "<code>regexp</code>" matches the
+          <code>User-Agent:</code> header supplied by the client (in the first
+          case) or if the file "<code>foo</code>" contains a matching regular
+          expression (in the second case).
+        </p>
+      </dd>
+
+    </dl>
+
+
+    <h4>C.1.2 <a name="match.control">Access Control Files</a></h4>
+
+    <p>
+      The normal <a href="access.html">access control files</a> used by
+      <em>WN</em> to limit access to a directory can also be used to
+      conditionally permit or deny access to text segments.
+    </p>
+
+    <dl>
+      <dt>
+        <a
+        name="match.control.accessfile"><code>#if&nbsp;accessfile="filename"</code></a>
+        -- Check access control file
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;accessfile="/dir/accessfile"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that the file <code>/dir/accessfile</code> is to be used to
+          determine access privileges (by hostname or IP address) for this text
+          segment.  The path <code>/dir/accessfile</code> is relative to the
+          server root directory.  If this path does not begin with a
+          '<code>/</code>' then the path is relative to the directory
+          containing the file with this text.  See the chapter "<a
+          href="access.html">Limiting Access to Your <em>WN</em> Hierarchy</a>"
+          in this guide.
+        </p>
+      </dd>
+    </dl>
+
+
+    <h3>C.2 <a name="insert">Inserting the Contents of a File</a></h3>
+
+    <dl>
+      <dt>
+        <a name="insert.include"><code>#include</code></a> -- Insert the
+        contents of a file
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#include&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that the contents of next file listed in the <a
+          href="parse.html">includes or wrappers</a> should be inserted at this
+          point.  It is permissible to add the name of this file, as in:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#include&nbsp;&nbsp;foo.txt&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          but this acts only as a comment.  The actual file inserted depends
+          only on the "<code><a
+          href="appendixD.html#includes">Includes=</a></code>" and "<code><a
+          href="appendixD.html#wrappers">Wrappers=</a></code>" directives in
+          the <a href="index_desc.html#index"><code>index.wn</code></a> file (or
+          more precisely the <code>index.cache</code> file created from it).
+        </p>
+      </dd>
+
+      <dt>
+        <a name="insert.section"><code>#section</code></a> -- Insert part of
+        the contents of a file
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#section&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that part of the contents of next file listed in the <a
+          href="parse.html">includes or wrappers</a> should be inserted at this
+          point.  It is permissible to add the name of this file, as in:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#section&nbsp;&nbsp;foo.txt&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          but this acts only as a comment.  The actual file inserted depends
+          only on the "<code><a
+          href="appendixD.html#includes">Includes=</a></code>" and "<code><a
+          href="appendixD.html#wrappers">Wrappers=</a></code>" directives in
+          the <a href="index_desc.html#index"><code>index.wn</code></a> file (or
+          more precisely the <code>index.cache</code> file created from it).
+        </p>
+
+        <p>
+          The part of the file actually included is that portion of the
+          document between the special comments
+          "<code>&lt;!--&nbsp;#start&nbsp;--&gt;</code>" and
+          "<code>&lt;!--&nbsp;#end&nbsp;--&gt;</code>" inserted in that
+          document.  This requires that these starting and ending comments
+          occur in the HTML document on lines by themselves. For more
+          information see the section "<a href="parse.html#section">More on
+          Including: the <code>section</code> Marker</a>" in this guide.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="insert.start"><code>#start</code> and <code>#end</code></a> --
+        Mark the beginning and end of text to be included
+      </dt>
+      <dd>
+        <p>
+          The lines:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#start&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          and:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#end&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          mark the beginning and end of the portion of the text to be inserted
+          from an include or wrapper in response to encountering
+          "<code>&lt;!--&nbsp;#section&nbsp;--&gt;</code>" in the text of a
+          document being parsed.  There can be more than one
+          "<code>#start</code>/<code>#end</code>" pair in a document.  For more
+          information see the section "<a href="parse.html#section">More on
+          Including: the <code>section</code> Marker</a>" in this guide.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="insert.title"><code>#title</code>, <code>#query</code>, and
+        <code>#field</code></a> -- Insert the title, current search string, or
+        a user defined field
+      </dt>
+      <dd>
+        <p>
+          The lines:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#title&nbsp;--&gt;
+            <br>
+            &lt;!--&nbsp;#query&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          or:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#field&nbsp;3&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          in a parsed document instruct the server to include the title of the
+          current document, the current search term from the client or the
+          value of user defined "<code>field&nbsp;#3</code>" for the current
+          document.  All of these markers must occur on a line by themselves.
+          For more information see the section "<a
+          href="parse.html#section">Including Title, Query, Fields and
+          Environment Variables</a>" in this guide.
+        </p>
+      </dd>
+
+      <dt>
+        <a name="insert.environ"><code>#environ</code></a> -- Insert the
+        contents of an environment variable
+      </dt>
+      <dd>
+        <p>
+          The lines:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#environ&nbsp;=&nbsp;"WHATEVER"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          in a parsed document instructs the server to include the contents of
+          the environment variable <code>WHATEVER</code>.  Remember to use an
+          "<code><a
+          href="appendixB.html#attributes.parse">Attributes=parse</a></code>"
+          line when using this construct and to use an "<code><a
+          href="appendixB.html#attributes.parse">Attributes=cgi</a></code>"
+          when it is a <a href="appendixD.html">CGI variable</a> like <a
+          href="appendixD.html#http_referer"><code>HTTP_REFERER</code></a>
+          which is to be included.
+        </p>
+      </dd>
+    </dl>
+
+
+    <h3><a name="redirect">Conditional Redirecting</a></h3>
+
+    <dl>
+      <dt>
+        <a name="redirect.redirect"><code>#redirect</code></a> -- Redirect to a
+        different URL
+      </dt>
+      <dd>
+        <p>
+          The line:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#redirect&nbsp;=&nbsp;"url"&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          specifies that if no text has yet been sent the server should send an
+          HTTP redirect to the given URL.  This might be used as follows.  If
+          the text:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;hostname&nbsp;=~&nbsp;"\.uk$"&nbsp;--&gt;
+            <br>
+            &lt;!--&nbsp;#redirect&nbsp;=&nbsp;"UK_mirror_url"&nbsp;--&gt;
+            <br>
+            &lt;!--&nbsp;#endif&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          is included at the beginning of an HTML document then any request
+          from a <code>uk</code> host will automatically be redirected to the
+          specified URL, the <code>UK_mirror_url</code> in this case.  This
+          mechanism could also be used to redirect text only browsers to a text
+          only alternative page, etc.
+        </p>
+
+        <p>
+          There must be no text sent before the
+          '<code>&lt;!--&nbsp;#redirect&nbsp;=&nbsp;"url"&nbsp;--&gt;</code>'
+          is encountered (not even blank lines) since the server cannot send an
+          HTTP redirect while in the middle of transmitting a document.  Thus
+          the example above would be an error if there are any blank lines
+          before the "<code>#if&nbsp;hostname</code>" line or any blank lines
+          after it before the "<code>#redirect</code>" line.  When such an
+          error occurs it is logged in the <a href="setup.html#logging">error
+          file</a> and the "<code>#redirect</code>" line is ignored.
+        </p>
+
+        <p>
+          Note however that:
+        </p>
+
+        <blockquote>
+          <code>
+            &lt;!--&nbsp;#if&nbsp;hostname&nbsp;=~&nbsp;"\.uk$"&nbsp;--&gt;
+            <br>
+            &nbsp;&nbsp;[Lots of text here]
+            <br>
+            &lt;!--&nbsp;#else&nbsp;--&gt;
+            <br>
+            &lt;!--&nbsp;&nbsp;&nbsp;#redirect&nbsp;=&nbsp;"some_URL"&nbsp;--&gt;
+            <br>
+            &lt;!--&nbsp;#endif&nbsp;--&gt;
+          </code>
+        </blockquote>
+
+        <p>
+          is correct since when the <code>#redirect</code> line is encountered
+          no text has been sent.
+        </p>
+
+        <p>
+          Normally the URL in the
+          "<code>&lt;!--&nbsp;#redirect&nbsp;=&nbsp;"URL"&nbsp;--&gt;</code>"
+          line is fully qualified, like "<code>http://host/path/foo</code>".
+          However, it can also be simply "<code>foo</code>" referring to a file
+          in the same directory as the file being parsed.  In this case an HTTP
+          redirection is not sent, and instead the file "<code>foo</code>" is
+          returned immediately to the client.
+        </p>
+      </dd>
+    </dl>
+
+
+
+    <!-- #end -->
+    <hr size="4">
+
+    <address>
+      <em>WN</em> version 2.4.7
+      <br>
+      Copyright &copy; 1998-2005 <a href="mailto:john@math.northwestern.edu">John Franks
+      &lt;john@math.northwestern.edu&gt;</a>
+      <br>
+      licensed under the <a
+        href="http://www.gnu.org/copyleft/fdl.txt">GNU Free Documentation License</a>
+      <br>
+<!-- hhmts start -->
+Last modified: Sat June  18 2005
+<!-- hhmts end -->
+    </address>
+
+    <!-- pnuts --> <a href="appendixB.html">[Previous]</a> <a href="appendixD.html">[Next]</a> <a href="manual.html">[Up]</a> <a href="manual.html">[Top]</a> <a href="dosearch.html">[Search]</a> <a href="docindex.html">[Index]</a>
+  </body>
+</html>

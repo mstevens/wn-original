@@ -1,0 +1,15 @@
+Put-Authorization-realm=roaming@yourhost
+Put-Authorization-module=/path/to/wnauth -P "/path/to/wnpasswd"
+Put-Authorization-type=basic
+Authorization-realm=roaming@yourhost
+Authorization-module=/path/to/wnauth -P "/path/to/wnpasswd"
+Authorization-type=basic
+Attributes=serveall
+Default-Attribute=put
+Default-Put-handler=/path/to/wnputh -g 3003  #group ownership of PUT files
+
+
+
+
+
+

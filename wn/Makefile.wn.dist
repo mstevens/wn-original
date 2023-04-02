@@ -1,0 +1,119 @@
+CC = cc
+CFLAGS = -Wall
+CPPFLAGS = 
+LDFLAGS =
+
+SSLFLAGS =
+# If you have compiled openssl without IDEA add -DNO_IDEA to SSLFLAGS
+
+SSLLDFLAGS = -L/usr/local/openssl/lib -L/usr/local/ssl/lib
+SSLINCLUDES = -I/usr/local/openssl/include -I/usr/local/ssl/include
+SSLLIBS = -lssl -lcrypto
+PAMLIBS =
+MD5LIB = -lcrypto
+EXTRALIBS = $(PAMLIBS) $(SSLLIBS)
+
+BINDIR = ../bin
+
+OBJS	= wn.o prequest.o init.o chkcntrl.o send.o parse.o util.o misc.o www.o\
+	  csearch.o gsearch.o isearch.o regcomp.o regfind.o cgi.o mod.o\
+	  tilde.o rfc931.o evalif.o image.o chkauth.o vhost.o
+
+SSLOBJS	= wn_ssl.o prequest.o init_ssl.o chkcntrl.o send_ssl.o parse.o util.o\
+	  misc.o www.o csearch.o gsearch.o isearch.o regcomp.o regfind.o cgi.o\
+	  mod.o tilde.o rfc931.o evalif.o image.o chkauth.o vhost.o ssl_data.o
+
+SDOBJS	= swn.o prequest.o swninit.o chkcntrl.o send.o parse.o util.o\
+	misc.o www.o csearch.o gsearch.o isearch.o regcomp.o regfind.o cgi.o\
+	mod.o standalone.o tilde.o rfc931.o evalif.o image.o chkauth.o\
+	vhost.o
+
+SSLSDOBJS = swn_ssl.o prequest.o swninit_ssl.o chkcntrl.o send_ssl.o parse.o\
+	util.o	misc.o www.o csearch.o gsearch.o isearch.o regcomp.o regfind.o\
+	cgi.o mod.o standalone.o tilde.o rfc931.o evalif.o image.o chkauth.o\
+	vhost.o ssl_data.o
+
+HEADERS = wn.h common.h err.h  ../config.h
+SSLHEADERS = wnssl.h
+
+all:	wnd wnsd
+
+wnd:	$(OBJS)
+	$(CC) $(LDFLAGS) -o wnd $(OBJS) $(LIBS) $(PAMLIBS) $(MD5LIB)
+
+wnsd:	$(SDOBJS)
+	$(CC) $(LDFLAGS) -o wnsd $(SDOBJS) $(LIBS) $(PAMLIBS) $(MD5LIB)
+
+wnssl:	wnssld wnsslsd
+
+wnssld:	$(SSLOBJS)
+	$(CC) $(LDFLAGS) $(SSLLDFLAGS) -o wnssld $(SSLOBJS) \
+	$(LIBS) $(EXTRALIBS)
+
+wnsslsd: $(SSLSDOBJS)
+	$(CC) $(LDFLAGS) $(SSLLDFLAGS) -o wnsslsd $(SSLSDOBJS) \
+	$(LIBS) $(EXTRALIBS)
+
+install: wnd wnsd
+	@-if test ! -d $(BINDIR) ; then \
+		echo "Creating $(BINDIR)" ; \
+		mkdir $(BINDIR) ; \
+	fi
+	@echo "Installing wnd and wnsd in $(BINDIR)"
+	@cp wnd $(BINDIR)
+	@strip $(BINDIR)/wnd
+	@cp wnsd $(BINDIR)
+	@strip $(BINDIR)/wnsd
+
+install_wnssl: wnssld wnsslsd
+	@-if test ! -d $(BINDIR) ; then \
+		echo "Creating $(BINDIR)" ; \
+		mkdir $(BINDIR) ; \
+	fi
+	@echo "Installing wnssld and wnsslsd in $(BINDIR)"
+	@cp wnssld $(BINDIR)
+	@cp wnsslsd $(BINDIR)
+
+clean:
+	@rm -f *.o *~ junk* wnd wnsd wnssld wnsslsd
+
+wn.o:		wn.c version.h $(HEADERS)
+swn.o:		swn.c wn.c version.h $(HEADERS)
+wn_ssl.o:	wn.c version.h $(HEADERS) $(SSLHEADERS)
+	$(CC) $(CFLAGS) $(SSLFLAGS) $(SSLINCLUDES) wn.c  -c -o wn_ssl.o
+swn_ssl.o:	swn.c wn.c version.h  $(HEADERS) $(SSLHEADERS)
+	$(CC) $(CFLAGS) $(SSLFLAGS) $(SSLINCLUDES) swn.c  -c -o swn_ssl.o
+prequest.o:	prequest.c $(HEADERS)
+init.o:		init.c version.h $(HEADERS) content.h
+init_ssl.o:	init.c version.h content.h $(HEADERS) $(SSLHEADERS) 
+	$(CC) $(CFLAGS) $(SSLFLAGS) $(SSLINCLUDES) init.c  -c -o init_ssl.o
+swninit.o:	init.c version.h $(HEADERS) content.h
+swninit_ssl.o:	init.c version.h content.h $(HEADERS) $(SSLHEADERS) 
+	$(CC) $(CFLAGS) $(SSLFLAGS) $(SSLINCLUDES) swninit.c  -c -o swninit_ssl.o
+util.o:		util.c $(HEADERS)
+acc.o:		acc.c $(HEADERS)
+chkcntrl.o:	chkcntrl.c $(HEADERS) chkcntrl.h access.h 
+csearch.o:	csearch.c $(HEADERS) search.h 
+gsearch.o:	gsearch.c $(HEADERS) search.h  parse.h
+isearch.o:	isearch.c $(HEADERS) search.h 
+misc.o:		misc.c $(HEADERS)
+www.o:		www.c $(HEADERS)
+send.o:		send.c version.h $(HEADERS) 
+send_ssl.o:	send.c version.h $(HEADERS) $(SSLHEADERS) 
+	$(CC) $(CFLAGS) $(SSLFLAGS) $(SSLINCLUDES) send.c  -c -o send_ssl.o
+ssl_data.o:	ssl_data.c $(HEADERS) $(SSLHEADERS) 
+	$(CC) $(CFLAGS) $(SSLFLAGS) $(SSLINCLUDES) ssl_data.c  -c -o ssl_data.o
+parse.o:	parse.c $(HEADERS)  parse.h
+evalif.o:	evalif.c $(HEADERS) parse.h access.h 
+cgi.o:		cgi.c $(HEADERS) version.h cgi.h 
+mod.o:		mod.c $(HEADERS)
+standalone.o:	standalone.c $(HEADERS)
+tilde.o:	tilde.c $(HEADERS)
+rfc931.o:	rfc931.c $(HEADERS)
+chkauth.o:	chkauth.c $(HEADERS) auth.h
+image.o:	image.c $(HEADERS) image.h 
+vhost.o:	vhost.c $(HEADERS) vhost.h
+regcomp.o:	reg.h regi.h
+regfind.o:	reg.h regi.h
+
+
